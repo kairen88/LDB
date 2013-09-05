@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+
+<AnchorPane fx:id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1100.0" prefWidth="1830.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.live.Debugger.Controller">
+  <children>
+    <Pane fx:id="naviBarSection" layoutX="10.0" layoutY="15.0" prefHeight="200.0" prefWidth="1830.0" style="-fx-background-color:#ACD9FC;">
+      <children>
+        <Group />
+      </children>
+    </Pane>
+    <Pane fx:id="codeWindowSection" layoutX="15.0" layoutY="253.0" prefHeight="800.0" prefWidth="1600.0" style="-fx-background-color:#CCCCCC;" />
+    <Button fx:id="PrevBtn" layoutX="18.0" layoutY="219.0" mnemonicParsing="false" text="Prev" />
+    <Button fx:id="NextBtn" layoutX="76.0" layoutY="219.0" mnemonicParsing="false" text="Next" />
+    <Pane fx:id="VariablePane" layoutX="1615.0" layoutY="253.0" prefHeight="800.0" prefWidth="230.0" style="-fx-background-color:#F7F7F7;" />
+  </children>
+</AnchorPane>

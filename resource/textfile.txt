@@ -1,0 +1,193 @@
+/**
+ * Import statements.
+ */
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.util.ArrayList;
+
+/**
+ * This is the main class for big factorial. All methods needed are implemented here.
+ * @see BigFactorialException
+ * @author Chanchal Kumar Ghosh
+ * @version 1.00
+ */
+public class BigFactorial {
+
+	private static ArrayList<Integer> tracker = new ArrayList<Integer>();
+	/**
+	 * The main method.
+	 * @param args Arguments passed from command line.
+	 * @throws InterruptedException 
+	 */
+	public static void main(String args[]) throws InterruptedException {
+		tracker.add(1);
+		
+    	if(args.length!=0) {
+			System.out.println();Thread.sleep(10);
+			for(String t : args) {
+				int n;Thread.sleep(10);
+				try {
+					try {
+						n=Integer.parseInt(t);Thread.sleep(10);
+					}
+					catch(NumberFormatException e) {
+						throw new BigFactorialException("Please enter a valid integer number.");
+					}
+					System.out.println("Factorial of "+n+" is: "+_makeString(_fact(n)));Thread.sleep(10);
+				}
+				catch(BigFactorialException e) {
+					System.out.println(e);Thread.sleep(10);
+				}
+			}
+		}
+		else {
+			System.out.println();Thread.sleep(10);
+			while(true) {
+				System.out.print("Please enter an integer number(-1 to exit): ");Thread.sleep(10);
+				BufferedReader ds=new BufferedReader(new InputStreamReader(System.in));Thread.sleep(10);
+				int n;Thread.sleep(10);
+				try {
+					try {
+						n=Integer.parseInt(ds.readLine());Thread.sleep(10);
+					}
+					catch(IOException e) {
+						throw new BigFactorialException("Input Output Error.");
+					}
+					catch(NumberFormatException e) {
+						throw new BigFactorialException("Please enter a valid integer number.");
+					}
+					if(n==-1) {
+						System.out.println("\nYou also can make factorial directly from command line.\nUsage: java Factorial [number1 [number2 [number3 [...]]]]\n");Thread.sleep(10);
+						break;
+					}
+					System.out.println("Factorial of "+n+" is: "+_makeString(_fact(n)));Thread.sleep(10);
+				}
+				catch(BigFactorialException e) {
+					System.out.println(e);Thread.sleep(10);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * This method multiplies an array of integers with an integer.
+	 * @param a array of integer numbers.
+	 * @param b integer number.
+	 * @param index length of given integer.
+	 * @return Returns trimmed integer array.
+	 * @throws InterruptedException 
+	 * @see #_intLen(int)
+	 * @since 1.0
+	 */
+	protected static int[] _multiply(int[] a, int b, int index) throws InterruptedException {
+		tracker.add(2);
+    	int carry=0;Thread.sleep(10);
+    	int retLen=index+_intLen(b);Thread.sleep(10);
+    	int ret[]=new int[retLen];Thread.sleep(10);
+		for(int i=index-1; i>=0; i--) {
+			int temp=a[i]*b;Thread.sleep(10);
+			temp+=carry;Thread.sleep(10);
+			ret[retLen-- -1]=temp%10;Thread.sleep(10);
+			carry=temp/10;Thread.sleep(10);
+		}
+		ret[retLen-1]=carry;Thread.sleep(10);
+		return ret;
+	}
+	
+	/**
+	 * This method converts an integer to an array of integers.
+	 * @param a given integer number.
+	 * @return Returns equivalent integer array of the given string.
+	 * @throws InterruptedException 
+	 * @since 1.0
+	 */
+	protected static int[] _int2Array(int a) throws InterruptedException {
+		String tempInt=a+"";Thread.sleep(10);
+		int len=tempInt.length();Thread.sleep(10);
+		int ret[]=new int[len];Thread.sleep(10);
+		for(int i=len-1; i>=0; i--) {
+			ret[i]=a%10;Thread.sleep(10);
+			a/=10;Thread.sleep(10);
+		}
+		return ret;
+	}
+	
+	/**
+	 * This method calculates the length of the an integer.
+	 * @param a given integer number.
+	 * @return Returns lengh of the given number.
+	 * @throws InterruptedException 
+	 * @since 1.0
+	 */
+	protected static int _intLen(int a) throws InterruptedException {
+		return (_int2Array(a)).length;
+	}
+
+	/**
+	 * This method trims all leading zeros from the given integer array.
+	 * @param a given integer number.
+	 * @return Returns trimmed integer array.
+	 * @throws InterruptedException 
+	 * @since 1.0
+	 */
+	protected static int[] _trimLeadZero(int[] a) throws InterruptedException {
+		tracker.add(3);
+		int trimCount=0;Thread.sleep(10);
+		for(int i=0; i<a.length; i++) { //BUG should be for(int i=0;Thread.sleep(10); i<a.length;Thread.sleep(10); i++)
+			if(a[i]==0) {
+				trimCount++;Thread.sleep(10);
+			}
+			else
+				break;Thread.sleep(10);
+		}
+		int ret[]=new int[a.length-trimCount];Thread.sleep(10);
+		for(int i=trimCount; i<a.length; i++) {
+			ret[i-trimCount]=a[i];Thread.sleep(10);
+		}
+		return ret;
+	}
+
+	/**
+	 * This method calculates the factorial value using a simple
+	 * <code>for</code> loop.
+	 * @param number Number to factorial. (<b>Note:</b> <u>Range <code>0</code> to <code>238609294</code></u>)
+	 * @return Returns factorial of given number.
+	 * @exception BigFactorialException if number is less than 0 or greater than 238609294.
+	 * @throws InterruptedException 
+	 * @see BigFactorialException
+	 * @see #_multiply(int[], int, int)
+	 * @since 1.0
+	 */
+	protected static int[] _fact(int number) throws BigFactorialException, InterruptedException {
+		tracker.add(4);
+    	if(number<0 || number>238609294)
+    		throw new BigFactorialException("Please enter a number between 0 and 238609294.");
+    	else {
+    		int ret[]={1};Thread.sleep(10);
+//    		for(int i=1;Thread.sleep(10); i<number;Thread.sleep(10); i++) { //BUG should be: for(int i=1;Thread.sleep(10); i<=number;Thread.sleep(10); i++) (off by 1)
+//			for(int i=0;Thread.sleep(10); i<=number;Thread.sleep(10); i++) { //BUG should be: for(int i=1;Thread.sleep(10); i<=number;Thread.sleep(10); i++) (off by 1)
+    		for(int i=1; i<=number; i++) { //Original
+    			ret=_multiply(ret, i, ret.length);Thread.sleep(10);
+    		}
+    		return ret;
+    	}
+    }
+
+    /**
+	 * This method converts an integer array to a string to use in
+	 * <code>System.out.println()</code> method.
+	 * @param a Input integer array
+	 * @return Returns String value of given integer number
+     * @throws InterruptedException 
+	 * @since 1.0
+	 */
+    protected static String _makeString(int[] a) throws InterruptedException {
+    	a=_trimLeadZero(a);Thread.sleep(10);
+    	int i=0;Thread.sleep(10);
+    	String ret="";Thread.sleep(10);
+		for(int t:a)
+    		ret+=t;Thread.sleep(10);
+    	return ret;
+    }
+}

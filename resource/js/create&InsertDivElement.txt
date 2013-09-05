@@ -1,0 +1,1 @@
+var newdiv = document.createElement('div');var divIdName = 'div1';newdiv.setAttribute('id',divIdName);newdiv.style.width = "100px";newdiv.style.height = "100px";newdiv.style.position = "absolute";newdiv.style.background = "#FF0000";newdiv.innerHTML = 'this is 1st DIV';document.body.appendChild(newdiv);

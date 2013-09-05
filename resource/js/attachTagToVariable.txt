@@ -1,0 +1,25 @@
+//tttttttttttttttt
+function addTag(position, varIdx)
+{
+	var newdiv = document.createElement('div');
+	var divIdName = 'div' + varIdx;
+	newdiv.setAttribute('id',divIdName);
+	newdiv.style.width = "10px";
+	newdiv.style.height = "10px";
+	newdiv.style.position = "absolute";
+	newdiv.style.background = "#FFA500";
+	newdiv.innerHTML = '5';
+	
+	document.body.appendChild(newdiv);
+	
+	return newdiv;
+}
+
+var varIdx = 1; 
+
+$('.cm-variable').each(function(){
+	var position = $(this).position();
+	var tag = addTag(position, varIdx);
+	$(this).append(tag);
+	$('#div'+ varIdx).offset({ top: position.top + 5, left: position.left + 35});varIdx += 1;
+});

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+
+<AnchorPane fx:id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0000999999975" prefWidth="1030.000199999995" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.live.Debugger.Controller">
+  <children>
+    <Label fx:id="label" layoutX="715.0" layoutY="14.0" prefHeight="34.0" prefWidth="141.0" text="Label" />
+    <Pane fx:id="codeWindowSection" layoutX="14.0" layoutY="14.0" prefHeight="485.0" prefWidth="680.0" style="-fx-background-color:#F9FCAC;">
+      <children>
+        <Pane fx:id="naviBarSection" layoutY="518.0" prefHeight="156.0" prefWidth="680.0" style="-fx-background-color:#ACD9FC;" />
+        <Button fx:id="PrevBtn" layoutY="491.0" mnemonicParsing="false" text="Prev" />
+        <Button fx:id="NextBtn" layoutX="53.0" layoutY="491.0" mnemonicParsing="false" text="Next" />
+        <Button fx:id="button" layoutX="109.0" layoutY="491.0" mnemonicParsing="false" onAction="#clicked" text="Toggle" />
+        <Button fx:id="varTagSwitch" layoutX="191.0" layoutY="491.0" mnemonicParsing="false" text="Tag Switch" />
+        <Button layoutX="295.0" layoutY="492.0" mnemonicParsing="false" text="Test" />
+        <TitledPane animated="false" layoutX="74.0" layoutY="36.0" text="Method 1">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+          </content>
+        </TitledPane>
+      </children>
+    </Pane>
+  </children>
+</AnchorPane>

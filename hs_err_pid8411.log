@@ -1,0 +1,996 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x68696e4f, pid=8411, tid=1775123264
+#
+# JRE version: 7.0_21-b11
+# Java VM: Java HotSpot(TM) Server VM (23.21-b01 mixed mode linux-x86 )
+# Problematic frame:
+# C  [libjfxwebkit.so+0x922e4f]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x13579f
+#
+# Failed to write core dump. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+# If you would like to submit a bug report, please visit:
+#   http://bugreport.sun.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x6ae52c00):  JavaThread "JavaFX Application Thread" [_thread_in_native, id=8446, stack(0x69c93000,0x69ce4000)]
+
+siginfo:si_signo=SIGSEGV: si_errno=0, si_code=1 (SEGV_MAPERR), si_addr=0x00000000
+
+Registers:
+EAX=0x00000000, EBX=0x693f2ff4, ECX=0x00000000, EDX=0x00000002
+ESP=0x69ce1330, EBP=0x69ce13b8, ESI=0x694c9d30, EDI=0x69494db8
+EIP=0x68696e4f, EFLAGS=0x00010246, CR2=0x00000000
+
+Top of Stack: (sp=0x69ce1330)
+0x69ce1330:   694c9d30 a3167254 00000000 693f2ff4
+0x69ce1340:   0000008d 694853bc 69ce13b8 68d3a297
+0x69ce1350:   69ce1398 690149c2 71c94800 69ce169c
+0x69ce1360:   00000000 69ce181c 71b00010 69ce174c
+0x69ce1370:   00000027 00000000 007d008d a2fe80cc
+0x69ce1380:   00000fff 69485188 69ce13d4 693f2ff4
+0x69ce1390:   a3167168 69ce1448 a31594c0 68d35edd
+0x69ce13a0:   00000000 722a1c00 722a1c00 693f2ff4 
+
+Instructions: (pc=0x68696e4f)
+0x68696e2f:   04 eb ad 8d b6 00 00 00 00 83 c2 14 89 54 24 04
+0x68696e3f:   c7 44 24 08 00 00 00 00 89 34 24 e8 c1 97 e1 ff
+0x68696e4f:   8b 10 c7 44 24 04 20 00 00 00 89 04 24 ff 52 08
+0x68696e5f:   89 46 30 e9 b9 fe ff ff 90 89 34 24 e8 c0 97 6a 
+
+Register to memory mapping:
+
+EAX=0x00000000 is an unknown value
+EBX=0x693f2ff4: <offset 0x167eff4> in /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjfxwebkit.so at 0x67d74000
+ECX=0x00000000 is an unknown value
+EDX=0x00000002 is an unknown value
+ESP=0x69ce1330 is pointing into the stack for thread: 0x6ae52c00
+EBP=0x69ce13b8 is pointing into the stack for thread: 0x6ae52c00
+ESI=0x694c9d30 is an unknown value
+EDI=0x69494db8 is an unknown value
+
+
+Stack: [0x69c93000,0x69ce4000],  sp=0x69ce1330,  free space=312k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [libjfxwebkit.so+0x922e4f]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x13579f
+C  [libjfxwebkit.so+0x923acd]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x13641d
+C  [libjfxwebkit.so+0x922f79]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x1358c9
+C  [libjfxwebkit.so+0x871b3b]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x8448b
+C  [libjfxwebkit.so+0x8795a3]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x8bef3
+C  [libjfxwebkit.so+0x879c3f]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x8c58f
+C  [libjfxwebkit.so+0x87e61d]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x90f6d
+C  [libjfxwebkit.so+0x85543a]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x67d8a
+C  [libjfxwebkit.so+0x8395e8]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x4bf38
+C  [libjfxwebkit.so+0x86919b]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x7baeb
+C  [libjfxwebkit.so+0x86a3ba]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x7cd0a
+C  [libjfxwebkit.so+0x86c3f4]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x7ed44
+C  [libjfxwebkit.so+0x86cc90]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x7f5e0
+C  [libjfxwebkit.so+0x8558a9]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x681f9
+C  [libjfxwebkit.so+0x8395e8]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x4bf38
+C  [libjfxwebkit.so+0x854da0]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x676f0
+C  [libjfxwebkit.so+0x8552a4]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x67bf4
+C  [libjfxwebkit.so+0x855e0a]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x6875a
+C  [libjfxwebkit.so+0x8395e8]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x4bf38
+C  [libjfxwebkit.so+0x854da0]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x676f0
+C  [libjfxwebkit.so+0x8552a4]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x67bf4
+C  [libjfxwebkit.so+0x855e0a]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x6875a
+C  [libjfxwebkit.so+0x8395e8]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x4bf38
+C  [libjfxwebkit.so+0x854da0]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x676f0
+C  [libjfxwebkit.so+0x8552a4]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x67bf4
+C  [libjfxwebkit.so+0x855e0a]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x6875a
+C  [libjfxwebkit.so+0x8395e8]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x4bf38
+C  [libjfxwebkit.so+0x937eca]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x14a81a
+C  [libjfxwebkit.so+0x6fe9dc]  Java_com_sun_webpane_webkit_dom_EventListenerImpl_twkCreatePeer+0x586b1c
+C  [libjfxwebkit.so+0x6ff7b5]  Java_com_sun_webpane_webkit_dom_EventListenerImpl_twkCreatePeer+0x5878f5
+C  [libjfxwebkit.so+0x700161]  Java_com_sun_webpane_webkit_dom_EventListenerImpl_twkCreatePeer+0x5882a1
+C  [libjfxwebkit.so+0x80bcd9]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x1e629
+C  [libjfxwebkit.so+0x80bd41]  Java_com_sun_webpane_webkit_network_URLLoader_twkWillSendRequest+0x1e691
+C  [libjfxwebkit.so+0x7b3578]  Java_com_sun_webpane_webkit_Timer_twkFireTimerEvent+0x18
+j  com.sun.webpane.webkit.Timer.twkFireTimerEvent()V+0
+j  com.sun.webpane.webkit.Timer.fireTimerEvent(J)V+45
+j  com.sun.webpane.webkit.Timer.notifyTick()V+25
+j  javafx.scene.web.WebEngine$PulseTimer$2.pulse()V+3
+j  com.sun.javafx.tk.Toolkit.firePulse()V+129
+j  com.sun.javafx.tk.quantum.QuantumToolkit.pulse()V+100
+j  com.sun.javafx.tk.quantum.QuantumToolkit$9.run()V+4
+j  com.sun.glass.ui.InvokeLaterDispatcher$Future.run()V+4
+v  ~StubRoutines::call_stub
+V  [libjvm.so+0x412f65]  JavaCalls::call_helper(JavaValue*, methodHandle*, JavaCallArguments*, Thread*)+0x315
+V  [libjvm.so+0x5d9f79]  os::os_exception_wrapper(void (*)(JavaValue*, methodHandle*, JavaCallArguments*, Thread*), JavaValue*, methodHandle*, JavaCallArguments*, Thread*)+0x19
+V  [libjvm.so+0x411d7f]  JavaCalls::call(JavaValue*, methodHandle, JavaCallArguments*, Thread*)+0x2f
+V  [libjvm.so+0x425d55]  jni_invoke_nonstatic(JNIEnv_*, JavaValue*, _jobject*, JNICallType, _jmethodID*, JNI_ArgumentPusher*, Thread*)+0x295
+V  [libjvm.so+0x43ff2c]  jni_CallVoidMethodV+0xcc
+C  [libglass.so+0xe4a9]  JNIEnv_::CallVoidMethod(_jobject*, _jmethodID*, ...)+0x29
+C  [libglass.so+0xd587]  call_runnable(void*)+0x47
+
+Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+j  com.sun.webpane.webkit.Timer.twkFireTimerEvent()V+0
+j  com.sun.webpane.webkit.Timer.fireTimerEvent(J)V+45
+j  com.sun.webpane.webkit.Timer.notifyTick()V+25
+j  javafx.scene.web.WebEngine$PulseTimer$2.pulse()V+3
+j  com.sun.javafx.tk.Toolkit.firePulse()V+129
+j  com.sun.javafx.tk.quantum.QuantumToolkit.pulse()V+100
+j  com.sun.javafx.tk.quantum.QuantumToolkit$9.run()V+4
+j  com.sun.glass.ui.InvokeLaterDispatcher$Future.run()V+4
+v  ~StubRoutines::call_stub
+j  com.sun.glass.ui.gtk.GtkApplication._runLoop([Ljava/lang/String;Lcom/sun/glass/ui/Launchable;Z)V+0
+j  com.sun.glass.ui.gtk.GtkApplication$3$1.run()V+38
+j  java.lang.Thread.run()V+11
+v  ~StubRoutines::call_stub
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x6948b400 JavaThread "Disposer" daemon [_thread_blocked, id=8459, stack(0x696af000,0x69700000)]
+  0x09416000 JavaThread "pool-2-thread-1" [_thread_blocked, id=8456, stack(0x6956b000,0x695bc000)]
+  0x697ee400 JavaThread "SRPCChannel thread" [_thread_in_native, id=8454, stack(0x695bc000,0x6960d000)]
+  0x697db000 JavaThread "MaxUpdaterThread" daemon [_thread_blocked, id=8452, stack(0x6960d000,0x6965e000)]
+  0x699cd400 JavaThread "JobScheduler" [_thread_blocked, id=8449, stack(0x6980d000,0x6985e000)]
+  0x699b8c00 JavaThread "AWT-XAWT" daemon [_thread_in_native, id=8448, stack(0x6985e000,0x698af000)]
+  0x699a2c00 JavaThread "Java2D Disposer" daemon [_thread_blocked, id=8447, stack(0x698af000,0x69900000)]
+=>0x6ae52c00 JavaThread "JavaFX Application Thread" [_thread_in_native, id=8446, stack(0x69c93000,0x69ce4000)]
+  0x6ae4fc00 JavaThread "Thread-2" daemon [_thread_blocked, id=8445, stack(0x69ce4000,0x69d35000)]
+  0x6e2d2c00 JavaThread "Disposer" daemon [_thread_blocked, id=8441, stack(0x6c104000,0x6c155000)]
+  0x6e2cf000 JavaThread "QuantumRenderer-0" daemon [_thread_blocked, id=8440, stack(0x6e187000,0x6e1d8000)]
+  0x6e888c00 JavaThread "JavaFX-Launcher" [_thread_blocked, id=8438, stack(0x6e920000,0x6e971000)]
+  0x71c8cc00 JavaThread "Service Thread" daemon [_thread_blocked, id=8435, stack(0x6ea81000,0x6ead2000)]
+  0x71c82400 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=8434, stack(0x6ead2000,0x6eb53000)]
+  0x71c80400 JavaThread "C2 CompilerThread0" daemon [_thread_blocked, id=8433, stack(0x6eb53000,0x6ebd4000)]
+  0x08fe2c00 JavaThread "JDWP Command Reader" daemon [_thread_in_native, id=8430, stack(0x6ebd4000,0x6ec25000)]
+  0x71c7e800 JavaThread "JDWP Event Helper Thread" daemon [_thread_blocked, id=8429, stack(0x6ec25000,0x6ec76000)]
+  0x71c7c000 JavaThread "JDWP Transport Listener: dt_socket" daemon [_thread_blocked, id=8426, stack(0x6ec76000,0x6ecc7000)]
+  0x71c72000 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=8424, stack(0x6ecc7000,0x6ed18000)]
+  0x71c38000 JavaThread "Finalizer" daemon [_thread_blocked, id=8422, stack(0x6ed18000,0x6ed69000)]
+  0x71c36400 JavaThread "Reference Handler" daemon [_thread_blocked, id=8421, stack(0x6ed69000,0x6edba000)]
+  0xb680b000 JavaThread "main" [_thread_blocked, id=8417, stack(0xb6933000,0xb6984000)]
+
+Other Threads:
+  0x71c30800 VMThread [stack: 0x6edba000,0x6ee3b000] [id=8420]
+  0x71c8e800 WatcherThread [stack: 0x6ea00000,0x6ea81000] [id=8436]
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap
+ PSYoungGen      total 48448K, used 27671K [0x9eea0000, 0xa2120000, 0xb34a0000)
+  eden space 45184K, 60% used [0x9eea0000,0xa09228f0,0xa1ac0000)
+  from space 3264K, 16% used [0xa1ac0000,0xa1b43380,0xa1df0000)
+  to   space 3072K, 0% used [0xa1e20000,0xa1e20000,0xa2120000)
+ ParOldGen       total 41728K, used 6125K [0x762a0000, 0x78b60000, 0x9eea0000)
+  object space 41728K, 14% used [0x762a0000,0x7689b540,0x78b60000)
+ PSPermGen       total 16384K, used 14403K [0x722a0000, 0x732a0000, 0x762a0000)
+  object space 16384K, 87% used [0x722a0000,0x730b0df0,0x732a0000)
+
+Card table byte_map: [0x72096000,0x722a0000] byte_map_base: 0x71d04b00
+
+Polling page: 0xb77cd000
+
+Code Cache  [0xb3562000, 0xb37a2000, 0xb6562000)
+ total_blobs=441 nmethods=136 adapters=265 free_code_cache=48411Kb largest_free_block=49530240
+
+Compilation events (10 events):
+Event: 13.863 Thread 0x71c82400  129   !         java.io.BufferedReader::readLine (304 bytes)
+Event: 13.889 Thread 0x71c80400  130             java.lang.String::indexOf (7 bytes)
+Event: 13.890 Thread 0x71c80400 nmethod 130 0xb3610d48 code [0xb3610e60, 0xb3610fbc]
+Event: 13.890 Thread 0x71c82400 nmethod 129 0xb3619f08 code [0xb361a140, 0xb361b4e4]
+Event: 14.562 Thread 0x71c82400  131             java.util.regex.Pattern$BnM::match (161 bytes)
+Event: 14.571 Thread 0x71c80400  132             java.lang.AbstractStringBuilder::append (144 bytes)
+Event: 14.580 Thread 0x71c82400 nmethod 131 0xb3623b48 code [0xb3623ca0, 0xb36246fc]
+Event: 14.583 Thread 0x71c80400 nmethod 132 0xb3624d48 code [0xb3624ea0, 0xb362559c]
+Event: 14.979 Thread 0x71c82400  133             java.util.HashMap::put (124 bytes)
+Event: 14.991 Thread 0x71c82400 nmethod 133 0xb35b9588 code [0xb35b9760, 0xb35ba118]
+
+GC Heap History (10 events):
+Event: 14.476 GC heap before
+{Heap before GC invocations=39 (full 0):
+ PSYoungGen      total 48256K, used 45576K [0x9eea0000, 0xa2120000, 0xb34a0000)
+  eden space 45184K, 99% used [0x9eea0000,0xa1aa86c8,0xa1ac0000)
+  from space 3072K, 15% used [0xa1e20000,0xa1e99aa0,0xa2120000)
+  to   space 3264K, 0% used [0xa1ac0000,0xa1ac0000,0xa1df0000)
+ ParOldGen       total 41728K, used 6125K [0x762a0000, 0x78b60000, 0x9eea0000)
+  object space 41728K, 14% used [0x762a0000,0x7689b540,0x78b60000)
+ PSPermGen       total 16384K, used 14030K [0x722a0000, 0x732a0000, 0x762a0000)
+  object space 16384K, 85% used [0x722a0000,0x73053910,0x732a0000)
+Event: 14.477 GC heap after
+Heap after GC invocations=39 (full 0):
+ PSYoungGen      total 48448K, used 494K [0x9eea0000, 0xa2120000, 0xb34a0000)
+  eden space 45184K, 0% used [0x9eea0000,0x9eea0000,0xa1ac0000)
+  from space 3264K, 15% used [0xa1ac0000,0xa1b3b850,0xa1df0000)
+  to   space 3072K, 0% used [0xa1e20000,0xa1e20000,0xa2120000)
+ ParOldGen       total 41728K, used 6125K [0x762a0000, 0x78b60000, 0x9eea0000)
+  object space 41728K, 14% used [0x762a0000,0x7689b540,0x78b60000)
+ PSPermGen       total 16384K, used 14030K [0x722a0000, 0x732a0000, 0x762a0000)
+  object space 16384K, 85% used [0x722a0000,0x73053910,0x732a0000)
+}
+Event: 14.496 GC heap before
+{Heap before GC invocations=40 (full 0):
+ PSYoungGen      total 48448K, used 45557K [0x9eea0000, 0xa2120000, 0xb34a0000)
+  eden space 45184K, 99% used [0x9eea0000,0xa1aa1bb8,0xa1ac0000)
+  from space 3264K, 15% used [0xa1ac0000,0xa1b3b850,0xa1df0000)
+  to   space 3072K, 0% used [0xa1e20000,0xa1e20000,0xa2120000)
+ ParOldGen       total 41728K, used 6125K [0x762a0000, 0x78b60000, 0x9eea0000)
+  object space 41728K, 14% used [0x762a0000,0x7689b540,0x78b60000)
+ PSPermGen       total 16384K, used 14030K [0x722a0000, 0x732a0000, 0x762a0000)
+  object space 16384K, 85% used [0x722a0000,0x73053910,0x732a0000)
+Event: 14.497 GC heap after
+Heap after GC invocations=40 (full 0):
+ PSYoungGen      total 48256K, used 258K [0x9eea0000, 0xa2120000, 0xb34a0000)
+  eden space 45184K, 0% used [0x9eea0000,0x9eea0000,0xa1ac0000)
+  from space 3072K, 8% used [0xa1e20000,0xa1e60b88,0xa2120000)
+  to   space 3264K, 0% used [0xa1ac0000,0xa1ac0000,0xa1df0000)
+ ParOldGen       total 41728K, used 6125K [0x762a0000, 0x78b60000, 0x9eea0000)
+  object space 41728K, 14% used [0x762a0000,0x7689b540,0x78b60000)
+ PSPermGen       total 16384K, used 14030K [0x722a0000, 0x732a0000, 0x762a0000)
+  object space 16384K, 85% used [0x722a0000,0x73053910,0x732a0000)
+}
+Event: 14.515 GC heap before
+{Heap before GC invocations=41 (full 0):
+ PSYoungGen      total 48256K, used 45130K [0x9eea0000, 0xa2120000, 0xb34a0000)
+  eden space 45184K, 99% used [0x9eea0000,0xa1a71e50,0xa1ac0000)
+  from space 3072K, 8% used [0xa1e20000,0xa1e60b88,0xa2120000)
+  to   space 3264K, 0% used [0xa1ac0000,0xa1ac0000,0xa1df0000)
+ ParOldGen       total 41728K, used 6125K [0x762a0000, 0x78b60000, 0x9eea0000)
+  object space 41728K, 14% used [0x762a0000,0x7689b540,0x78b60000)
+ PSPermGen       total 16384K, used 14030K [0x722a0000, 0x732a0000, 0x762a0000)
+  object space 16384K, 85% used [0x722a0000,0x73053910,0x732a0000)
+Event: 14.516 GC heap after
+Heap after GC invocations=41 (full 0):
+ PSYoungGen      total 48448K, used 510K [0x9eea0000, 0xa2120000, 0xb34a0000)
+  eden space 45184K, 0% used [0x9eea0000,0x9eea0000,0xa1ac0000)
+  from space 3264K, 15% used [0xa1ac0000,0xa1b3fa80,0xa1df0000)
+  to   space 3072K, 0% used [0xa1e20000,0xa1e20000,0xa2120000)
+ ParOldGen       total 41728K, used 6125K [0x762a0000, 0x78b60000, 0x9eea0000)
+  object space 41728K, 14% used [0x762a0000,0x7689b540,0x78b60000)
+ PSPermGen       total 16384K, used 14030K [0x722a0000, 0x732a0000, 0x762a0000)
+  object space 16384K, 85% used [0x722a0000,0x73053910,0x732a0000)
+}
+Event: 14.535 GC heap before
+{Heap before GC invocations=42 (full 0):
+ PSYoungGen      total 48448K, used 45585K [0x9eea0000, 0xa2120000, 0xb34a0000)
+  eden space 45184K, 99% used [0x9eea0000,0xa1aa4cd8,0xa1ac0000)
+  from space 3264K, 15% used [0xa1ac0000,0xa1b3fa80,0xa1df0000)
+  to   space 3072K, 0% used [0xa1e20000,0xa1e20000,0xa2120000)
+ ParOldGen       total 41728K, used 6125K [0x762a0000, 0x78b60000, 0x9eea0000)
+  object space 41728K, 14% used [0x762a0000,0x7689b540,0x78b60000)
+ PSPermGen       total 16384K, used 14030K [0x722a0000, 0x732a0000, 0x762a0000)
+  object space 16384K, 85% used [0x722a0000,0x73053910,0x732a0000)
+Event: 14.535 GC heap after
+Heap after GC invocations=42 (full 0):
+ PSYoungGen      total 48256K, used 266K [0x9eea0000, 0xa2120000, 0xb34a0000)
+  eden space 45184K, 0% used [0x9eea0000,0x9eea0000,0xa1ac0000)
+  from space 3072K, 8% used [0xa1e20000,0xa1e62ab8,0xa2120000)
+  to   space 3264K, 0% used [0xa1ac0000,0xa1ac0000,0xa1df0000)
+ ParOldGen       total 41728K, used 6125K [0x762a0000, 0x78b60000, 0x9eea0000)
+  object space 41728K, 14% used [0x762a0000,0x7689b540,0x78b60000)
+ PSPermGen       total 16384K, used 14030K [0x722a0000, 0x732a0000, 0x762a0000)
+  object space 16384K, 85% used [0x722a0000,0x73053910,0x732a0000)
+}
+Event: 14.554 GC heap before
+{Heap before GC invocations=43 (full 0):
+ PSYoungGen      total 48256K, used 44946K [0x9eea0000, 0xa2120000, 0xb34a0000)
+  eden space 45184K, 98% used [0x9eea0000,0xa1a41e38,0xa1ac0000)
+  from space 3072K, 8% used [0xa1e20000,0xa1e62ab8,0xa2120000)
+  to   space 3264K, 0% used [0xa1ac0000,0xa1ac0000,0xa1df0000)
+ ParOldGen       total 41728K, used 6125K [0x762a0000, 0x78b60000, 0x9eea0000)
+  object space 41728K, 14% used [0x762a0000,0x7689b540,0x78b60000)
+ PSPermGen       total 16384K, used 14030K [0x722a0000, 0x732a0000, 0x762a0000)
+  object space 16384K, 85% used [0x722a0000,0x73053910,0x732a0000)
+Event: 14.554 GC heap after
+Heap after GC invocations=43 (full 0):
+ PSYoungGen      total 48448K, used 524K [0x9eea0000, 0xa2120000, 0xb34a0000)
+  eden space 45184K, 0% used [0x9eea0000,0x9eea0000,0xa1ac0000)
+  from space 3264K, 16% used [0xa1ac0000,0xa1b43380,0xa1df0000)
+  to   space 3072K, 0% used [0xa1e20000,0xa1e20000,0xa2120000)
+ ParOldGen       total 41728K, used 6125K [0x762a0000, 0x78b60000, 0x9eea0000)
+  object space 41728K, 14% used [0x762a0000,0x7689b540,0x78b60000)
+ PSPermGen       total 16384K, used 14030K [0x722a0000, 0x732a0000, 0x762a0000)
+  object space 16384K, 85% used [0x722a0000,0x73053910,0x732a0000)
+}
+
+Deoptimization events (10 events):
+Event: 12.493 Thread 0x697ee400 Uncommon trap -34 fr.pc 0xb35bb830
+Event: 13.114 Thread 0x6ae52c00 Uncommon trap -34 fr.pc 0xb35db048
+Event: 13.114 Thread 0x6ae52c00 Uncommon trap -34 fr.pc 0xb35db048
+Event: 13.793 Thread 0x6ae52c00 Uncommon trap -83 fr.pc 0xb360eaa8
+Event: 13.816 Thread 0x6ae52c00 Uncommon trap -34 fr.pc 0xb36145a0
+Event: 14.564 Thread 0x6ae52c00 Uncommon trap -34 fr.pc 0xb36145a0
+Event: 14.569 Thread 0x6ae52c00 Uncommon trap -34 fr.pc 0xb36145a0
+Event: 14.571 Thread 0x6ae52c00 Uncommon trap -34 fr.pc 0xb36145a0
+Event: 14.580 Thread 0x6ae52c00 Uncommon trap -34 fr.pc 0xb3614f18
+Event: 15.094 Thread 0x6ae52c00 Uncommon trap 51 fr.pc 0xb35d0fb8
+
+Internal exceptions (10 events):
+Event: 14.914 Thread 0x6ae52c00 Threw 0xa08629b0 at /HUDSON/workspace/jdk7u21-2-build-linux-i586-product/jdk7u21/hotspot/src/share/vm/prims/jvm.cpp:1166
+Event: 14.936 Thread 0x6ae52c00 Threw 0xa0866f08 at /HUDSON/workspace/jdk7u21-2-build-linux-i586-product/jdk7u21/hotspot/src/share/vm/prims/jvm.cpp:1166
+Event: 14.977 Thread 0x6ae52c00 Threw 0xa088b298 at /HUDSON/workspace/jdk7u21-2-build-linux-i586-product/jdk7u21/hotspot/src/share/vm/prims/jvm.cpp:1166
+Event: 14.977 Thread 0x6ae52c00 Threw 0xa0898be8 at /HUDSON/workspace/jdk7u21-2-build-linux-i586-product/jdk7u21/hotspot/src/share/vm/prims/jvm.cpp:1166
+Event: 14.978 Thread 0x6ae52c00 Threw 0xa08a7880 at /HUDSON/workspace/jdk7u21-2-build-linux-i586-product/jdk7u21/hotspot/src/share/vm/prims/jvm.cpp:1166
+Event: 14.978 Thread 0x6ae52c00 Threw 0xa08b55f0 at /HUDSON/workspace/jdk7u21-2-build-linux-i586-product/jdk7u21/hotspot/src/share/vm/prims/jvm.cpp:1166
+Event: 15.220 Thread 0x6e888c00 Threw 0xa07be998 at /HUDSON/workspace/jdk7u21-2-build-linux-i586-product/jdk7u21/hotspot/src/share/vm/prims/jvm.cpp:1166
+Event: 15.220 Thread 0x6ae52c00 Threw 0xa0912e60 at /HUDSON/workspace/jdk7u21-2-build-linux-i586-product/jdk7u21/hotspot/src/share/vm/prims/jvm.cpp:1166
+Event: 15.227 Thread 0x6ae52c00 Threw 0xa0918750 at /HUDSON/workspace/jdk7u21-2-build-linux-i586-product/jdk7u21/hotspot/src/share/vm/oops/instanceKlass.cpp:485
+Event: 15.268 Thread 0x6ae52c00 Threw 0xa091d9c0 at /HUDSON/workspace/jdk7u21-2-build-linux-i586-product/jdk7u21/hotspot/src/share/vm/oops/instanceKlass.cpp:485
+
+Events (10 events):
+Event: 15.219 loading class 0x6e88e198
+Event: 15.219 loading class 0x6e88e198 done
+Event: 15.220 loading class 0x69438660
+Event: 15.220 loading class 0x69438660 done
+Event: 15.239 loading class 0xb6865698
+Event: 15.256 loading class 0xb6865970
+Event: 15.256 loading class 0xb6865970 done
+Event: 15.256 loading class 0xb6865698 done
+Event: 15.257 loading class 0x6e2d1aa0
+Event: 15.267 loading class 0x6e2d1aa0 done
+
+
+Dynamic libraries:
+08048000-08049000 r-xp 00000000 08:06 2895013    /home/dronesimulator/Desktop/jdk1.7.0_21/bin/java
+08049000-0804a000 rw-p 00000000 08:06 2895013    /home/dronesimulator/Desktop/jdk1.7.0_21/bin/java
+08fe0000-094d5000 rw-p 00000000 00:00 0          [heap]
+66fcb000-673ea000 rw-p 00000000 00:00 0 
+673ea000-673eb000 ---p 00000000 00:00 0 
+673eb000-67beb000 rw-p 00000000 00:00 0          [stack:8460]
+67beb000-67d32000 r-xp 00000000 08:06 5243996    /usr/lib/i386-linux-gnu/libxml2.so.2.7.8
+67d32000-67d36000 r--p 00147000 08:06 5243996    /usr/lib/i386-linux-gnu/libxml2.so.2.7.8
+67d36000-67d37000 rw-p 0014b000 08:06 5243996    /usr/lib/i386-linux-gnu/libxml2.so.2.7.8
+67d37000-67d38000 rw-p 00000000 00:00 0 
+67d38000-67d72000 r-xp 00000000 08:06 5248040    /usr/lib/i386-linux-gnu/libxslt.so.1.1.26
+67d72000-67d73000 r--p 0003a000 08:06 5248040    /usr/lib/i386-linux-gnu/libxslt.so.1.1.26
+67d73000-67d74000 rw-p 0003b000 08:06 5248040    /usr/lib/i386-linux-gnu/libxslt.so.1.1.26
+67d74000-6933e000 r-xp 00000000 08:06 3021158    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjfxwebkit.so
+6933e000-693f3000 r--p 015ca000 08:06 3021158    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjfxwebkit.so
+693f3000-693f9000 rw-p 0167f000 08:06 3021158    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjfxwebkit.so
+693f9000-69400000 rw-p 00000000 00:00 0 
+69400000-69500000 rw-p 00000000 00:00 0 
+69518000-69537000 rw-p 00000000 00:00 0 
+69537000-69569000 r-xp 00000000 08:06 3021147    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjavafx-iio.so
+69569000-6956a000 r--p 00032000 08:06 3021147    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjavafx-iio.so
+6956a000-6956b000 rw-p 00033000 08:06 3021147    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjavafx-iio.so
+6956b000-6956e000 ---p 00000000 00:00 0 
+6956e000-695bc000 rw-p 00000000 00:00 0          [stack:8456]
+695bc000-695bf000 ---p 00000000 00:00 0 
+695bf000-6960d000 rw-p 00000000 00:00 0          [stack:8454]
+6960d000-69610000 ---p 00000000 00:00 0 
+69610000-6965e000 rw-p 00000000 00:00 0          [stack:8452]
+6965e000-69661000 ---p 00000000 00:00 0 
+69661000-696af000 rw-p 00000000 00:00 0 
+696af000-696b2000 ---p 00000000 00:00 0 
+696b2000-69700000 rw-p 00000000 00:00 0          [stack:8459]
+69700000-69800000 rw-p 00000000 00:00 0 
+6980d000-69810000 ---p 00000000 00:00 0 
+69810000-6985e000 rw-p 00000000 00:00 0          [stack:8449]
+6985e000-69861000 ---p 00000000 00:00 0 
+69861000-698af000 rw-p 00000000 00:00 0          [stack:8448]
+698af000-698b2000 ---p 00000000 00:00 0 
+698b2000-69900000 rw-p 00000000 00:00 0          [stack:8447]
+69900000-699fc000 rw-p 00000000 00:00 0 
+699fc000-69a00000 ---p 00000000 00:00 0 
+69a03000-69a4c000 r-xp 00000000 08:06 3021123    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/xawt/libmawt.so
+69a4c000-69a4f000 rw-p 00048000 08:06 3021123    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/xawt/libmawt.so
+69a4f000-69ad5000 r-xp 00000000 08:06 3021119    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libawt.so
+69ad5000-69adc000 rw-p 00086000 08:06 3021119    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libawt.so
+69adc000-69b00000 rw-p 00000000 00:00 0 
+69b00000-69bee000 rw-p 00000000 00:00 0 
+69bee000-69c00000 ---p 00000000 00:00 0 
+69c03000-69c07000 rwxp 00000000 00:00 0 
+69c07000-69c0b000 r--s 0008a000 08:06 2895209    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/jsse.jar
+69c0b000-69c1f000 r-xp 00000000 08:06 3021157    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libnet.so
+69c1f000-69c20000 rw-p 00014000 08:06 3021157    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libnet.so
+69c20000-69c93000 rw-p 00000000 00:00 0 
+69c93000-69c96000 ---p 00000000 00:00 0 
+69c96000-69ce4000 rw-p 00000000 00:00 0          [stack:8446]
+69ce4000-69ce7000 ---p 00000000 00:00 0 
+69ce7000-69d35000 rw-p 00000000 00:00 0          [stack:8445]
+69d35000-69d3b000 r-xp 00000000 08:06 5247853    /usr/lib/i386-linux-gnu/libogg.so.0.7.1
+69d3b000-69d3c000 r--p 00005000 08:06 5247853    /usr/lib/i386-linux-gnu/libogg.so.0.7.1
+69d3c000-69d3d000 rw-p 00006000 08:06 5247853    /usr/lib/i386-linux-gnu/libogg.so.0.7.1
+69d3d000-69d66000 r-xp 00000000 08:06 5248003    /usr/lib/i386-linux-gnu/libvorbis.so.0.4.5
+69d66000-69d67000 r--p 00028000 08:06 5248003    /usr/lib/i386-linux-gnu/libvorbis.so.0.4.5
+69d67000-69d68000 rw-p 00029000 08:06 5248003    /usr/lib/i386-linux-gnu/libvorbis.so.0.4.5
+69d68000-69d70000 r-xp 00000000 08:06 5247810    /usr/lib/i386-linux-gnu/libltdl.so.7.3.0
+69d70000-69d71000 r--p 00008000 08:06 5247810    /usr/lib/i386-linux-gnu/libltdl.so.7.3.0
+69d71000-69d72000 rw-p 00009000 08:06 5247810    /usr/lib/i386-linux-gnu/libltdl.so.7.3.0
+69d72000-69d83000 r-xp 00000000 08:06 5247978    /usr/lib/i386-linux-gnu/libtdb.so.1.2.9
+69d83000-69d84000 r--p 00010000 08:06 5247978    /usr/lib/i386-linux-gnu/libtdb.so.1.2.9
+69d84000-69d85000 rw-p 00011000 08:06 5247978    /usr/lib/i386-linux-gnu/libtdb.so.1.2.9
+69d85000-69d94000 r-xp 00000000 08:06 5247536    /usr/lib/i386-linux-gnu/libcanberra.so.0.2.5
+69d94000-69d95000 r--p 0000e000 08:06 5247536    /usr/lib/i386-linux-gnu/libcanberra.so.0.2.5
+69d95000-69d96000 rw-p 0000f000 08:06 5247536    /usr/lib/i386-linux-gnu/libcanberra.so.0.2.5
+69d96000-69d9a000 r-xp 00000000 08:06 5247532    /usr/lib/i386-linux-gnu/libcanberra-gtk.so.0.1.8
+69d9a000-69d9b000 r--p 00003000 08:06 5247532    /usr/lib/i386-linux-gnu/libcanberra-gtk.so.0.1.8
+69d9b000-69d9c000 rw-p 00004000 08:06 5247532    /usr/lib/i386-linux-gnu/libcanberra-gtk.so.0.1.8
+69d9e000-69dac000 r-xp 00000000 08:06 3021166    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libnio.so
+69dac000-69dad000 rw-p 0000e000 08:06 3021166    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libnio.so
+69dad000-69db7000 r--s 00254000 08:06 2895201    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/resources.jar
+69db7000-69dec000 r-xp 00000000 08:06 5248514    /usr/lib/i386-linux-gnu/gtk-2.0/2.10.0/engines/libmurrine.so
+69dec000-69ded000 r--p 00034000 08:06 5248514    /usr/lib/i386-linux-gnu/gtk-2.0/2.10.0/engines/libmurrine.so
+69ded000-69dee000 rw-p 00035000 08:06 5248514    /usr/lib/i386-linux-gnu/gtk-2.0/2.10.0/engines/libmurrine.so
+69dee000-69def000 ---p 00000000 00:00 0 
+69def000-6a5ef000 rw-p 00000000 00:00 0          [stack:8444]
+6a5ef000-6a5f0000 ---p 00000000 00:00 0 
+6a5f0000-6adf0000 rw-p 00000000 00:00 0          [stack:8443]
+6adf0000-6adfe000 r-xp 00000000 08:06 3801211    /lib/i386-linux-gnu/libudev.so.0.13.0
+6adfe000-6adff000 r--p 0000e000 08:06 3801211    /lib/i386-linux-gnu/libudev.so.0.13.0
+6adff000-6ae00000 rw-p 0000f000 08:06 3801211    /lib/i386-linux-gnu/libudev.so.0.13.0
+6ae00000-6aefe000 rw-p 00000000 00:00 0 
+6aefe000-6af00000 ---p 00000000 00:00 0 
+6af01000-6af04000 r--s 000f7000 08:06 3021112    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/ext/localedata.jar
+6af04000-6af0c000 r-xp 00000000 08:06 5248007    /usr/lib/i386-linux-gnu/libvorbisfile.so.3.3.4
+6af0c000-6af0d000 r--p 00007000 08:06 5248007    /usr/lib/i386-linux-gnu/libvorbisfile.so.3.3.4
+6af0d000-6af0e000 rw-p 00008000 08:06 5248007    /usr/lib/i386-linux-gnu/libvorbisfile.so.3.3.4
+6af0e000-6af55000 r-xp 00000000 08:06 3801932    /lib/i386-linux-gnu/libdbus-1.so.3.5.8
+6af55000-6af56000 r--p 00047000 08:06 3801932    /lib/i386-linux-gnu/libdbus-1.so.3.5.8
+6af56000-6af57000 rw-p 00048000 08:06 3801932    /lib/i386-linux-gnu/libdbus-1.so.3.5.8
+6af57000-6af59000 rw-s 00000000 08:06 5516142    /tmp/glnKP1h2 (deleted)
+6af59000-6af5e000 r-xp 00000000 08:06 5248536    /usr/lib/i386-linux-gnu/gtk-2.0/modules/libcanberra-gtk-module.so
+6af5e000-6af5f000 r--p 00004000 08:06 5248536    /usr/lib/i386-linux-gnu/gtk-2.0/modules/libcanberra-gtk-module.so
+6af5f000-6af60000 rw-p 00005000 08:06 5248536    /usr/lib/i386-linux-gnu/gtk-2.0/modules/libcanberra-gtk-module.so
+6af60000-6af70000 r-xp 00000000 08:06 5248380    /usr/lib/i386-linux-gnu/gio/modules/libgioremote-volume-monitor.so
+6af70000-6af71000 r--p 0000f000 08:06 5248380    /usr/lib/i386-linux-gnu/gio/modules/libgioremote-volume-monitor.so
+6af71000-6af72000 rw-p 00010000 08:06 5248380    /usr/lib/i386-linux-gnu/gio/modules/libgioremote-volume-monitor.so
+6af72000-6af87000 r-xp 00000000 08:06 5248584    /usr/lib/i386-linux-gnu/gvfs/libgvfscommon.so
+6af87000-6af88000 r--p 00014000 08:06 5248584    /usr/lib/i386-linux-gnu/gvfs/libgvfscommon.so
+6af88000-6af89000 rw-p 00015000 08:06 5248584    /usr/lib/i386-linux-gnu/gvfs/libgvfscommon.so
+6af89000-6afb2000 r-xp 00000000 08:06 5248381    /usr/lib/i386-linux-gnu/gio/modules/libgvfsdbus.so
+6afb2000-6afb3000 r--p 00028000 08:06 5248381    /usr/lib/i386-linux-gnu/gio/modules/libgvfsdbus.so
+6afb3000-6afb4000 rw-p 00029000 08:06 5248381    /usr/lib/i386-linux-gnu/gio/modules/libgvfsdbus.so
+6afb4000-6afd8000 r--p 00000000 08:06 6040038    /usr/share/glib-2.0/schemas/gschemas.compiled
+6afd8000-6b012000 r-xp 00000000 08:06 3801993    /lib/i386-linux-gnu/libpcre.so.3.12.1
+6b012000-6b013000 r--p 00039000 08:06 3801993    /lib/i386-linux-gnu/libpcre.so.3.12.1
+6b013000-6b014000 rw-p 0003a000 08:06 3801993    /lib/i386-linux-gnu/libpcre.so.3.12.1
+6b014000-6b019000 r-xp 00000000 08:06 5247620    /usr/lib/i386-linux-gnu/libffi.so.6.0.0
+6b019000-6b01a000 r--p 00004000 08:06 5247620    /usr/lib/i386-linux-gnu/libffi.so.6.0.0
+6b01a000-6b01b000 rw-p 00005000 08:06 5247620    /usr/lib/i386-linux-gnu/libffi.so.6.0.0
+6b01b000-6b041000 r-xp 00000000 08:06 3801938    /lib/i386-linux-gnu/libexpat.so.1.5.2
+6b041000-6b042000 ---p 00026000 08:06 3801938    /lib/i386-linux-gnu/libexpat.so.1.5.2
+6b042000-6b044000 r--p 00026000 08:06 3801938    /lib/i386-linux-gnu/libexpat.so.1.5.2
+6b044000-6b045000 rw-p 00028000 08:06 3801938    /lib/i386-linux-gnu/libexpat.so.1.5.2
+6b045000-6b04d000 r-xp 00000000 08:06 5248026    /usr/lib/i386-linux-gnu/libxcb-render.so.0.0.0
+6b04d000-6b04e000 r--p 00008000 08:06 5248026    /usr/lib/i386-linux-gnu/libxcb-render.so.0.0.0
+6b04e000-6b04f000 rw-p 00009000 08:06 5248026    /usr/lib/i386-linux-gnu/libxcb-render.so.0.0.0
+6b04f000-6b051000 r-xp 00000000 08:06 5248030    /usr/lib/i386-linux-gnu/libxcb-shm.so.0.0.0
+6b051000-6b052000 r--p 00001000 08:06 5248030    /usr/lib/i386-linux-gnu/libxcb-shm.so.0.0.0
+6b052000-6b053000 rw-p 00002000 08:06 5248030    /usr/lib/i386-linux-gnu/libxcb-shm.so.0.0.0
+6b053000-6b07b000 r-xp 00000000 08:06 3801997    /lib/i386-linux-gnu/libpng12.so.0.46.0
+6b07b000-6b07c000 r--p 00027000 08:06 3801997    /lib/i386-linux-gnu/libpng12.so.0.46.0
+6b07c000-6b07d000 rw-p 00028000 08:06 3801997    /lib/i386-linux-gnu/libpng12.so.0.46.0
+6b07d000-6b110000 r-xp 00000000 08:06 5247885    /usr/lib/i386-linux-gnu/libpixman-1.so.0.24.4
+6b110000-6b114000 r--p 00092000 08:06 5247885    /usr/lib/i386-linux-gnu/libpixman-1.so.0.24.4
+6b114000-6b115000 rw-p 00096000 08:06 5247885    /usr/lib/i386-linux-gnu/libpixman-1.so.0.24.4
+6b115000-6b128000 r-xp 00000000 08:06 3802004    /lib/i386-linux-gnu/libresolv-2.15.so
+6b128000-6b129000 ---p 00013000 08:06 3802004    /lib/i386-linux-gnu/libresolv-2.15.so
+6b129000-6b12a000 r--p 00013000 08:06 3802004    /lib/i386-linux-gnu/libresolv-2.15.so
+6b12a000-6b12b000 rw-p 00014000 08:06 3802004    /lib/i386-linux-gnu/libresolv-2.15.so
+6b12b000-6b12d000 rw-p 00000000 00:00 0 
+6b12d000-6b14a000 r-xp 00000000 08:06 3802008    /lib/i386-linux-gnu/libselinux.so.1
+6b14a000-6b14b000 r--p 0001c000 08:06 3802008    /lib/i386-linux-gnu/libselinux.so.1
+6b14b000-6b14c000 rw-p 0001d000 08:06 3802008    /lib/i386-linux-gnu/libselinux.so.1
+6b14c000-6b160000 r-xp 00000000 08:06 3802031    /lib/i386-linux-gnu/libz.so.1.2.3.4
+6b160000-6b161000 r--p 00013000 08:06 3802031    /lib/i386-linux-gnu/libz.so.1.2.3.4
+6b161000-6b162000 rw-p 00014000 08:06 3802031    /lib/i386-linux-gnu/libz.so.1.2.3.4
+6b162000-6b164000 r-xp 00000000 08:06 5247436    /usr/lib/i386-linux-gnu/libXdamage.so.1.1.0
+6b164000-6b165000 r--p 00001000 08:06 5247436    /usr/lib/i386-linux-gnu/libXdamage.so.1.1.0
+6b165000-6b166000 rw-p 00002000 08:06 5247436    /usr/lib/i386-linux-gnu/libXdamage.so.1.1.0
+6b166000-6b168000 r-xp 00000000 08:06 5247432    /usr/lib/i386-linux-gnu/libXcomposite.so.1.0.0
+6b168000-6b169000 r--p 00001000 08:06 5247432    /usr/lib/i386-linux-gnu/libXcomposite.so.1.0.0
+6b169000-6b16a000 rw-p 00002000 08:06 5247432    /usr/lib/i386-linux-gnu/libXcomposite.so.1.0.0
+6b16a000-6b173000 r-xp 00000000 08:06 5247434    /usr/lib/i386-linux-gnu/libXcursor.so.1.0.2
+6b173000-6b174000 r--p 00008000 08:06 5247434    /usr/lib/i386-linux-gnu/libXcursor.so.1.0.2
+6b174000-6b175000 rw-p 00009000 08:06 5247434    /usr/lib/i386-linux-gnu/libXcursor.so.1.0.2
+6b175000-6b17c000 r-xp 00000000 08:06 5252010    /usr/lib/i386-linux-gnu/libXrandr.so.2.2.0
+6b17c000-6b17d000 r--p 00006000 08:06 5252010    /usr/lib/i386-linux-gnu/libXrandr.so.2.2.0
+6b17d000-6b17e000 rw-p 00007000 08:06 5252010    /usr/lib/i386-linux-gnu/libXrandr.so.2.2.0
+6b17e000-6b18c000 r-xp 00000000 08:06 5247446    /usr/lib/i386-linux-gnu/libXi.so.6.1.0
+6b18c000-6b18d000 r--p 0000d000 08:06 5247446    /usr/lib/i386-linux-gnu/libXi.so.6.1.0
+6b18d000-6b18e000 rw-p 0000e000 08:06 5247446    /usr/lib/i386-linux-gnu/libXi.so.6.1.0
+6b18e000-6b196000 r-xp 00000000 08:06 5247462    /usr/lib/i386-linux-gnu/libXrender.so.1.3.0
+6b196000-6b197000 r--p 00007000 08:06 5247462    /usr/lib/i386-linux-gnu/libXrender.so.1.3.0
+6b197000-6b198000 rw-p 00008000 08:06 5247462    /usr/lib/i386-linux-gnu/libXrender.so.1.3.0
+6b198000-6b19c000 r-xp 00000000 08:06 5247442    /usr/lib/i386-linux-gnu/libXfixes.so.3.1.0
+6b19c000-6b19d000 r--p 00004000 08:06 5247442    /usr/lib/i386-linux-gnu/libXfixes.so.3.1.0
+6b19d000-6b19e000 rw-p 00005000 08:06 5247442    /usr/lib/i386-linux-gnu/libXfixes.so.3.1.0
+6b19e000-6b1ba000 r-xp 00000000 08:06 3801941    /lib/i386-linux-gnu/libgcc_s.so.1
+6b1ba000-6b1bb000 r--p 0001b000 08:06 3801941    /lib/i386-linux-gnu/libgcc_s.so.1
+6b1bb000-6b1bc000 rw-p 0001c000 08:06 3801941    /lib/i386-linux-gnu/libgcc_s.so.1
+6b1bc000-6b294000 r-xp 00000000 08:06 5247970    /usr/lib/i386-linux-gnu/libstdc++.so.6.0.16
+6b294000-6b295000 ---p 000d8000 08:06 5247970    /usr/lib/i386-linux-gnu/libstdc++.so.6.0.16
+6b295000-6b299000 r--p 000d8000 08:06 5247970    /usr/lib/i386-linux-gnu/libstdc++.so.6.0.16
+6b299000-6b29a000 rw-p 000dc000 08:06 5247970    /usr/lib/i386-linux-gnu/libstdc++.so.6.0.16
+6b29a000-6b2a1000 rw-p 00000000 00:00 0 
+6b2a1000-6b2a6000 r-xp 00000000 08:06 5247466    /usr/lib/i386-linux-gnu/libXtst.so.6.1.0
+6b2a6000-6b2a7000 r--p 00004000 08:06 5247466    /usr/lib/i386-linux-gnu/libXtst.so.6.1.0
+6b2a7000-6b2a8000 rw-p 00005000 08:06 5247466    /usr/lib/i386-linux-gnu/libXtst.so.6.1.0
+6b2a8000-6b39f000 r-xp 00000000 08:06 3801945    /lib/i386-linux-gnu/libglib-2.0.so.0.3200.3
+6b39f000-6b3a0000 r--p 000f6000 08:06 3801945    /lib/i386-linux-gnu/libglib-2.0.so.0.3200.3
+6b3a0000-6b3a1000 rw-p 000f7000 08:06 3801945    /lib/i386-linux-gnu/libglib-2.0.so.0.3200.3
+6b3a1000-6b3ee000 r-xp 00000000 08:06 5247687    /usr/lib/i386-linux-gnu/libgobject-2.0.so.0.3200.3
+6b3ee000-6b3ef000 r--p 0004c000 08:06 5247687    /usr/lib/i386-linux-gnu/libgobject-2.0.so.0.3200.3
+6b3ef000-6b3f0000 rw-p 0004d000 08:06 5247687    /usr/lib/i386-linux-gnu/libgobject-2.0.so.0.3200.3
+6b3f0000-6b422000 r-xp 00000000 08:06 5247622    /usr/lib/i386-linux-gnu/libfontconfig.so.1.4.4
+6b422000-6b423000 r--p 00032000 08:06 5247622    /usr/lib/i386-linux-gnu/libfontconfig.so.1.4.4
+6b423000-6b424000 rw-p 00033000 08:06 5247622    /usr/lib/i386-linux-gnu/libfontconfig.so.1.4.4
+6b424000-6b4b9000 r-xp 00000000 08:06 5247630    /usr/lib/i386-linux-gnu/libfreetype.so.6.8.0
+6b4b9000-6b4bd000 r--p 00094000 08:06 5247630    /usr/lib/i386-linux-gnu/libfreetype.so.6.8.0
+6b4bd000-6b4be000 rw-p 00098000 08:06 5247630    /usr/lib/i386-linux-gnu/libfreetype.so.6.8.0
+6b4be000-6b505000 r-xp 00000000 08:06 5247865    /usr/lib/i386-linux-gnu/libpango-1.0.so.0.3000.0
+6b505000-6b506000 ---p 00047000 08:06 5247865    /usr/lib/i386-linux-gnu/libpango-1.0.so.0.3000.0
+6b506000-6b507000 r--p 00047000 08:06 5247865    /usr/lib/i386-linux-gnu/libpango-1.0.so.0.3000.0
+6b507000-6b508000 rw-p 00048000 08:06 5247865    /usr/lib/i386-linux-gnu/libpango-1.0.so.0.3000.0
+6b508000-6b5cf000 r-xp 00000000 08:06 5247528    /usr/lib/i386-linux-gnu/libcairo.so.2.11000.2
+6b5cf000-6b5d0000 r--p 000c7000 08:06 5247528    /usr/lib/i386-linux-gnu/libcairo.so.2.11000.2
+6b5d0000-6b5d1000 rw-p 000c8000 08:06 5247528    /usr/lib/i386-linux-gnu/libcairo.so.2.11000.2
+6b5d1000-6b5d3000 rw-p 00000000 00:00 0 
+6b5d3000-6b726000 r-xp 00000000 08:06 5247663    /usr/lib/i386-linux-gnu/libgio-2.0.so.0.3200.3
+6b726000-6b728000 r--p 00153000 08:06 5247663    /usr/lib/i386-linux-gnu/libgio-2.0.so.0.3200.3
+6b728000-6b729000 rw-p 00155000 08:06 5247663    /usr/lib/i386-linux-gnu/libgio-2.0.so.0.3200.3
+6b729000-6b72a000 rw-p 00000000 00:00 0 
+6b72a000-6b747000 r-xp 00000000 08:06 5247490    /usr/lib/i386-linux-gnu/libatk-1.0.so.0.20409.1
+6b747000-6b749000 r--p 0001c000 08:06 5247490    /usr/lib/i386-linux-gnu/libatk-1.0.so.0.20409.1
+6b749000-6b74a000 rw-p 0001e000 08:06 5247490    /usr/lib/i386-linux-gnu/libatk-1.0.so.0.20409.1
+6b74a000-6b7f5000 r-xp 00000000 08:06 5247649    /usr/lib/i386-linux-gnu/libgdk-x11-2.0.so.0.2400.10
+6b7f5000-6b7f6000 ---p 000ab000 08:06 5247649    /usr/lib/i386-linux-gnu/libgdk-x11-2.0.so.0.2400.10
+6b7f6000-6b7f8000 r--p 000ab000 08:06 5247649    /usr/lib/i386-linux-gnu/libgdk-x11-2.0.so.0.2400.10
+6b7f8000-6b7f9000 rw-p 000ad000 08:06 5247649    /usr/lib/i386-linux-gnu/libgdk-x11-2.0.so.0.2400.10
+6b7f9000-6bc59000 r-xp 00000000 08:06 5247748    /usr/lib/i386-linux-gnu/libgtk-x11-2.0.so.0.2400.10
+6bc59000-6bc5d000 r--p 00460000 08:06 5247748    /usr/lib/i386-linux-gnu/libgtk-x11-2.0.so.0.2400.10
+6bc5d000-6bc5f000 rw-p 00464000 08:06 5247748    /usr/lib/i386-linux-gnu/libgtk-x11-2.0.so.0.2400.10
+6bc5f000-6bc61000 rw-p 00000000 00:00 0 
+6bc61000-6be61000 rw-s 116ca000 00:05 9958       /dev/nvidia0
+6be61000-6bf61000 rw-s 0ffaa000 00:05 9958       /dev/nvidia0
+6bf61000-6bf65000 rw-s 02a68000 00:05 9958       /dev/nvidia0
+6bf65000-6bf66000 rw-s dec0a000 00:05 9958       /dev/nvidia0
+6bf66000-6bfa6000 rw-s 12b9e000 00:05 9958       /dev/nvidia0
+6bfa6000-6bfc6000 rw-s 18a6f000 00:05 9958       /dev/nvidia0
+6bfc6000-6bfc7000 rw-s de641000 00:05 9958       /dev/nvidia0
+6bfc7000-6bfc8000 rw-s 3071d000 00:05 9958       /dev/nvidia0
+6bfc8000-6bfc9000 rw-s 18a6e000 00:05 9958       /dev/nvidia0
+6bfc9000-6c07d000 rw-p 00000000 00:00 0 
+6c07e000-6c080000 r-xs 00000000 08:06 5516142    /tmp/glnKP1h2 (deleted)
+6c080000-6c082000 r-xp 00000000 08:06 5247448    /usr/lib/i386-linux-gnu/libXinerama.so.1.0.0
+6c082000-6c083000 r--p 00001000 08:06 5247448    /usr/lib/i386-linux-gnu/libXinerama.so.1.0.0
+6c083000-6c084000 rw-p 00002000 08:06 5247448    /usr/lib/i386-linux-gnu/libXinerama.so.1.0.0
+6c084000-6c085000 r-xp 00000000 08:06 5247744    /usr/lib/i386-linux-gnu/libgthread-2.0.so.0.3200.3
+6c085000-6c086000 r--p 00000000 08:06 5247744    /usr/lib/i386-linux-gnu/libgthread-2.0.so.0.3200.3
+6c086000-6c087000 rw-p 00001000 08:06 5247744    /usr/lib/i386-linux-gnu/libgthread-2.0.so.0.3200.3
+6c087000-6c092000 r-xp 00000000 08:06 5247867    /usr/lib/i386-linux-gnu/libpangocairo-1.0.so.0.3000.0
+6c092000-6c093000 r--p 0000a000 08:06 5247867    /usr/lib/i386-linux-gnu/libpangocairo-1.0.so.0.3000.0
+6c093000-6c094000 rw-p 0000b000 08:06 5247867    /usr/lib/i386-linux-gnu/libpangocairo-1.0.so.0.3000.0
+6c094000-6c0b3000 r-xp 00000000 08:06 5247651    /usr/lib/i386-linux-gnu/libgdk_pixbuf-2.0.so.0.2600.1
+6c0b3000-6c0b4000 r--p 0001e000 08:06 5247651    /usr/lib/i386-linux-gnu/libgdk_pixbuf-2.0.so.0.2600.1
+6c0b4000-6c0b5000 rw-p 0001f000 08:06 5247651    /usr/lib/i386-linux-gnu/libgdk_pixbuf-2.0.so.0.2600.1
+6c0b5000-6c0df000 r-xp 00000000 08:06 5247869    /usr/lib/i386-linux-gnu/libpangoft2-1.0.so.0.3000.0
+6c0df000-6c0e0000 r--p 00029000 08:06 5247869    /usr/lib/i386-linux-gnu/libpangoft2-1.0.so.0.3000.0
+6c0e0000-6c0e1000 rw-p 0002a000 08:06 5247869    /usr/lib/i386-linux-gnu/libpangoft2-1.0.so.0.3000.0
+6c0e1000-6c102000 r-xp 00000000 08:06 3021159    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libglass.so
+6c102000-6c103000 r--p 00021000 08:06 3021159    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libglass.so
+6c103000-6c104000 rw-p 00022000 08:06 3021159    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libglass.so
+6c104000-6c107000 ---p 00000000 00:00 0 
+6c107000-6c155000 rw-p 00000000 00:00 0          [stack:8441]
+6c155000-6c156000 rw-s de060000 00:05 9958       /dev/nvidia0
+6c156000-6c175000 rw-s 2e509000 00:05 9958       /dev/nvidia0
+6c175000-6c1f4000 rw-p 00000000 00:00 0 
+6c1f4000-6dea7000 r-xp 00000000 08:06 5259965    /usr/lib/nvidia-experimental-310/libnvidia-glcore.so.310.14
+6dea7000-6df04000 rwxp 01cb2000 08:06 5259965    /usr/lib/nvidia-experimental-310/libnvidia-glcore.so.310.14
+6df04000-6df17000 rwxp 00000000 00:00 0 
+6df17000-6df1a000 r-xp 00000000 08:06 5259959    /usr/lib/nvidia-experimental-310/tls/libnvidia-tls.so.310.14
+6df1a000-6df1b000 rw-p 00002000 08:06 5259959    /usr/lib/nvidia-experimental-310/tls/libnvidia-tls.so.310.14
+6df1b000-6df2b000 r-xp 00000000 08:06 5247440    /usr/lib/i386-linux-gnu/libXext.so.6.4.0
+6df2b000-6df2c000 r--p 0000f000 08:06 5247440    /usr/lib/i386-linux-gnu/libXext.so.6.4.0
+6df2c000-6df2d000 rw-p 00010000 08:06 5247440    /usr/lib/i386-linux-gnu/libXext.so.6.4.0
+6df2d000-6df4c000 r-xp 00000000 08:06 5248034    /usr/lib/i386-linux-gnu/libxcb.so.1.1.0
+6df4c000-6df4d000 r--p 0001f000 08:06 5248034    /usr/lib/i386-linux-gnu/libxcb.so.1.1.0
+6df4d000-6df4e000 rw-p 00020000 08:06 5248034    /usr/lib/i386-linux-gnu/libxcb.so.1.1.0
+6df4e000-6dffe000 r-xp 00000000 08:06 5259961    /usr/lib/nvidia-experimental-310/libGL.so.310.14
+6dffe000-6e01f000 rwxp 000af000 08:06 5259961    /usr/lib/nvidia-experimental-310/libGL.so.310.14
+6e01f000-6e02e000 rwxp 00000000 00:00 0 
+6e02e000-6e15e000 r-xp 00000000 08:06 5247425    /usr/lib/i386-linux-gnu/libX11.so.6.3.0
+6e15e000-6e15f000 r--p 0012f000 08:06 5247425    /usr/lib/i386-linux-gnu/libX11.so.6.3.0
+6e15f000-6e161000 rw-p 00130000 08:06 5247425    /usr/lib/i386-linux-gnu/libX11.so.6.3.0
+6e161000-6e162000 rw-p 00000000 00:00 0 
+6e162000-6e169000 r-xp 00000000 08:06 5248376    /usr/lib/i386-linux-gnu/gio/modules/libdconfsettings.so
+6e169000-6e16a000 r--p 00006000 08:06 5248376    /usr/lib/i386-linux-gnu/gio/modules/libdconfsettings.so
+6e16a000-6e16b000 rw-p 00007000 08:06 5248376    /usr/lib/i386-linux-gnu/gio/modules/libdconfsettings.so
+6e16b000-6e17b000 r-xp 00000000 08:06 5245949    /usr/lib/liboverlay-scrollbar-0.2.so.0.0.16
+6e17b000-6e17c000 r--p 0000f000 08:06 5245949    /usr/lib/liboverlay-scrollbar-0.2.so.0.0.16
+6e17c000-6e17d000 rw-p 00010000 08:06 5245949    /usr/lib/liboverlay-scrollbar-0.2.so.0.0.16
+6e17d000-6e185000 r-xp 00000000 08:06 3021173    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libprism-es2.so
+6e185000-6e186000 r--p 00007000 08:06 3021173    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libprism-es2.so
+6e186000-6e187000 rw-p 00008000 08:06 3021173    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libprism-es2.so
+6e187000-6e18a000 ---p 00000000 00:00 0 
+6e18a000-6e1d8000 rw-p 00000000 00:00 0          [stack:8440]
+6e1d8000-6e1eb000 r--s 0012c000 08:06 2893679    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.ajdt.ui_2.2.3.e42x-20130509-1100.jar
+6e1eb000-6e200000 r--s 00197000 08:06 2893675    /home/dronesimulator/Desktop/eclipse/plugins/org.aspectj.weaver_1.7.3.20130403143700.jar
+6e200000-6e300000 rw-p 00000000 00:00 0 
+6e301000-6e304000 r-xp 00000000 08:06 5247673    /usr/lib/i386-linux-gnu/libgmodule-2.0.so.0.3200.3
+6e304000-6e305000 r--p 00002000 08:06 5247673    /usr/lib/i386-linux-gnu/libgmodule-2.0.so.0.3200.3
+6e305000-6e306000 rw-p 00003000 08:06 5247673    /usr/lib/i386-linux-gnu/libgmodule-2.0.so.0.3200.3
+6e306000-6e33f000 r--s 005b2000 08:06 2893674    /home/dronesimulator/Desktop/eclipse/plugins/org.aspectj.ajde_1.7.3.20130403143700.jar
+6e33f000-6e347000 r--s 0009c000 08:06 2893676    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.ajdt.core_2.2.3.e42x-20130509-1100.jar
+6e347000-6e34b000 r--s 00035000 08:06 3671307    /home/dronesimulator/Desktop/tod/git/zz.jinterp/lib/asm-all-3.2-svn.jar
+6e34b000-6e359000 r--s 00081000 08:06 3670792    /home/dronesimulator/Desktop/tod/git/tod/evdbng/lib/reflex-core.jar
+6e359000-6e35b000 r--s 00005000 08:06 3670791    /home/dronesimulator/Desktop/tod/git/tod/evdbng/lib/pom.jar
+6e35b000-6e363000 r--s 0005b000 08:06 3670790    /home/dronesimulator/Desktop/tod/git/tod/evdbng/lib/lucene-core-2.0.0.jar
+6e363000-6e367000 r--s 00018000 08:06 3670789    /home/dronesimulator/Desktop/tod/git/tod/evdbng/lib/junit-4.1.jar
+6e367000-6e36b000 r--s 00018000 08:06 3416074    /home/dronesimulator/Desktop/tod/git/tod/dbgrid/lib/junit-4.1.jar
+6e36b000-6e373000 r--s 0005b000 08:06 3416075    /home/dronesimulator/Desktop/tod/git/tod/dbgrid/lib/lucene-core-2.0.0.jar
+6e373000-6e37b000 r--s 0005b000 08:06 3670823    /home/dronesimulator/Desktop/tod/git/tod/tod.plugin/lib/lucene-core-2.0.0.jar
+6e37b000-6e392000 r--s 00113000 08:06 3670821    /home/dronesimulator/Desktop/tod/git/tod/tod.plugin/lib/jython-2.2.1.jar
+6e392000-6e3a2000 r--s 0009a000 08:06 3670820    /home/dronesimulator/Desktop/tod/git/tod/tod.plugin/lib/infovis.jar
+6e3a2000-6e3a6000 r--s 00045000 08:06 3670818    /home/dronesimulator/Desktop/tod/git/tod/tod.plugin/lib/asm-all-3.2-svn.jar
+6e3a6000-6e3b1000 r--s 00084000 08:06 2894070    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.ui.workbench.texteditor_3.8.0.v20120523-1310.jar
+6e3b1000-6e3b4000 r--s 0000b000 08:06 2893693    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jdt.junit.runtime_3.4.301.v20120914-131016.jar
+6e3b4000-6e3b7000 r--s 00021000 08:06 2894214    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jdt.junit.core_3.7.100.v20120523-1257.jar
+6e3b7000-6e3c0000 r--s 0005f000 08:06 2894165    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jdt.junit_3.7.100.v20120523-1543.jar
+6e3c0000-6e3c2000 r--s 0001a000 08:06 2894063    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.pde.launching_3.6.100.v20120605-203027.jar
+6e3c2000-6e3d3000 r--s 0011c000 08:06 2893791    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.pde.core_3.8.1.v20130115-200504.jar
+6e3d3000-6e41e000 r--s 003d1000 08:06 2893869    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.pde.ui_3.7.2.v20130121-093123.jar
+6e41e000-6e423000 r--s 00038000 08:06 2894060    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.text_3.5.200.v20120523-1310.jar
+6e423000-6e436000 r--s 000e0000 08:06 2893828    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jface.text_3.8.2.v20121126-164145.jar
+6e436000-6e43b000 r--s 00049000 08:06 2894314    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jdt.launching_3.6.101.v20130111-183046.jar
+6e43b000-6e455000 r--s 00139000 08:06 2894170    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jdt.debug.ui_3.6.100.v20120530-1425.jar
+6e455000-6e456000 r--s 00002000 08:06 2894203    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.e4.ui.workbench3_0.12.0.v20120521-2329.jar
+6e456000-6e498000 r--s 00360000 08:06 2894044    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.ui.workbench_3.104.0.v20130204-164612.jar
+6e498000-6e49b000 r--s 00018000 08:06 2893758    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.core.commands_3.6.2.v20130123-162658.jar
+6e49b000-6e4af000 r--s 000f7000 08:06 2893922    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jface_3.8.102.v20130123-162658.jar
+6e4af000-6e4b3000 r--s 00022000 08:06 2893906    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.ui_3.104.0.v20121024-145224.jar
+6e4b3000-6e4c9000 r--s 00233000 08:06 2894050    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.swt.gtk.linux.x86_3.100.1.v4236b.jar
+6e4c9000-6e4ca000 r--s 00004000 08:06 2893980    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.swt_3.100.1.v4236b.jar
+6e4ca000-6e4cc000 r--s 0000d000 08:06 2894019    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jdt.compiler.tool_1.0.200.v20130116-050536.jar
+6e4cc000-6e4ce000 r--s 00024000 08:06 2893942    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jdt.compiler.apt_1.0.600.v20130116-050536.jar
+6e4ce000-6e4f8000 r--s 0046e000 08:06 2893955    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jdt.core_3.8.3.v20130121-145325.jar
+6e4f8000-6e4fb000 r--s 00013000 08:06 2893603    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.equinox.app_1.3.100.v20120522-1841.jar
+6e4fb000-6e4fd000 r--s 00015000 08:06 2893987    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.core.contenttype_3.4.200.v20120523-2004.jar
+6e4fd000-6e500000 r--s 0001c000 08:06 2893778    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.equinox.preferences_3.5.1.v20121031-182809.jar
+6e500000-6e5fc000 rw-p 00000000 00:00 0 
+6e5fc000-6e600000 ---p 00000000 00:00 0 
+6e600000-6e6fd000 rw-p 00000000 00:00 0 
+6e6fd000-6e700000 ---p 00000000 00:00 0 
+6e700000-6e701000 rw-p 00000000 00:00 0 
+6e701000-6e702000 rw-p 00000000 00:00 0 
+6e702000-6e705000 r--s 0002a000 08:06 2893727    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.equinox.registry_3.5.200.v20120522-1841.jar
+6e705000-6e707000 r--s 00002000 08:06 3283694    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.core.runtime.compatibility.registry_3.5.101.v20130108-163257/runtime_registry_compatibility.jar
+6e707000-6e709000 r--s 00015000 08:06 2894131    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.core.jobs_3.5.300.v20120912-155018.jar
+6e709000-6e70c000 r--s 00018000 08:06 2894081    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.equinox.common_3.6.100.v20120522-1841.jar
+6e70c000-6e70e000 r--s 00008000 08:06 2893691    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.equinox.weaving.hook_1.0.200.I20130319-1000.jar
+6e70e000-6e710000 r--s 00006000 08:06 2894278    /home/dronesimulator/Desktop/eclipse/plugins/at.bestsolution.efxclipse.runtime.osgi_0.8.1.201303112105.jar
+6e710000-6e724000 r--s 00142000 08:06 2893926    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.osgi_3.8.2.v20130124-134944.jar
+6e724000-6e726000 r--s 00011000 08:06 2894017    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.core.runtime_3.8.0.v20120912-155025.jar
+6e726000-6e7bc000 r--s 00946000 08:06 2893938    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jdt.ui_3.8.2.v20130107-165834.jar
+6e7bc000-6e7c9000 r--s 000c6000 08:06 3283659    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jdt.debug_3.7.101.v20120913-153601/jdimodel.jar
+6e7c9000-6e7cd000 r--s 0000e000 08:06 3283661    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.jdt.debug_3.7.101.v20120913-153601/jdi.jar
+6e7cd000-6e800000 r--s 0024c000 08:06 2893781    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.debug.ui_3.8.2.v20130130-171415.jar
+6e800000-6e8f2000 rw-p 00000000 00:00 0 
+6e8f2000-6e900000 ---p 00000000 00:00 0 
+6e900000-6e901000 rw-p 00000000 00:00 0 
+6e901000-6e905000 rw-s 188a9000 00:05 9958       /dev/nvidia0
+6e905000-6e90a000 r-xp 00000000 08:06 5247438    /usr/lib/i386-linux-gnu/libXdmcp.so.6.0.0
+6e90a000-6e90b000 r--p 00004000 08:06 5247438    /usr/lib/i386-linux-gnu/libXdmcp.so.6.0.0
+6e90b000-6e90c000 rw-p 00005000 08:06 5247438    /usr/lib/i386-linux-gnu/libXdmcp.so.6.0.0
+6e90c000-6e910000 r-xp 00000000 08:06 5247470    /usr/lib/i386-linux-gnu/libXxf86vm.so.1.0.0
+6e910000-6e911000 r--p 00003000 08:06 5247470    /usr/lib/i386-linux-gnu/libXxf86vm.so.1.0.0
+6e911000-6e912000 rw-p 00004000 08:06 5247470    /usr/lib/i386-linux-gnu/libXxf86vm.so.1.0.0
+6e912000-6e91a000 r--s 0004d000 08:06 2894208    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.debug.core_3.7.100.v20120521-2012.jar
+6e91a000-6e920000 r--s 00034000 08:06 3283689    /home/dronesimulator/Desktop/eclipse/plugins/org.junit_4.10.0.v4_10_0_v20120426-0900/junit.jar
+6e920000-6e923000 ---p 00000000 00:00 0 
+6e923000-6e971000 rw-p 00000000 00:00 0          [stack:8438]
+6e971000-6ea00000 r--s 00dd7000 08:06 2895213    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/jfxrt.jar
+6ea00000-6ea01000 ---p 00000000 00:00 0 
+6ea01000-6ea81000 rw-p 00000000 00:00 0          [stack:8436]
+6ea81000-6ea84000 ---p 00000000 00:00 0 
+6ea84000-6ead2000 rw-p 00000000 00:00 0          [stack:8435]
+6ead2000-6ead5000 ---p 00000000 00:00 0 
+6ead5000-6eb53000 rw-p 00000000 00:00 0          [stack:8434]
+6eb53000-6eb56000 ---p 00000000 00:00 0 
+6eb56000-6ebd4000 rw-p 00000000 00:00 0          [stack:8433]
+6ebd4000-6ebd7000 ---p 00000000 00:00 0 
+6ebd7000-6ec25000 rw-p 00000000 00:00 0          [stack:8430]
+6ec25000-6ec28000 ---p 00000000 00:00 0 
+6ec28000-6ec76000 rw-p 00000000 00:00 0          [stack:8429]
+6ec76000-6ec79000 ---p 00000000 00:00 0 
+6ec79000-6ecc7000 rw-p 00000000 00:00 0          [stack:8426]
+6ecc7000-6ecca000 ---p 00000000 00:00 0 
+6ecca000-6ed18000 rw-p 00000000 00:00 0          [stack:8424]
+6ed18000-6ed1b000 ---p 00000000 00:00 0 
+6ed1b000-6ed69000 rw-p 00000000 00:00 0          [stack:8422]
+6ed69000-6ed6c000 ---p 00000000 00:00 0 
+6ed6c000-6edba000 rw-p 00000000 00:00 0          [stack:8421]
+6edba000-6edbb000 ---p 00000000 00:00 0 
+6edbb000-6ee86000 rw-p 00000000 00:00 0          [stack:8420]
+6ee86000-6f043000 r--s 039de000 08:06 2895026    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/rt.jar
+6f043000-71b00000 rw-p 00000000 00:00 0 
+71b00000-71c00000 rw-p 00000000 00:00 0 
+71c00000-71cf0000 rw-p 00000000 00:00 0 
+71cf0000-71d00000 ---p 00000000 00:00 0 
+71d00000-71d21000 rw-p 00000000 00:00 0 
+71d21000-71e00000 ---p 00000000 00:00 0 
+71e00000-71e02000 r-xp 00000000 08:06 5247427    /usr/lib/i386-linux-gnu/libXau.so.6.0.0
+71e02000-71e03000 r--p 00001000 08:06 5247427    /usr/lib/i386-linux-gnu/libXau.so.6.0.0
+71e03000-71e04000 rw-p 00002000 08:06 5247427    /usr/lib/i386-linux-gnu/libXau.so.6.0.0
+71e04000-71e0f000 r--s 000bb000 08:06 2893838    /home/dronesimulator/Desktop/eclipse/plugins/org.eclipse.core.resources_3.8.1.v20121114-124432.jar
+71e0f000-71e13000 r--s 00045000 08:06 3670747    /home/dronesimulator/Desktop/tod/git/tod/core/lib/asm-all-3.2-svn.jar
+71e13000-71e17000 r--s 0001c000 08:06 2893672    /home/dronesimulator/Desktop/eclipse/plugins/org.aspectj.runtime_1.7.3.20130403143700.jar
+71e17000-71e2e000 r--s 00113000 08:06 3670751    /home/dronesimulator/Desktop/tod/git/tod/core/lib/jython-2.2.1.jar
+71e2e000-71e2f000 ---p 00000000 00:00 0 
+71e2f000-71eaf000 rw-p 00000000 00:00 0          [stack:8419]
+71eaf000-71eb0000 ---p 00000000 00:00 0 
+71eb0000-71f38000 rw-p 00000000 00:00 0          [stack:8418]
+71f38000-71f50000 rw-p 00000000 00:00 0 
+71f50000-71f65000 rw-p 00000000 00:00 0 
+71f65000-72096000 rw-p 00000000 00:00 0 
+72096000-7209e000 rw-p 00000000 00:00 0 
+7209e000-720b6000 rw-p 00000000 00:00 0 
+720b6000-720cb000 rw-p 00000000 00:00 0 
+720cb000-721fc000 rw-p 00000000 00:00 0 
+721fc000-72216000 rw-p 00000000 00:00 0 
+72216000-7229f000 rw-p 00000000 00:00 0 
+7229f000-732a0000 rw-p 00000000 00:00 0 
+732a0000-762a0000 rw-p 00000000 00:00 0 
+762a0000-78b60000 rw-p 00000000 00:00 0 
+78b60000-9eea0000 rw-p 00000000 00:00 0 
+9eea0000-a2120000 rw-p 00000000 00:00 0 
+a2e00000-a2ebc000 rw-p 00000000 00:00 0 
+a2ebc000-a2f00000 ---p 00000000 00:00 0 
+a2f00000-a2ff9000 rw-p 00000000 00:00 0 
+a2ff9000-a3000000 ---p 00000000 00:00 0 
+a30b6000-a30be000 rwxp 00000000 00:00 0 
+a30be000-a30dd000 rw-p 00000000 00:00 0 
+a30dd000-a30e1000 rwxp 00000000 00:00 0 
+a30e1000-a31ff000 rw-p 00000000 00:00 0 
+a31ff000-a3200000 ---p 00000000 00:00 0 
+a3214000-a3228000 rwxp 00000000 00:00 0 
+a3228000-a3266000 rw-p 00000000 00:00 0 
+a3266000-a32a2000 rwxp 00000000 00:00 0 
+a32a2000-a335c000 rw-p 00000000 00:00 0 
+a335c000-a33a9000 r-xp 00000000 08:06 3021163    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjavafx-font.so
+a33a9000-a33aa000 ---p 0004d000 08:06 3021163    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjavafx-font.so
+a33ae000-a33fb000 r-xp 00000000 08:06 3021163    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjavafx-font.so
+a33fb000-a33fc000 ---p 0004d000 08:06 3021163    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjavafx-font.so
+a3400000-a34e7000 rw-p 00000000 00:00 0 
+a34e7000-a3500000 ---p 00000000 00:00 0 
+a3510000-a351c000 rwxp 00000000 00:00 0 
+a351c000-a3569000 r-xp 00000000 08:06 3021163    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjavafx-font.so
+a3569000-a356a000 ---p 0004d000 08:06 3021163    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjavafx-font.so
+a356a000-a356e000 rwxp 00000000 00:00 0 
+a356e000-a35bb000 r-xp 00000000 08:06 3021163    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjavafx-font.so
+a35bb000-a35bc000 ---p 0004d000 08:06 3021163    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjavafx-font.so
+a35bc000-a35c0000 rwxp 00000000 00:00 0 
+a35c0000-b34a0000 rw-p 00000000 00:00 0 
+b34a0000-b34a2000 r--p 00000000 08:06 2884592    /home/dronesimulator/.config/dconf/user
+b34a2000-b34ab000 rw-p 00000000 00:00 0 
+b34ab000-b3562000 rw-p 00000000 00:00 0 
+b3562000-b37a2000 rwxp 00000000 00:00 0 
+b37a2000-b6562000 rw-p 00000000 00:00 0 
+b6562000-b6579000 r-xp 00000000 08:06 3021180    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libzip.so
+b6579000-b657a000 rw-p 00017000 08:06 3021180    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libzip.so
+b657a000-b6585000 r-xp 00000000 08:06 3801971    /lib/i386-linux-gnu/libnss_files-2.15.so
+b6585000-b6586000 r--p 0000a000 08:06 3801971    /lib/i386-linux-gnu/libnss_files-2.15.so
+b6586000-b6587000 rw-p 0000b000 08:06 3801971    /lib/i386-linux-gnu/libnss_files-2.15.so
+b6587000-b659d000 r-xp 00000000 08:06 3801965    /lib/i386-linux-gnu/libnsl-2.15.so
+b659d000-b659e000 r--p 00015000 08:06 3801965    /lib/i386-linux-gnu/libnsl-2.15.so
+b659e000-b659f000 rw-p 00016000 08:06 3801965    /lib/i386-linux-gnu/libnsl-2.15.so
+b659f000-b65a1000 rw-p 00000000 00:00 0 
+b65a1000-b65a8000 r-xp 00000000 08:06 3801967    /lib/i386-linux-gnu/libnss_compat-2.15.so
+b65a8000-b65a9000 r--p 00006000 08:06 3801967    /lib/i386-linux-gnu/libnss_compat-2.15.so
+b65a9000-b65aa000 rw-p 00007000 08:06 3801967    /lib/i386-linux-gnu/libnss_compat-2.15.so
+b65aa000-b65ab000 rw-p 00000000 00:00 0 
+b65ab000-b65ac000 r--s 00000000 08:06 2885250    /home/dronesimulator/.cache/dconf/user
+b65ac000-b65ad000 rw-s f0009000 00:05 9958       /dev/nvidia0
+b65ad000-b65bd000 r--s 0009a000 08:06 3670749    /home/dronesimulator/Desktop/tod/git/tod/core/lib/infovis.jar
+b65bd000-b65c5000 rw-s 00000000 08:06 5515216    /tmp/hsperfdata_dronesimulator/8411
+b65c5000-b67c5000 r--p 00000000 08:06 5250102    /usr/lib/locale/locale-archive
+b67c5000-b67c7000 r-xp 00000000 08:06 3021174    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libnpt.so
+b67c7000-b67c8000 rw-p 00002000 08:06 3021174    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libnpt.so
+b67c8000-b67ff000 r-xp 00000000 08:06 3021154    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjdwp.so
+b67ff000-b6800000 rw-p 00037000 08:06 3021154    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjdwp.so
+b6800000-b68fc000 rw-p 00000000 00:00 0 
+b68fc000-b6900000 ---p 00000000 00:00 0 
+b6900000-b6901000 rw-s 07f5a000 00:05 9958       /dev/nvidia0
+b6901000-b6902000 r--s 00006000 08:06 2894120    /home/dronesimulator/Desktop/eclipse/plugins/org.hamcrest.core_1.1.0.v20090501071000.jar
+b6902000-b6905000 r-xp 00000000 08:06 3021161    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libdt_socket.so
+b6905000-b6906000 rw-p 00003000 08:06 3021161    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libdt_socket.so
+b6906000-b6929000 r-xp 00000000 08:06 3021142    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjava.so
+b6929000-b692a000 rw-p 00023000 08:06 3021142    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libjava.so
+b692a000-b6931000 r-xp 00000000 08:06 3802006    /lib/i386-linux-gnu/librt-2.15.so
+b6931000-b6932000 r--p 00006000 08:06 3802006    /lib/i386-linux-gnu/librt-2.15.so
+b6932000-b6933000 rw-p 00007000 08:06 3802006    /lib/i386-linux-gnu/librt-2.15.so
+b6933000-b6936000 ---p 00000000 00:00 0 
+b6936000-b6984000 rw-p 00000000 00:00 0          [stack:8417]
+b6984000-b69ae000 r-xp 00000000 08:06 3801952    /lib/i386-linux-gnu/libm-2.15.so
+b69ae000-b69af000 r--p 00029000 08:06 3801952    /lib/i386-linux-gnu/libm-2.15.so
+b69af000-b69b0000 rw-p 0002a000 08:06 3801952    /lib/i386-linux-gnu/libm-2.15.so
+b69b0000-b716b000 r-xp 00000000 08:06 3021179    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/server/libjvm.so
+b716b000-b71bd000 rw-p 007bb000 08:06 3021179    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/server/libjvm.so
+b71bd000-b75e0000 rw-p 00000000 00:00 0 
+b75e0000-b7783000 r-xp 00000000 08:06 3801920    /lib/i386-linux-gnu/libc-2.15.so
+b7783000-b7784000 ---p 001a3000 08:06 3801920    /lib/i386-linux-gnu/libc-2.15.so
+b7784000-b7786000 r--p 001a3000 08:06 3801920    /lib/i386-linux-gnu/libc-2.15.so
+b7786000-b7787000 rw-p 001a5000 08:06 3801920    /lib/i386-linux-gnu/libc-2.15.so
+b7787000-b778a000 rw-p 00000000 00:00 0 
+b778a000-b778d000 r-xp 00000000 08:06 3801933    /lib/i386-linux-gnu/libdl-2.15.so
+b778d000-b778e000 r--p 00002000 08:06 3801933    /lib/i386-linux-gnu/libdl-2.15.so
+b778e000-b778f000 rw-p 00003000 08:06 3801933    /lib/i386-linux-gnu/libdl-2.15.so
+b778f000-b77a2000 r-xp 00000000 08:06 3021146    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/jli/libjli.so
+b77a2000-b77a3000 rw-p 00012000 08:06 3021146    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/jli/libjli.so
+b77a3000-b77a4000 rw-p 00000000 00:00 0 
+b77a4000-b77bb000 r-xp 00000000 08:06 3802000    /lib/i386-linux-gnu/libpthread-2.15.so
+b77bb000-b77bc000 r--p 00016000 08:06 3802000    /lib/i386-linux-gnu/libpthread-2.15.so
+b77bc000-b77bd000 rw-p 00017000 08:06 3802000    /lib/i386-linux-gnu/libpthread-2.15.so
+b77bd000-b77bf000 rw-p 00000000 00:00 0 
+b77bf000-b77c9000 r-xp 00000000 08:06 3801975    /lib/i386-linux-gnu/libnss_nis-2.15.so
+b77c9000-b77ca000 r--p 00009000 08:06 3801975    /lib/i386-linux-gnu/libnss_nis-2.15.so
+b77ca000-b77cb000 rw-p 0000a000 08:06 3801975    /lib/i386-linux-gnu/libnss_nis-2.15.so
+b77cb000-b77cc000 r--p 005e0000 08:06 5250102    /usr/lib/locale/locale-archive
+b77cc000-b77cd000 rw-p 00000000 00:00 0 
+b77cd000-b77ce000 r--p 00000000 00:00 0 
+b77ce000-b77d9000 r-xp 00000000 08:06 3021124    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libverify.so
+b77d9000-b77da000 rw-p 0000b000 08:06 3021124    /home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/libverify.so
+b77da000-b77dc000 rw-p 00000000 00:00 0 
+b77dc000-b77dd000 r-xp 00000000 00:00 0          [vdso]
+b77dd000-b77fd000 r-xp 00000000 08:06 3801900    /lib/i386-linux-gnu/ld-2.15.so
+b77fd000-b77fe000 r--p 0001f000 08:06 3801900    /lib/i386-linux-gnu/ld-2.15.so
+b77fe000-b77ff000 rw-p 00020000 08:06 3801900    /lib/i386-linux-gnu/ld-2.15.so
+bf9e8000-bfa0a000 rw-p 00000000 00:00 0          [stack]
+
+VM Arguments:
+jvm_args: -agentlib:jdwp=transport=dt_socket,suspend=y,address=localhost:37433 -ea -Ddbimpl=evdbng -Dfile.encoding=UTF-8 
+java_command: com.live.Debugger.liveDebugging tod-dbgrid-remote:localhost
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+PATH=/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+LD_LIBRARY_PATH=/home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/server:/home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386:/home/dronesimulator/Desktop/jdk1.7.0_21/jre/../lib/i386:/home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386/client:/home/dronesimulator/Desktop/jdk1.7.0_21/jre/lib/i386:
+SHELL=/bin/bash
+DISPLAY=:0.0
+
+Signal Handlers:
+SIGSEGV: [libjvm.so+0x722ea0], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGBUS: [libjvm.so+0x722ea0], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGFPE: [libjvm.so+0x5dbc80], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGPIPE: SIG_IGN, sa_mask[0]=0x00001000, sa_flags=0x10000000
+SIGXFSZ: [libjvm.so+0x5dbc80], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGILL: [libjvm.so+0x5dbc80], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGUSR1: SIG_DFL, sa_mask[0]=0x00000000, sa_flags=0x00000000
+SIGUSR2: [libjvm.so+0x5db560], sa_mask[0]=0x00000004, sa_flags=0x10000004
+SIGHUP: [libjvm.so+0x5ddb50], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGINT: [libjvm.so+0x5ddb50], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGTERM: [libjvm.so+0x5ddb50], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGQUIT: [libjvm.so+0x5ddb50], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+
+
+---------------  S Y S T E M  ---------------
+
+OS:wheezy/sid
+
+uname:Linux 3.5.0-23-generic #35~precise1-Ubuntu SMP Fri Jan 25 17:15:33 UTC 2013 i686
+libc:glibc 2.15 NPTL 2.15 
+rlimit: STACK 8192k, CORE 0k, NPROC 31142, NOFILE 4096, AS infinity
+load average:4.14 5.97 3.42
+
+/proc/meminfo:
+MemTotal:        4002024 kB
+MemFree:          167756 kB
+Buffers:            1672 kB
+Cached:            58092 kB
+SwapCached:        14160 kB
+Active:          2644856 kB
+Inactive:         811904 kB
+Active(anon):    2615832 kB
+Inactive(anon):   783300 kB
+Active(file):      29024 kB
+Inactive(file):    28604 kB
+Unevictable:           0 kB
+Mlocked:               0 kB
+HighTotal:       3147780 kB
+HighFree:           8660 kB
+LowTotal:         854244 kB
+LowFree:          159096 kB
+SwapTotal:       4059132 kB
+SwapFree:              0 kB
+Dirty:                 0 kB
+Writeback:            76 kB
+AnonPages:       3382832 kB
+Mapped:           156728 kB
+Shmem:              2276 kB
+Slab:              41156 kB
+SReclaimable:      11012 kB
+SUnreclaim:        30144 kB
+KernelStack:        7896 kB
+PageTables:        24764 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     6060144 kB
+Committed_AS:   11313076 kB
+VmallocTotal:     122880 kB
+VmallocUsed:       80512 kB
+VmallocChunk:      15144 kB
+HardwareCorrupted:     0 kB
+AnonHugePages:         0 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+DirectMap4k:      421880 kB
+DirectMap2M:      491520 kB
+
+
+CPU:total 2 (2 cores per cpu, 1 threads per core) family 6 model 23 stepping 10, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, tsc
+
+/proc/cpuinfo:
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 23
+model name	: Intel(R) Core(TM)2 Duo CPU     E8500  @ 3.16GHz
+stepping	: 10
+microcode	: 0xa07
+cpu MHz		: 3166.000
+cache size	: 6144 KB
+physical id	: 0
+siblings	: 2
+core id		: 0
+cpu cores	: 2
+apicid		: 0
+initial apicid	: 0
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe nx lm constant_tsc arch_perfmon pebs bts aperfmperf pni dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr pdcm sse4_1 xsave lahf_lm dtherm tpr_shadow vnmi flexpriority
+bogomips	: 6317.69
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 23
+model name	: Intel(R) Core(TM)2 Duo CPU     E8500  @ 3.16GHz
+stepping	: 10
+microcode	: 0xa07
+cpu MHz		: 3166.000
+cache size	: 6144 KB
+physical id	: 0
+siblings	: 2
+core id		: 1
+cpu cores	: 2
+apicid		: 1
+initial apicid	: 1
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe nx lm constant_tsc arch_perfmon pebs bts aperfmperf pni dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr pdcm sse4_1 xsave lahf_lm dtherm tpr_shadow vnmi flexpriority
+bogomips	: 6317.69
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+
+
+Memory: 4k page, physical 4002024k(167756k free), swap 4059132k(0k free)
+
+vm_info: Java HotSpot(TM) Server VM (23.21-b01) for linux-x86 JRE (1.7.0_21-b11), built on Apr  4 2013 04:20:11 by "java_re" with gcc 4.3.0 20080428 (Red Hat 4.3.0-8)
+
+time: Wed Jul 24 18:03:57 2013
+elapsed time: 15 seconds
+
