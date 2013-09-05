@@ -242,6 +242,34 @@ public class EventUtils {
 		return lineNum;
 	}
 	
+	//returns the position of the start character of an event, returns -1 if not available
+	public int getStartPos(ILogEvent _event)
+	{
+		int startPos = -1;
+		ProbeInfo theProbeInfo = LocationUtils.getProbeInfo(_event);
+		if(theProbeInfo !=null)
+		{
+			SourceRange srcRange = LocationUtils.getSourceRange(logBrowser.getStructureDatabase(),theProbeInfo);
+			startPos = srcRange.startColumn;
+		}
+		
+		return startPos;
+	}
+	
+	//returns the position of the start character of an event, returns -1 if not available
+	public int getEndPos(ILogEvent _event)
+	{
+		int endPos = -1;
+		ProbeInfo theProbeInfo = LocationUtils.getProbeInfo(_event);
+		if(theProbeInfo !=null)
+		{
+			SourceRange srcRange = LocationUtils.getSourceRange(logBrowser.getStructureDatabase(),theProbeInfo);
+			endPos = srcRange.endColumn;
+		}
+		
+		return endPos;
+	}
+	
 	//takes an event and returns the line number of the next event
 	public int getNextLineNum()
 	{

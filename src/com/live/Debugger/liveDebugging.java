@@ -452,7 +452,7 @@ public class liveDebugging extends Application {
 		currentCodeWindow.highlightGutters(lineNumbers, codeFragments.getLineNumberOffset(currentCodeWindow.getMethodName()) );
 		
 	}
-	//This method is used to increment the slider value
+	//This method is used to increment the slider value by 1
 	private void setTick(timeline currentTimeline2,ProgressIndicator p){
 		double tick=currentTimeline2.getValue();
 		try{
@@ -470,7 +470,7 @@ public class liveDebugging extends Application {
 //		t.setTooltip(tip);
 
 	}
-	//This method is used to decrement the slider value
+	//This method is used to decrement the slider value by 1
 	private void decrementTick(timeline currentTimeline2,ProgressIndicator p){
 		double tick=currentTimeline2.getValue();
 		try{
@@ -977,35 +977,38 @@ public class liveDebugging extends Application {
 				// step forward and get next event
 				ILogEvent nextEvent = eventUtils.forwardStepInto();
 				if (nextEvent != null) {
-					do {//this do while loop will ignore events on the same line, highlight and ticks will proceed line by line
+//					do {//this do while loop will ignore events on the same line, highlight and ticks will proceed line by line
 						//comment out to proceed event by event 
 						int clineNum = eventUtils.getLineNum(curEvent);
 						int nextlineNum = eventUtils.getLineNum(nextEvent);
+						
 						if (clineNum != nextlineNum) {
 							processNextLine(clineNum, curEvent, nextEvent);
-							break;
+//							break;
 						} 
 						else if (eventUtils.isMethodCall(nextEvent)) {
 							String methodName = eventUtils
 									.getMethodName(nextEvent);
 							if (codeFragments.codeFragmentExist(methodName)) {
 								processNextLine(clineNum, curEvent, nextEvent);
-								break;
+//								break;
 							}
-							else{
+							else{//system method calls, highlight the section
 								curEvent = eventUtils.getCurrentEvent();
 								nextEvent = eventUtils.forwardStepInto();
 								setTick(currentTimeline,curProgIndicator);//kai
+								currentCodeWindow.highlightSection(clineNum - lineNumberOffset - 1, eventUtils.getStartPos(curEvent), eventUtils.getEndPos(curEvent));
 							}
 						}
 
-						else {
+						else {//events are on the same line that are not method calls, highlight section, increment timeline tick
 							curEvent = eventUtils.getCurrentEvent();
 							nextEvent = eventUtils.forwardStepInto();
 							setTick(currentTimeline,curProgIndicator);//kai
+							currentCodeWindow.highlightSection(clineNum - lineNumberOffset - 1, eventUtils.getStartPos(curEvent), eventUtils.getEndPos(curEvent));
 						}
 
-					} while (true);
+//					} while (true);
 					
 					//currentCodeWindow.getPinBtn().setVisible(false);
 					

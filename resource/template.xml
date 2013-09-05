@@ -10,6 +10,8 @@
     	.CodeMirror-scroll { height: 100%; } 
     	.CodeMirror { width: 120% ;  font-size: 9px}
     	.CodeMirror-reduce { height: dynamic; width: dynamic;  font-size: 3px}
+    	
+    	.CodeMirror-original-background {background-color:white !important;}
     	.completedLine {background-color:#FFFFFF !important;}
 		.currentLine {background-color:#FFFF99 !important;}
 		.newLine {background-color:#ECC3BF !important;}
@@ -31,7 +33,9 @@
 		  cursor: default;
 		  background-color: #CCFF66;
 		}
-		
+		.CodeMirror-LineSection-highlight{
+          background-color:rgba(0,255,0,0.5);
+        }
 	</style>
     <script>${jquery}</script>	
     <script>      

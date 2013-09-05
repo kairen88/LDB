@@ -74,6 +74,11 @@ public class CodeWindow {
 	private int instance=0;//This will determine how many instances of same method name are opened
 	private int startLine=0;
 	private int endLine=0;
+	
+	//column values for highlighting sections of a line
+	private int prevStartCol = -1;
+	private int prevEndCol = -1;
+	
 	private GridPane gridPane=new GridPane();
 	private ArrayList<GridPane> gridPaneList=new ArrayList<GridPane>();
 	private liveDebugging ld;//to use reposition logic, etc.
@@ -325,9 +330,29 @@ public void setCodeWindowContainer(DraggableNode e){
 		public void highlightGutters(ArrayList<Integer> lineNumList, int offset)
 		{
 			for(int lineNum : lineNumList)
-				editor.webview.getEngine().executeScript("editor.setMarker(" + String.valueOf(lineNum - offset) + ",'<div height=10 width=10 style=\"background-color:#A3FF7F;\"> %N%');");
+				editor.webview.getEngine().executeScript("editor.setMarker(" + String.valueOf(lineNum - offset - 1) + ",'<div height=10 width=10 style=\"background-color:#A3FF7F;\"> %N%');");
 			//98FB98
 		}
+		
+	//highlights a section of the current line
+		//**currently this method works, but info from tod is returning 1, 1 for start and end, so no highlight appears
+	public void highlightSection(int lineNum, int startChar, int endChar)
+	{
+		//if there was another section highlighted, remove the highlight
+		if(prevStartCol != -1 && prevEndCol != -1)
+		{
+			editor.webview.getEngine().executeScript("var start = {line:" + String.valueOf(lineNum) + ",ch:" + String.valueOf(prevStartCol) + "};" +
+					"var end = {line:" + String.valueOf(lineNum) + ", ch:" + String.valueOf(prevEndCol) + "};" +
+					"editor.markText(start,end,\"CodeMirror-original-background\");");
+			//set current section as previous
+			prevStartCol = startChar;
+			prevEndCol = endChar;
+		}
+		//highlihgt section on line
+		editor.webview.getEngine().executeScript("var start = {line:" + String.valueOf(lineNum) + ",ch:" + String.valueOf(startChar) + "};" +
+												"var end = {line:" + String.valueOf(lineNum) + ", ch:" + String.valueOf(endChar) + "};" +
+												"editor.markText(start,end,\"CodeMirror-LineSection-highlight\");");		
+	}
 	
 	//sets the class for the line number indicated to completedLine which styles it green
 	public void setLineColorToCompleted(int lineNum)
