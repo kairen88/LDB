@@ -354,7 +354,7 @@ public void setCodeWindowContainer(DraggableNode e){
 												"editor.markText(start,end,\"CodeMirror-LineSection-highlight\");");		
 	}
 	
-	//sets the class for the line number indicated to completedLine which styles it green
+	//sets the class for the line number indicated to completedLine which styles it white
 	public void setLineColorToCompleted(int lineNum)
 	{
 		editor.webview.getEngine().executeScript("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'completedLine');");
@@ -362,13 +362,13 @@ public void setCodeWindowContainer(DraggableNode e){
 	}
 	
 	
-	//sets the class for the line number indicated to completedLine which styles it yellow
+	//sets the class for the line number indicated to currentLine which styles it yellow
 	public void setLineColorToCurrent(int lineNum)
 	{
 		editor.webview.getEngine().executeScript("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'currentLine');");
 	}
 	
-	//sets the class for the line number indicated to completedLine which styles it red
+	//sets the class for the line number indicated to newLine which styles it green
 	public void setLineColorToNew(int lineNum)
 	{
 		editor.webview.getEngine().executeScript("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'newLine');");

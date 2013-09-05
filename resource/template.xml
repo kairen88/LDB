@@ -11,7 +11,7 @@
     	.CodeMirror { width: 120% ;  font-size: 9px}
     	.CodeMirror-reduce { height: dynamic; width: dynamic;  font-size: 3px}
     	
-    	.CodeMirror-original-background {background-color:white !important;}
+    	.CodeMirror-original-background {background-color:transparent !important;}
     	.completedLine {background-color:#FFFFFF !important;}
 		.currentLine {background-color:#FFFF99 !important;}
 		.newLine {background-color:#ECC3BF !important;}

@@ -75,7 +75,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
@@ -111,20 +110,20 @@ public class liveDebugging extends Application {
 
 	Stack<CodeWindow> codeWindowStack;
 	Stack<timeline> timelineStack;
-	Stack<ProgressIndicator> progIndStack;
+	
 	CodeWindow currentCodeWindow;
-
-	timeline currentTimeline;
-	timeline prevTimeline;
 	CodeWindow prevCodeWindow;
+	
+	timeline currentTimeline;
+	timeline prevTimeline;	
 
-	NavigationBar currentNaviBar;
-	ArrayList<NavigationBar> navibarAry;
-	TickNavigator tickNavigator;
-
-	ILogBrowser logBrowser;
-	Stepper stepper;
-	ArrayList<ICallerSideEvent> eventList;
+//	NavigationBar currentNaviBar;
+//	ArrayList<NavigationBar> navibarAry;
+//	TickNavigator tickNavigator;
+//
+//	ILogBrowser logBrowser;
+//	Stepper stepper;
+//	ArrayList<ICallerSideEvent> eventList;
 	
 	Pane codeWindowAreaNew;
 	Pane codeWindowArea=new Pane ();
@@ -133,12 +132,11 @@ public class liveDebugging extends Application {
 	CodeFragments codeFragments;
 
 	int lineNumberOffset;
-	ArrayList<Long> childEventsTimestamps;
+//	ArrayList<Long> childEventsTimestamps;
 	private HashMap codeFragmentWindowsList; //list of code windows currently displayed on screen
 	Pane timelineSectionNew;
 	Pane timelineSection=new Pane ();
-	ProgressIndicator curProgIndicator;
-	ProgressIndicator prevProgIndicator;
+
 	//timeline positions
 	double posX=37;
 	int posY=0;
@@ -146,7 +144,6 @@ public class liveDebugging extends Application {
 
 	//for Highlighting
 	CodeWindow mainCWH;
-
 	timeline mainTH;
 
 	ScrollPane s1 = new ScrollPane();
@@ -176,16 +173,16 @@ public class liveDebugging extends Application {
 		launch(args);
 		_args = args;
 	}
-	private Rectangle createCodeWindowBackground(int windowWidth,int windowHeight,String color)
-	{
-		Rectangle codeWindowBackground = new Rectangle(windowWidth, windowHeight);
-		javafx.scene.paint.Paint codeMirrorBackgroundColor = javafx.scene.paint.Paint.valueOf("CCCCCC");//grey
-		codeWindowBackground.setFill(codeMirrorBackgroundColor);
-		codeWindowBackground.setArcHeight(15);
-		codeWindowBackground.setArcWidth(15);
-
-		return codeWindowBackground;
-	}
+//	private Rectangle createCodeWindowBackground(int windowWidth,int windowHeight,String color)
+//	{
+//		Rectangle codeWindowBackground = new Rectangle(windowWidth, windowHeight);
+//		javafx.scene.paint.Paint codeMirrorBackgroundColor = javafx.scene.paint.Paint.valueOf("CCCCCC");//grey
+//		codeWindowBackground.setFill(codeMirrorBackgroundColor);
+//		codeWindowBackground.setArcHeight(15);
+//		codeWindowBackground.setArcWidth(15);
+//
+//		return codeWindowBackground;
+//	}
 
 	public void highlighter(CodeWindow cd , timeline tl,ColorAdjust c, String color){
 		
@@ -254,7 +251,6 @@ public class liveDebugging extends Application {
 		lineNumberOffset = 0;
 		codeWindowStack = new Stack<>();
 		timelineStack=new Stack<>();
-		progIndStack=new Stack<>();
 		codeFragmentWindowsList = new HashMap<>();
 		//vb.setSpacing(5);
 
@@ -315,9 +311,10 @@ public class liveDebugging extends Application {
 		
 		
 		timelineSectionNew.getChildren().add(sc);
-		Object []obj=createTimeLine(null,"main",-1,0);
+		ILogEvent mainEvent = getMainMethodEvent();
+		timeline tLine = createTimeLine(mainEvent,"main");
 
-		currentTimeline=(timeline)obj[0];
+		currentTimeline = tLine;
 //		curProgIndicator=(ProgressIndicator)obj[1];
 
 		mainTH=currentTimeline;
@@ -370,51 +367,51 @@ public class liveDebugging extends Application {
 		}
 	}
 
-	private ObservableList<HBox> getArray() {
-		ObservableList<HBox> vertArray = FXCollections.observableArrayList();
-		ArrayList<String[]> list = getInputFromFile();
-
-		for (String[] strAry : list) {
-			HBox hBox = new HBox();
-			hBox.setStyle("-fx-background-color: #ECC3BF");
-			for (String string : strAry) {
-				Label label = new Label(string);
-				hBox.getChildren().add(label);
-			}
-			vertArray.add(hBox);
-		}
-
-		// hBox2.setStyle("-fx-background-color: #ECC3BF");
-		return vertArray;
-	}
-
-	private ArrayList<String[]> getInputFromFile() {
-		ArrayList<String[]> list = new ArrayList<String[]>();
-		try {
-			// Open the file that is the first
-			// command line parameter
-			FileInputStream fstream = new FileInputStream("textfile.txt");
-			// Get the object of DataInputStream
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			String strLine;
-			// Read File Line By Line
-			while ((strLine = br.readLine()) != null) {
-				// Print the content on the console
-				// System.out.println (strLine);
-				String[] strAry = strLine.split(" ");
-
-				list.add(strAry);
-			}
-			// Close the input stream
-			in.close();
-
-		} catch (Exception e) {
-			// Catch exception if any
-			System.err.println("Error: " + e.getMessage());
-		}
-		return list;
-	}
+//	private ObservableList<HBox> getArray() {
+//		ObservableList<HBox> vertArray = FXCollections.observableArrayList();
+//		ArrayList<String[]> list = getInputFromFile();
+//
+//		for (String[] strAry : list) {
+//			HBox hBox = new HBox();
+//			hBox.setStyle("-fx-background-color: #ECC3BF");
+//			for (String string : strAry) {
+//				Label label = new Label(string);
+//				hBox.getChildren().add(label);
+//			}
+//			vertArray.add(hBox);
+//		}
+//
+//		// hBox2.setStyle("-fx-background-color: #ECC3BF");
+//		return vertArray;
+//	}
+//
+//	private ArrayList<String[]> getInputFromFile() {
+//		ArrayList<String[]> list = new ArrayList<String[]>();
+//		try {
+//			// Open the file that is the first
+//			// command line parameter
+//			FileInputStream fstream = new FileInputStream("textfile.txt");
+//			// Get the object of DataInputStream
+//			DataInputStream in = new DataInputStream(fstream);
+//			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+//			String strLine;
+//			// Read File Line By Line
+//			while ((strLine = br.readLine()) != null) {
+//				// Print the content on the console
+//				// System.out.println (strLine);
+//				String[] strAry = strLine.split(" ");
+//
+//				list.add(strAry);
+//			}
+//			// Close the input stream
+//			in.close();
+//
+//		} catch (Exception e) {
+//			// Catch exception if any
+//			System.err.println("Error: " + e.getMessage());
+//		}
+//		return list;
+//	}
 
 	// displaying main code
 	private void createMainWindow(String methodName) {
@@ -443,23 +440,20 @@ public class liveDebugging extends Application {
 //			highlightGutters(curEvent);
 		}
 	}
+	
 	//This method is used to highlight gutters in the editor
 	private void highlightGutters(ILogEvent event){
 		ArrayList<Integer> lineNumbers =eventUtils.getExecutedLineNumers(event);
-//		for(int i=0;i<lineNumbers.size();i++){
-//			currentCodeWindow.highlightGutters((int)lineNumbers.get(i).intValue() - 20- 1);
-//		}
 		currentCodeWindow.highlightGutters(lineNumbers, codeFragments.getLineNumberOffset(currentCodeWindow.getMethodName()) );
 		
 	}
 	//This method is used to increment the slider value by 1
-	private void setTick(timeline currentTimeline2,ProgressIndicator p){
+	private void setTick(timeline currentTimeline2){
 		double tick=currentTimeline2.getValue();
 		try{
 			tick++;
 			if(tick<=currentTimeline2.getMax()){
 				currentTimeline2.setValue(tick);
-//				p.setProgress(t.getValue()/t.getMax());
 			}
 		}
 		catch (Exception ex){
@@ -468,10 +462,10 @@ public class liveDebugging extends Application {
 
 //		Tooltip tip=new Tooltip(String.valueOf(t.getValue()));
 //		t.setTooltip(tip);
-
 	}
+	
 	//This method is used to decrement the slider value by 1
-	private void decrementTick(timeline currentTimeline2,ProgressIndicator p){
+	private void decrementTick(timeline currentTimeline2){
 		double tick=currentTimeline2.getValue();
 		try{
 			tick--;
@@ -486,8 +480,8 @@ public class liveDebugging extends Application {
 
 //		Tooltip tip=new Tooltip(String.valueOf(t.getValue()));
 //		t.setTooltip(tip);
-
 	}
+	
 	//This method is used to step backwards
 	private void processPrevious(int clineNum, int prevlineNum, ILogEvent prevEvent,ILogEvent curEvent) {
 		//step backwards towards previous line 
@@ -517,12 +511,10 @@ public class liveDebugging extends Application {
 			CodeWindow oldPreviousWindow=prevCodeWindow;
 			prevCodeWindow = currentCodeWindow;
 			prevTimeline=currentTimeline;
-			prevProgIndicator=curProgIndicator;
 
 			if (!codeWindowStack.empty()){
 				currentCodeWindow = codeWindowStack.pop();
 				currentTimeline=timelineStack.pop();
-				curProgIndicator= progIndStack.pop();
 			}
 			// highlight parent method
 			if(oldPreviousWindow==currentCodeWindow){
@@ -535,7 +527,7 @@ public class liveDebugging extends Application {
 			currentCodeWindow.setSelectedLineNumber(line);
 			currentCodeWindow.getEditor().setSelectedLineNumber(line);
 			
-			decrementTick(currentTimeline,curProgIndicator);//kai
+			decrementTick(currentTimeline);//kai
 			reposition();
 		} else if (eventUtils.isMethodCall(curEvent)){// (curEvent.getDepth() < prevEvent.getDepth()) {
 			// we have stepped backwards into a method
@@ -556,12 +548,10 @@ public class liveDebugging extends Application {
 			CodeWindow oldPreviousWindow=prevCodeWindow;
 			prevCodeWindow = currentCodeWindow;
 			prevTimeline=currentTimeline;
-			prevProgIndicator=curProgIndicator;
 			
 			if (!codeWindowStack.empty()){
 				currentCodeWindow = codeWindowStack.pop();
 				currentTimeline=timelineStack.pop();
-				curProgIndicator= progIndStack.pop();
 			}
 			// highlight parent method
 			
@@ -577,7 +567,7 @@ public class liveDebugging extends Application {
 			currentCodeWindow.setSelectedLineNumber(linenum);
 			currentCodeWindow.getEditor().setSelectedLineNumber(linenum);
 				
-			decrementTick(currentTimeline,curProgIndicator);//kai
+			decrementTick(currentTimeline);//kai
 			reposition();
 		} 
 		
@@ -589,10 +579,11 @@ public class liveDebugging extends Application {
 			currentCodeWindow.setLineColorToCurrent(linenum);
 			currentCodeWindow.setSelectedLineNumber(linenum);
 			currentCodeWindow.getEditor().setSelectedLineNumber(linenum);
-			decrementTick(currentTimeline,curProgIndicator);//kai
+			decrementTick(currentTimeline);//kai
 		}
 	}
-	//This method is used to calculate the position of arrow at x axis
+	
+	//calculate the position of arrow at x axis
 	private int calculateArrowX(DraggableNode cd){
 		CodeEditor ed=((CodeEditor)(cd.getChildren().get(2)));
 		if(!ed.isReduced()){
@@ -600,7 +591,8 @@ public class liveDebugging extends Application {
 		}else
 			return (int)(cd.getLayoutX()+ cd.getDWidth()+22);//((Rectangle)(cd.getChildren().get(0))).getWidth()
 	}
-	//This method is used to calculate the position of arrow at y axis
+	
+	//calculate the position of arrow at y axis
 	private int calculateArrowY(DraggableNode cd, int lineNum){
 		//return (int)(prevCodeWindow.y+lineNum*9+20);
 		CodeEditor ed=((CodeEditor)(cd.getChildren().get(2)));
@@ -611,19 +603,17 @@ public class liveDebugging extends Application {
 		else
 			return (int)(cd.getLayoutY()+ cd.getDHeigth());//(int)(((int)ed.getLayoutY()+ed.getHeight()));//(lineNum+1)*9+10)*0.3);//(int)(((int)ed.getLayoutY()+(lineNum+1)*9+10)*0.3);
 	}
-	//This method is used to calculate the position of code fragment window at x axis
+	
+	//calculate the position of code fragment window at x axis
 	private int calculateWindowX(DraggableNode cd) {
 		CodeEditor ed=((CodeEditor)(cd.getChildren().get(2)));
 		if(!ed.isReduced()){
 			return	(int)cd.getLayoutX()+630;
 		}else
 			return (int)(cd.getLayoutX()+ cd.getDWidth()+40);
-		
-		
-
-
 	}
-	//This method is used to calculate the position of code fragment window at y axis
+	
+	//calculate the position of code fragment window at y axis
 	private int calculateWindowY(DraggableNode cd,int linenum) {
 		// TODO Auto-generated method stub
 		CodeEditor ed=((CodeEditor)(cd.getChildren().get(2)));
@@ -634,7 +624,7 @@ public class liveDebugging extends Application {
 			return (int)(cd.getLayoutY()+cd.getDHeigth());//(int)(((int)ed.getLayoutY()+ed.getHeight()));//(linenum+1)*9)*0.3);
 
 	}
-	//This method is used to relocate all the existing added arrows and code fragment windows over the screen
+	//elocate all the existing added arrows and code fragment windows over the screen
 	public void reposition(){
 		
 		DraggableNode cd=(DraggableNode)codeWindowArea.getChildren().get(0);
@@ -654,18 +644,13 @@ public class liveDebugging extends Application {
 			
 			codeWindowArea.getChildren().set(j,newCd);			
 			newCd.relocate(x, y);
-			//((Group)(newCd.getChildren().get(1))).relocate(newCd.getLayoutX()+5, newCd.getLayoutY()+5);
-			//((Group)(newCd.getChildren().get(1))).toFront();
-			
-			//((HBox)(((HBox)(newCd.getChildren().get(1))).getChildren().get(1))).relocate(newCd.getDWidth()-25, newCd.getLayoutY()+5);
-			//((HBox)(newCd.getChildren().get(1))).toFront();
+
 			cd=newCd;
 		}
-		/*s1=((ScrollPane)(codeWindowAreaNew.getChildren().get(0)));
-		s1.setContent(codeWindowArea);
-		codeWindowAreaNew.getChildren().set(0,s1);*/
+
 	}
-	//Thi is a helping function which returns index value of some variable name
+	
+	//helping function which returns index value of some variable name
 	private int returnIndexofValue(String name,LinkedHashMap<String,ArrayList> localVariableInfo){
 			int i=0;
 			Iterator keys=localVariableInfo.keySet().iterator();
@@ -679,11 +664,13 @@ public class liveDebugging extends Application {
 		
 	return -1;	
 	}
+	
 	//This method is used to initialize grid on moving towards another program fragment window, because we are showing grid pane of local variables for every program fragment window. 
 	private void initializeGrid(){
 		 gridPane=currentCodeWindow.getGridPane();
 		 variablePane.getChildren().set(0,gridPane);
 	}
+	
 	//This method is used to change the style of grid pane
 	private void removeGridStyles(GridPane gp){
 		for(int i=3;i<gp.getChildren().size();i=i+2){
@@ -703,37 +690,31 @@ public class liveDebugging extends Application {
 
 			clineNum = lineNumberOffset + 1;
 		}
-		currentCodeWindow.setLineColorToCompleted(clineNum - lineNumberOffset
-				- 1);//is this working???
-		//Case: Method return 
+		currentCodeWindow.setLineColorToCompleted(clineNum - lineNumberOffset - 1);
+		
+		//Case: Method return - 
 		//if depth of next event > current, we have returned to parent method
 		if (curEvent.getDepth() > nextEvent.getDepth()) {
-			// set parent code fragment to current
-			if(prevCodeWindow!=null){
-				//prevCodeWindow.getPinBtn().setVisible(false);
-			}
 			
+			// set previous code window color to grey
 			if(prevCodeWindow!=mainCWH){
 			ColorAdjust c=new ColorAdjust(0,0,0,0);
 			String color="CCCCCC";//grey
 			highlighter(prevCodeWindow,prevTimeline,c,color);
 			//prevCodeWindow.reduceWindowSize();
-			}/*
-			else{
-				if(prevCodeWindow!=null)
-					prevCodeWindow.reduceWindowSize();
-
-			}*/
-//please explain this logic----------------------------------------------
-			CodeWindow oldPreviousWindow=prevCodeWindow;
-			prevCodeWindow = currentCodeWindow;
-			prevTimeline=currentTimeline;
-			prevProgIndicator=curProgIndicator;
+			}
 			
+			//stash the previous window
+			CodeWindow oldPreviousWindow=prevCodeWindow;
+			//set current window as previous
+			prevCodeWindow = currentCodeWindow;
+			
+			prevTimeline=currentTimeline;
+			
+			//current code window is now from the code window stack
 			if (!codeWindowStack.empty()){
 				currentCodeWindow= codeWindowStack.pop();
 				currentTimeline=timelineStack.pop();
-				curProgIndicator= progIndStack.pop();
 			}
 			if(oldPreviousWindow!=currentCodeWindow){
 				oldPreviousWindow.reduceWindowSize();//prevCodeWindow.normalWindowSize();
@@ -741,33 +722,39 @@ public class liveDebugging extends Application {
 				//oldPreviousWindow.getPinBtn().setVisible(true);
 				currentCodeWindow.normalWindowSize();
 			}
-//----------------------------------------------------------------------------
+			
 			// highlight next line to be executed
 			int lineNum = eventUtils.getLineNum(nextEvent);
+			
 			lineNumberOffset = codeFragments
 					.getLineNumberOffset(currentCodeWindow.getMethodName());
 			int line=lineNum - lineNumberOffset- 1;
-			currentCodeWindow.setLineColorToCurrent(line);// should be this but currently i haven't set main
-			currentCodeWindow.setSelectedLineNumber(line);
+			
+			currentCodeWindow.setLineColorToCurrent(line);
+			
+			currentCodeWindow.setSelectedLineNumber(line);//so we know the start point of the arrow
 			currentCodeWindow.getEditor().setSelectedLineNumber(line);
-			setTick(currentTimeline, curProgIndicator);//kai
+			
+			setTick(currentTimeline);
 			
 			gridPane=currentCodeWindow.getGridPane();
 			variablePane.getChildren().set(0,gridPane);
 			reposition();
 		}
+		
 		// Case: Method call
 		else if (eventUtils.isMethodCall(nextEvent)) {
 			String methodName = eventUtils.getMethodName(nextEvent);
 			
-			setTick(currentTimeline,curProgIndicator);//kai
+			setTick(currentTimeline);
 			
 			if (codeFragments.codeFragmentExist(methodName)) {
-				int size=-1;
+				//int size=-1;
 				boolean isExist = false;
 				int value=0;
-//explain this logic------------------------------------------------------------------------keeping track of iternation num for window = vlaue
-				if (codeFragmentWindowsList.containsKey(methodName)) {
+				
+//keeping track of iteration num for window = value------------------------------------------------------------------------
+				if (codeFragmentWindowsList.containsKey(methodName)) {//check if we already have a code window on the display stage with that name
 					value = (int) codeFragmentWindowsList.get(methodName);
 					value++;
 					//codeFragmentWindowsList.remove(methodName);
@@ -778,176 +765,181 @@ public class liveDebugging extends Application {
 					value++;
 					codeFragmentWindowsList.put(methodName, value);	
 				}
+//codeWindow iter number End----------------------------------------------------------------------------------------------
 				
-				// get the code fragment and add it to the code area
-				CodeWindow codeFragment;
-				codeFragment = codeFragments.getCodeFragment(methodName);
-// explain this logic, is this needed?--------------------------------------------------------------------------------------no longer needed
-				int prevTick=0;
-				if(prevTimeline!=null){
-					prevTick=((int)prevTimeline.getValue());
-				}
-//---------------------------------------------------------------------------------------------------------------------------
-				Object []obj=createTimeLine(nextEvent,methodName,currentTimeline.getValue(),prevTick);
+				// get the code window 
+				CodeWindow codeWin = codeFragments.getCodeFragment(methodName);
+				timeline tLine = createTimeLine(nextEvent,methodName);
 
-			
+				//if it is a new code window
+				//add it to the display area and set the indexOnScreen
 				if(!isExist){
-					codeFragment.setIndexOnScreen(codeWindowArea.getChildren().size());// explain what setIndexOnScreen is for
+					codeWin.setIndexOnScreen(codeWindowArea.getChildren().size());// IndexOnScreen = index of element (eg. codeWindow) as a child of the code area pane
 					codeFragments.setCodeFragment(methodName,codeWindowArea.getChildren().size());
-					codeWindowArea.getChildren().add(codeFragment.getRootNode());
+					
+					codeWindowArea.getChildren().add(codeWin.getRootNode());
 				}
-				else{//update and display the code window iteration dropdown box value
-					int length=codeFragment.getIterationBox().getItems().size();
-					codeFragment.getIterationBox().getItems().add(length+1);
-					codeFragment.getIterationBox().setValue(length+1);
-					codeWindowArea.getChildren().set(codeFragment.getIndexOnScreen(), codeFragment.getRootNode());//(codeFragment.getRootNode()); we get the code window, set the value of the iteration combo box then set it in the display area again, so indexOnScreen is needed to replace the old codewindow
-					//additional note, arrows need index as well to get them from the child array and reposition them
+				else{//if it's not a new code window, update iteration combobox value and replace the old codeWindow
+					int length=codeWin.getIterationBox().getItems().size();
+					codeWin.getIterationBox().getItems().add(length+1);
+					codeWin.getIterationBox().setValue(length+1);
+					
+					//indexOnScreen is needed to replace the old codewindow
+					codeWindowArea.getChildren().set(codeWin.getIndexOnScreen(), codeWin.getRootNode());
 				}
 				
+				//highlight the line of the method call in the current window
 				int lineNum=eventUtils.getLineNum(nextEvent) - lineNumberOffset - 1;
 				currentCodeWindow.setLineColorToNew(lineNum);
-				// set line number offset
-				lineNumberOffset = codeFragments
-						.getLineNumberOffset(methodName);
 				
-				//Push the current codewindow and timeline in stack before we create the new window for the method call
+				lineNumberOffset = codeFragments.getLineNumberOffset(methodName);
+				
+				//Push the current codewindow and timeline onto stack 
 				codeWindowStack.push(currentCodeWindow);
 				timelineStack.push(currentTimeline);
-				progIndStack.push(curProgIndicator);
+				
+				//store the current grid pane in the current code window
 				currentCodeWindow.setGridPane(gridPane);
-				
-				CodeWindow oldPrevious=prevCodeWindow;
-				
-				if(oldPrevious!=codeFragment){
-					if(prevCodeWindow!=mainCWH&&prevCodeWindow!=null){	
+								
+				//if we are not returning to the previous code window, set it to grey and minimize it
+				if(prevCodeWindow!=codeWin){
+					if(prevCodeWindow!=mainCWH && prevCodeWindow!=null){	
 						ColorAdjust c=new ColorAdjust(0,0,0,0);
 						String color="CCCCCC";//grey
 						highlighter(prevCodeWindow,prevTimeline,c,color);
+					}
+					
+					if(prevCodeWindow!=null){
 						prevCodeWindow.reduceWindowSize();
 						prevCodeWindow.setPinBtn("plus");
 						//prevCodeWindow.getPinBtn().setVisible(true);
-					}
-					else{
-						if(prevCodeWindow!=null){
-							prevCodeWindow.reduceWindowSize();
-							prevCodeWindow.setPinBtn("plus");
-							//prevCodeWindow.getPinBtn().setVisible(true);
-						}
-					}
+					}					
 				}
 				
-				if(codeFragment.getEditor().isReduced()){
-					codeFragment.normalWindowSize();
+				if(codeWin.getEditor().isReduced()){
+					codeWin.normalWindowSize();
 				}
+				
+				//set the new window as current window
 				prevCodeWindow = currentCodeWindow;
-
-				currentCodeWindow = codeFragment;
+				currentCodeWindow = codeWin;
 
 				prevTimeline=currentTimeline;
-				currentTimeline=(timeline)obj[0];
-				prevProgIndicator=curProgIndicator;
-//				curProgIndicator=(ProgressIndicator)obj[1];
+				currentTimeline= tLine;
+
+				//if we added a new code window, add an arrow
 				if(!isExist){
 					Polygon arrow = createUMLArrow();
 					codeWindowArea.getChildren().add(arrow);
 				}
+				//set the line number which initiated the method call so we know where to palce the arrow
 				prevCodeWindow.getEditor().setSelectedLineNumber(lineNum);
 				
-				// need to highlight line here
 				highlightGutters(nextEvent);
 				initializeGrid();
 				reposition();
 				
-			} else{
+			} else{// code window for this method is not in code fragments, may be a system method call, we just highlight the next line
 				int line=eventUtils.getLineNum(nextEvent) - lineNumberOffset - 1;
 				currentCodeWindow.setLineColorToCurrent(line);
+				
 				currentCodeWindow.setSelectedLineNumber(line);
 				currentCodeWindow.getEditor().setSelectedLineNumber(line);
 			}
-			// need to find out why highlighted line is off by 1
 		}
+		
 		// Case: Next Line
 		else {
 			int line=eventUtils.getLineNum(nextEvent) - lineNumberOffset - 1;
+			
 			currentCodeWindow.setLineColorToCurrent(line);
 			currentCodeWindow.setSelectedLineNumber(line);
 			currentCodeWindow.getEditor().setSelectedLineNumber(line);
-			setTick(currentTimeline,curProgIndicator);//kai
 			
+			setTick(currentTimeline);
+			
+			//event writes to a variable, we handle inputing/updates values on the variable pane (grid pane)
 			if(eventUtils.isWriteEvent(nextEvent)){
 				//List<LocalVariableInfo> locVariablesList=eventUtils.getLocalVariables(nextEvent);
-				String name=eventUtils.getWriteEventVarName(nextEvent);
+				String varName= eventUtils.getWriteEventVarName(nextEvent);			
+				String varValue=eventUtils.getWriteEventValue(nextEvent);
 				
-				String value=eventUtils.getWriteEventValue(nextEvent);
 				LinkedHashMap<String,ArrayList> localVariableInfo=currentCodeWindow.getLocalVariables();
 				
-				if(!localVariableInfo.isEmpty()&&localVariableInfo.containsKey(name)){
-					ArrayList values=(ArrayList)localVariableInfo.get(name);
-					if(value!=null){
-						values.add(value);
+				//if the variable to be written to exist in our local var hashmap, append the value to it
+				if(!localVariableInfo.isEmpty()&&localVariableInfo.containsKey(varName)){
+					ArrayList values=(ArrayList)localVariableInfo.get(varName);
+					if(varValue!=null){
+						values.add(varValue);
 					}
 					else{
 						values.add("null");
 					}
-					localVariableInfo.put(name, values);
-					int index=returnIndexofValue(name,localVariableInfo);
+					//update the entry in local variable hashmap
+					localVariableInfo.put(varName, values);
+					
+					//variable may not exist in our list in which index will be -1
+					int index=returnIndexofValue(varName,localVariableInfo);
 					if(index!=-1){
-				        currentCodeWindow.setLocalVariables(localVariableInfo);
+				        currentCodeWindow.setLocalVariables(localVariableInfo);//set the updated variable hashmap
 				        index=2+2*index+2;
 				        
 				        removeGridStyles(gridPane);
 				        
+				        //highlight the variable name that is being written to
 				        Label nameLabel = (Label)gridPane.getChildren().get(index-1);	
 						nameLabel.setTextFill(Color.web("#ff9999"));
 						
-				        ComboBox valueBox= (ComboBox)gridPane.getChildren().get(index);
-				        
+						//highlight and set the new value in the combo box
+				        ComboBox valueBox= (ComboBox)gridPane.getChildren().get(index);				        
 				        valueBox.setScaleX(1);
 				        valueBox.setScaleY(1);
 				        valueBox.setStyle("-fx-font-size: 10px; -fx-background-color: #ff9999");    
-				        valueBox.getItems().add(value);
-				        valueBox.setValue(value);
+				        valueBox.getItems().add(varValue);
+				        valueBox.setValue(varValue);
 				        
-				        
+				        //update the elements being displayed
 				        gridPane.getChildren().set(index-1, nameLabel);
 				        gridPane.getChildren().set(index, valueBox);
 			        }
 				}
-				else{
+				else{ //if it does not exist in our hashmap, create the elements and add it to the variable pane
 					int rows=((gridPane.getChildren().size())/2);
 					removeGridStyles(gridPane);
-					Label nameLabel = new Label(name);
+					Label nameLabel = new Label(varName);
 					
 					nameLabel.setTextFill(Color.web("#ff9999"));
-					GridPane.setMargin(nameLabel, new Insets(10, 10, 10, 10));
+					gridPane.setMargin(nameLabel, new Insets(10, 10, 10, 10));
 			        
-					GridPane.setConstraints(nameLabel, 0,rows);
+					gridPane.setConstraints(nameLabel, 0,rows);
 			        
 			        ComboBox valueBox= new ComboBox();
 			        valueBox.setScaleX(1);
 			        valueBox.setScaleY(1);
 			        valueBox.setStyle("-fx-font-size: 10px; -fx-background-color: #ff9999");
-			        valueBox.getItems().add(value);
-			        valueBox.setValue(value);
+			        valueBox.getItems().add(varValue);
+			        valueBox.setValue(varValue);
 			        
 			        
-			        GridPane.setMargin(valueBox, new Insets(10, 10, 10, 10));
+			        gridPane.setMargin(valueBox, new Insets(10, 10, 10, 10));
 			        
-			        GridPane.setConstraints(valueBox, 1,rows);
+			        gridPane.setConstraints(valueBox, 1,rows);
 			       gridPane.getChildren().addAll(nameLabel,valueBox);
 			       
 			       
-			       
+			       //add the new var and value in local var hashmap and update the hashmap in the current code window
 			       ArrayList values=new ArrayList();
-			       values.add(value);
-			       localVariableInfo.put(name, values);
+			       values.add(varValue);
+			       localVariableInfo.put(varName, values);
 			       currentCodeWindow.setLocalVariables(localVariableInfo);
 				}
 
 			}
 		};
 	}
+	
 	//This method is used to create arrow head
+	//additional note, arrows need indexOnScreen as well to get them from the child array and reposition them
 	public static Polygon createUMLArrow() {
 		Polygon polygon = new Polygon(new double[]{
 				7.5, 0,
@@ -962,7 +954,8 @@ public class liveDebugging extends Application {
 		polygon.setStroke(Color.BLACK);
 		polygon.setRotate(90);
 		return polygon;
-		}
+	}
+	
 	private void initializeElementControl() {
 		Button nextBtn = (Button) getRootAnchorPane().lookup("#NextBtn");
 		Button previousBtn = (Button) getRootAnchorPane().lookup("#PrevBtn");
@@ -973,12 +966,11 @@ public class liveDebugging extends Application {
 			public void handle(ActionEvent e) {
 
 				ILogEvent curEvent = eventUtils.getCurrentEvent();
-
 				// step forward and get next event
 				ILogEvent nextEvent = eventUtils.forwardStepInto();
+				
 				if (nextEvent != null) {
-//					do {//this do while loop will ignore events on the same line, highlight and ticks will proceed line by line
-						//comment out to proceed event by event 
+
 						int clineNum = eventUtils.getLineNum(curEvent);
 						int nextlineNum = eventUtils.getLineNum(nextEvent);
 						
@@ -987,41 +979,46 @@ public class liveDebugging extends Application {
 //							break;
 						} 
 						else if (eventUtils.isMethodCall(nextEvent)) {
-							String methodName = eventUtils
-									.getMethodName(nextEvent);
+							
+							String methodName = eventUtils.getMethodName(nextEvent);
+							
 							if (codeFragments.codeFragmentExist(methodName)) {
 								processNextLine(clineNum, curEvent, nextEvent);
 //								break;
 							}
-							else{//system method calls, highlight the section
+							else{//system method calls, just highlight the section
 								curEvent = eventUtils.getCurrentEvent();
 								nextEvent = eventUtils.forwardStepInto();
-								setTick(currentTimeline,curProgIndicator);//kai
+								setTick(currentTimeline);
+								
 								currentCodeWindow.highlightSection(clineNum - lineNumberOffset - 1, eventUtils.getStartPos(curEvent), eventUtils.getEndPos(curEvent));
 							}
 						}
-
-						else {//events are on the same line that are not method calls, highlight section, increment timeline tick
+						//events are on the same line that are not method calls, highlight section, increment timeline tick
+						else {
 							curEvent = eventUtils.getCurrentEvent();
 							nextEvent = eventUtils.forwardStepInto();
-							setTick(currentTimeline,curProgIndicator);//kai
+							setTick(currentTimeline);
+							
 							currentCodeWindow.highlightSection(clineNum - lineNumberOffset - 1, eventUtils.getStartPos(curEvent), eventUtils.getEndPos(curEvent));
 						}
 
-//					} while (true);
 					
 					//currentCodeWindow.getPinBtn().setVisible(false);
 					
 					//handling the window minimizing image (pin) here
-					if(prevCodeWindow!=null){
-					//prevCodeWindow.getPinBtn().setVisible(false);
-				}
+//					if(prevCodeWindow!=null){
+//					prevCodeWindow.getPinBtn().setVisible(false);
+//					}
+					
+					//set current code window to green
 					if(mainCWH!=currentCodeWindow ){
 						ColorAdjust c=new ColorAdjust(0.426,0.63,0.075,0.015);
 						String color="A3FF7F";//green
 
 						highlighter(currentCodeWindow,currentTimeline,c,color);
 					}
+					//set previous code window to yellow
 					if(mainCWH!=prevCodeWindow){
 						//highlightPrevious();
 						ColorAdjust c=new ColorAdjust(0.3,1,0.218,0.38);
@@ -1078,14 +1075,14 @@ public class liveDebugging extends Application {
 						else{
 							curEvent = eventUtils.getCurrentEvent();
 							prevEvent = eventUtils.backwardStepInto();
-							decrementTick(currentTimeline,curProgIndicator);//kai
+							decrementTick(currentTimeline);//kai
 						}
 					}
 					else{
 
 						curEvent = eventUtils.getCurrentEvent();
 						prevEvent = eventUtils.backwardStepInto();
-						decrementTick(currentTimeline,curProgIndicator);//kai
+						decrementTick(currentTimeline);//kai
 						
 					}	
 					
@@ -1111,6 +1108,7 @@ public class liveDebugging extends Application {
 		});
 
 	}
+	
 	//This method relocates the timeline position along x-axis 
 	private int timelineLocationX(){
 		int x=0;
@@ -1126,8 +1124,8 @@ public class liveDebugging extends Application {
 			x=5;
 		}
 		return x;
-
 	}
+	
 	//This method relocates the timeline position along y-axis 
 	private int timelineLocationY(){
 		int y=0;
@@ -1139,45 +1137,44 @@ public class liveDebugging extends Application {
 			y=timelineStack.size()*40;
 		}
 		return y;
-		}
-
-	private Object[] createTimeLine(ILogEvent event,String methodName, double tick, double prevTick) {
-		IEventBrowser eventBrowser = eventUtils.getUnfilteredEventBrowser();
-
+	}
+	
+	// just a hack to get the main method for now
+	private ILogEvent getMainMethodEvent()
+	{
 		// find main method call event
-		if (event == null) {
-			while (eventBrowser.hasNext()) {
-				event = eventBrowser.next();
+		ILogEvent event = null;
+		IEventBrowser eventBrowser = eventUtils.getUnfilteredEventBrowser();
+		String methodName = "main";
 
-				String mName = eventUtils.getMethodName(event);
+		while (eventBrowser.hasNext()) {
+			event = eventBrowser.next();
 
-				// just a hack to get the main method for now
-				if (mName != null)
-					if (mName.equalsIgnoreCase(methodName))
-						break;
-			}			
+			String mName = eventUtils.getMethodName(event);
 
-		}
+			
+			if (mName != null)
+				if (mName.equalsIgnoreCase(methodName))
+					break;
+		}			
+		return event;
+	}
 
-		// get a list of child events timestamps
-		// for now i just use a global var
-		//create the slider (timeline)
-		childEventsTimestamps = eventUtils.getChildEventTimestamps(event);
+	// get a list of child events timestamps
+	//creates a tick for each event and returns a timeline object
+	private timeline createTimeLine(ILogEvent event,String methodName) {
+
+		ArrayList<Long> childEventsTimestamps = eventUtils.getChildEventTimestamps(event);
 		
 		timeline timeline = new timeline(childEventsTimestamps, eventUtils.getMethodName(event));
-		HBox hb = new HBox();
-		hb.setSpacing(5);
-		hb.getChildren().addAll(timeline);
 
 		posX=timelineLocationX();
 		posY=timelineLocationY();
 
-		timelineSection.getChildren().add(hb);
-		hb.relocate(posX,posY);
+		timelineSection.getChildren().add(timeline);
+		timeline.relocate(posX,posY);
 
-		Object[] object=new Object[1];
-		object[0]=timeline;
-		return object;
+		return timeline;
 	}
 
 }
