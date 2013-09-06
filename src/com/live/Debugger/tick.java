@@ -119,6 +119,11 @@ public class tick extends HBox{
 		return positionIdx;
 	}
 	
+	public long getTimestamp()
+	{
+		return timestamp;
+	}
+	
 	public void setTickColorSelected()
 	{
 		tick.setFill(selectedColor);

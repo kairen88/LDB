@@ -117,13 +117,6 @@ public class liveDebugging extends Application {
 	timeline currentTimeline;
 	timeline prevTimeline;	
 
-//	NavigationBar currentNaviBar;
-//	ArrayList<NavigationBar> navibarAry;
-//	TickNavigator tickNavigator;
-//
-//	ILogBrowser logBrowser;
-//	Stepper stepper;
-//	ArrayList<ICallerSideEvent> eventList;
 	
 	Pane codeWindowAreaNew;
 	Pane codeWindowArea=new Pane ();
@@ -133,7 +126,7 @@ public class liveDebugging extends Application {
 
 	int lineNumberOffset;
 //	ArrayList<Long> childEventsTimestamps;
-	private HashMap codeFragmentWindowsList; //list of code windows currently displayed on screen
+	private HashMap displayedCodeWindowsList; //list of code windows currently displayed on screen
 	Pane timelineSectionNew;
 	Pane timelineSection=new Pane ();
 
@@ -251,7 +244,7 @@ public class liveDebugging extends Application {
 		lineNumberOffset = 0;
 		codeWindowStack = new Stack<>();
 		timelineStack=new Stack<>();
-		codeFragmentWindowsList = new HashMap<>();
+		displayedCodeWindowsList = new HashMap<>();
 		//vb.setSpacing(5);
 
 		codeWindowAry = new ArrayList<CodeWindow>();
@@ -333,7 +326,7 @@ public class liveDebugging extends Application {
 		primaryStage.setTitle("Swift Debugger");
 		primaryStage.setScene(s);
 		primaryStage.setWidth(1830);
-		primaryStage.setHeight(1100);
+		primaryStage.setHeight(1000);
 		primaryStage.show();
 /*		
 		ILogEvent curEvent = eventUtils.getCurrentEvent();
@@ -432,8 +425,12 @@ public class liveDebugging extends Application {
 			s1.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 			s1.setContent(codeWindowArea);
 			codeWindowAreaNew.getChildren().add(s1);
-			codeFragmentWindowsList.put(methodName, 0);
+			displayedCodeWindowsList.put(methodName, 0);
 			codeWindowStack.push(currentCodeWindow);
+			
+			
+			codeWindowAreaNew.getChildren().add(createUMLArrow());
+			
 //			ILogEvent curEvent = eventUtils.getCurrentEvent();
 			//currentCodeWindow.getPinBtn().setVisible(false);
 			//ILogEvent nextEvent= eventUtils.forwardStepInto();
@@ -754,16 +751,16 @@ public class liveDebugging extends Application {
 				int value=0;
 				
 //keeping track of iteration num for window = value------------------------------------------------------------------------
-				if (codeFragmentWindowsList.containsKey(methodName)) {//check if we already have a code window on the display stage with that name
-					value = (int) codeFragmentWindowsList.get(methodName);
+				if (displayedCodeWindowsList.containsKey(methodName)) {//check if we already have a code window on the display stage with that name
+					value = (int) displayedCodeWindowsList.get(methodName);
 					value++;
 					//codeFragmentWindowsList.remove(methodName);
-					codeFragmentWindowsList.put(methodName, value);
+					displayedCodeWindowsList.put(methodName, value);
 					isExist = true;
 				}
 				else{
 					value++;
-					codeFragmentWindowsList.put(methodName, value);	
+					displayedCodeWindowsList.put(methodName, value);	
 				}
 //codeWindow iter number End----------------------------------------------------------------------------------------------
 				
@@ -964,149 +961,128 @@ public class liveDebugging extends Application {
 		nextBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-
 				ILogEvent curEvent = eventUtils.getCurrentEvent();
-				// step forward and get next event
-				ILogEvent nextEvent = eventUtils.forwardStepInto();
-				
-				if (nextEvent != null) {
-
-						int clineNum = eventUtils.getLineNum(curEvent);
-						int nextlineNum = eventUtils.getLineNum(nextEvent);
-						
-						if (clineNum != nextlineNum) {
-							processNextLine(clineNum, curEvent, nextEvent);
-//							break;
-						} 
-						else if (eventUtils.isMethodCall(nextEvent)) {
-							
-							String methodName = eventUtils.getMethodName(nextEvent);
-							
-							if (codeFragments.codeFragmentExist(methodName)) {
-								processNextLine(clineNum, curEvent, nextEvent);
-//								break;
-							}
-							else{//system method calls, just highlight the section
-								curEvent = eventUtils.getCurrentEvent();
-								nextEvent = eventUtils.forwardStepInto();
-								setTick(currentTimeline);
-								
-								currentCodeWindow.highlightSection(clineNum - lineNumberOffset - 1, eventUtils.getStartPos(curEvent), eventUtils.getEndPos(curEvent));
-							}
-						}
-						//events are on the same line that are not method calls, highlight section, increment timeline tick
-						else {
-							curEvent = eventUtils.getCurrentEvent();
-							nextEvent = eventUtils.forwardStepInto();
-							setTick(currentTimeline);
-							
-							currentCodeWindow.highlightSection(clineNum - lineNumberOffset - 1, eventUtils.getStartPos(curEvent), eventUtils.getEndPos(curEvent));
-						}
-
-					
-					//currentCodeWindow.getPinBtn().setVisible(false);
-					
-					//handling the window minimizing image (pin) here
-//					if(prevCodeWindow!=null){
-//					prevCodeWindow.getPinBtn().setVisible(false);
-//					}
-					
-					//set current code window to green
-					if(mainCWH!=currentCodeWindow ){
-						ColorAdjust c=new ColorAdjust(0.426,0.63,0.075,0.015);
-						String color="A3FF7F";//green
-
-						highlighter(currentCodeWindow,currentTimeline,c,color);
-					}
-					//set previous code window to yellow
-					if(mainCWH!=prevCodeWindow){
-						//highlightPrevious();
-						ColorAdjust c=new ColorAdjust(0.3,1,0.218,0.38);
-						String color="FFFB78";//yellow
-						highlighter(prevCodeWindow,prevTimeline,c,color);
-					}
-
-				}
+				stepForward(curEvent);
 			}
+
+			
 		});
 
 		previousBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-
-				// get current event
 				ILogEvent curEvent = eventUtils.getCurrentEvent();
-				// step backward and the the previous event
-				ILogEvent prevEvent = eventUtils.backwardStepInto();
-				
-				if (prevEvent != null) {
-				
-					do{
-					
-					int clineNum = eventUtils.getLineNum(curEvent);
-					int prevLineNum = eventUtils.getLineNum(prevEvent);	
-					if(clineNum!=prevLineNum){
-					
-
-					// currentCodeWindow.setLineColorToCompleted(clineNum -
-					// lineNumberOffset + 1);
-
-					// check if the previous event is the parent of current
-					// event
-						if (!eventUtils.isMethodCall(curEvent)) {
-							
-							processPrevious(clineNum,prevLineNum, prevEvent,curEvent);
-						}
-						else{
-
-							processPrevious(clineNum,prevLineNum, prevEvent,curEvent);
-						}
-					break;
-					}
-					else if (eventUtils.isMethodCall(prevEvent)) {
-						String methodName = eventUtils
-								.getMethodName(prevEvent);
-						//setTick(currentTimeline,curProgIndicator);
-						
-						if (codeFragments.codeFragmentExist(methodName)) {
-							processPrevious(clineNum,prevLineNum, prevEvent,curEvent);
-							break;
-						}
-						else{
-							curEvent = eventUtils.getCurrentEvent();
-							prevEvent = eventUtils.backwardStepInto();
-							decrementTick(currentTimeline);//kai
-						}
-					}
-					else{
-
-						curEvent = eventUtils.getCurrentEvent();
-						prevEvent = eventUtils.backwardStepInto();
-						decrementTick(currentTimeline);//kai
-						
-					}	
-					
-				}while(true);
-			
-					if(mainCWH!=currentCodeWindow ){
-						ColorAdjust c=new ColorAdjust(0.426,0.63,0.075,0.015);
-						String color="A3FF7F";//green
-
-						highlighter(currentCodeWindow,currentTimeline,c,color);
-					}
-					if(mainCWH!=prevCodeWindow){
-						ColorAdjust c=new ColorAdjust(0.3,1,0.218,0.38);
-						String color="FFFB78";//yellow
-						highlighter(prevCodeWindow,prevTimeline,c,color);
-					}
-					
-				}
+				stepBackward(curEvent);
 				
 				
 			}
 
+			
+
 		});
 
+	}
+	
+	void stepForward(ILogEvent curEvent) {
+		// step forward and get next event
+		ILogEvent nextEvent = eventUtils.forwardStepInto();
+		
+		if (nextEvent != null) {
+
+				int clineNum = eventUtils.getLineNum(curEvent);
+				int nextlineNum = eventUtils.getLineNum(nextEvent);
+				
+					processNextLine(clineNum, curEvent, nextEvent);
+			
+			//handling the window minimizing image (pin) here
+//			if(prevCodeWindow!=null){
+//			prevCodeWindow.getPinBtn().setVisible(false);
+//			}
+			
+			//set current code window to green
+			if(mainCWH!=currentCodeWindow ){
+				ColorAdjust c=new ColorAdjust(0.426,0.63,0.075,0.015);
+				String color="A3FF7F";//green
+
+				highlighter(currentCodeWindow,currentTimeline,c,color);
+			}
+			//set previous code window to yellow
+			if(mainCWH!=prevCodeWindow){
+				//highlightPrevious();
+				ColorAdjust c=new ColorAdjust(0.3,1,0.218,0.38);
+				String color="FFFB78";//yellow
+				highlighter(prevCodeWindow,prevTimeline,c,color);
+			}
+
+		}
+	}
+	
+	void stepBackward(ILogEvent curEvent) {
+		// step backward and the the previous event
+		ILogEvent prevEvent = eventUtils.backwardStepInto();
+		
+		if (prevEvent != null) {
+		
+//			do{
+			
+			int clineNum = eventUtils.getLineNum(curEvent);
+			int prevLineNum = eventUtils.getLineNum(prevEvent);	
+//			if(clineNum!=prevLineNum){
+			
+
+			// currentCodeWindow.setLineColorToCompleted(clineNum -
+			// lineNumberOffset + 1);
+
+			// check if the previous event is the parent of current
+			// event
+//				if (!eventUtils.isMethodCall(curEvent)) {
+					
+					processPrevious(clineNum,prevLineNum, prevEvent,curEvent);
+//				}
+//				else{
+//
+//					processPrevious(clineNum,prevLineNum, prevEvent,curEvent);
+//				}
+//			break;
+//			}
+//			else if (eventUtils.isMethodCall(prevEvent)) {
+//				String methodName = eventUtils
+//						.getMethodName(prevEvent);
+//				//setTick(currentTimeline,curProgIndicator);
+//				
+//				if (codeFragments.codeFragmentExist(methodName)) {
+//					processPrevious(clineNum,prevLineNum, prevEvent,curEvent);
+////					break;
+//				}
+//				else{
+//					curEvent = eventUtils.getCurrentEvent();
+//					prevEvent = eventUtils.backwardStepInto();
+//					decrementTick(currentTimeline);
+//				}
+//			}
+//			else{
+//
+//				curEvent = eventUtils.getCurrentEvent();
+//				prevEvent = eventUtils.backwardStepInto();
+//				decrementTick(currentTimeline);
+//				
+//			}	
+			
+//		}while(true);
+	
+			if(mainCWH!=currentCodeWindow ){
+				ColorAdjust c=new ColorAdjust(0.426,0.63,0.075,0.015);
+				String color="A3FF7F";//green
+
+				highlighter(currentCodeWindow,currentTimeline,c,color);
+			}
+			if(mainCWH!=prevCodeWindow){
+				ColorAdjust c=new ColorAdjust(0.3,1,0.218,0.38);
+				String color="FFFB78";//yellow
+				highlighter(prevCodeWindow,prevTimeline,c,color);
+			}
+			
+		}
 	}
 	
 	//This method relocates the timeline position along x-axis 
@@ -1166,7 +1142,7 @@ public class liveDebugging extends Application {
 
 		ArrayList<Long> childEventsTimestamps = eventUtils.getChildEventTimestamps(event);
 		
-		timeline timeline = new timeline(childEventsTimestamps, eventUtils.getMethodName(event));
+		timeline timeline = new timeline(childEventsTimestamps, eventUtils.getMethodName(event), this);
 
 		posX=timelineLocationX();
 		posY=timelineLocationY();

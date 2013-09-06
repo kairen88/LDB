@@ -1,6 +1,8 @@
 package com.live.Debugger;
 import java.util.ArrayList;
 
+import tod.core.database.event.ILogEvent;
+
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -20,7 +22,9 @@ public class timeline extends StackPane{
 	private HBox tickBox;
 	private ArrayList<tick> tickList;
 	
-	timeline(ArrayList<Long> _timestamps, String _methodName)
+	private liveDebugging liveDBug;
+	
+	timeline(ArrayList<Long> _timestamps, String _methodName, liveDebugging _liveDBug)
 	{
 		timestamps = _timestamps;
 		methodName = _methodName;
@@ -29,6 +33,8 @@ public class timeline extends StackPane{
 		//prev tick idx has not been set, initialized to -1
 		prevSelectedTickIdx = -1;
 		tickList = new ArrayList<tick>();
+		
+		liveDBug = _liveDBug;
 		
 		this.setMinHeight(30);
 		this.setMinWidth(300);
@@ -68,6 +74,7 @@ public class timeline extends StackPane{
 //				  prevSelectedTickIdx = tk.getPositionIdx();
 				   
 				   setTick(tk);
+//				   navigateToEvent(tk);
 			   }
 			});
 			
@@ -88,6 +95,29 @@ public class timeline extends StackPane{
 		  tk.setTickColorSelected();
 		  currentValue = tk.getPositionIdx() + 1;//position index is 0 based so we add 1
 		  prevSelectedTickIdx = tk.getPositionIdx();
+	}
+	
+	private void navigateToEvent(tick _tick)
+	{
+		ILogEvent currentEvent = liveDBug.eventUtils.getCurrentEvent();
+		
+		long tickTimestamp = _tick.getTimestamp();
+		while(currentEvent.getTimestamp() != tickTimestamp)
+		{
+			if(currentEvent.getTimestamp() < tickTimestamp)
+			{
+				liveDBug.stepForward(currentEvent);
+				currentEvent = liveDBug.eventUtils.getCurrentEvent();
+				if(currentEvent.getTimestamp() > tickTimestamp)
+					break;
+			}else 
+			{
+				liveDBug.stepBackward(currentEvent);
+				currentEvent = liveDBug.eventUtils.getCurrentEvent();
+				if(currentEvent.getTimestamp() < tickTimestamp)
+					break;
+			}
+		}
 	}
 	
 	public void setValue(double val)
