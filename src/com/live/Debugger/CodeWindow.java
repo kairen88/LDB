@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableIntegerValue;
@@ -47,7 +48,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-public class CodeWindow {
+public class CodeWindow extends DraggableNode{
 
 	private static String pinUnPressPath = CodeWindow.class.getResource("plus.png").toExternalForm();
     private static Image plus= new Image(pinUnPressPath);
@@ -63,11 +64,13 @@ public class CodeWindow {
 	private Rectangle cwBackground;
 	private TitledPane edit;//may not be used
 	private DraggableNode codeWindowContainer;
+	
 	private LinkedHashMap<String,ArrayList> localVariables= new LinkedHashMap<>();//store variables and value history
 	private ArrayList<LinkedHashMap<String,ArrayList>> localVariablesList= new ArrayList<>();//list of localVariables hashmaps to correspond the current iteration of the window
 	private String methodName;
 	SimpleIntegerProperty selectedLineNumber = new SimpleIntegerProperty(0);
 	SimpleIntegerProperty lineoffset = new SimpleIntegerProperty(9); //amount to offset the position of the arrow for each line according to selectedLineNumber
+	
 	private int windowWidth;
 	private int windowHeight;
 	private int padding = 10;
@@ -75,7 +78,8 @@ public class CodeWindow {
 	
 	private int currentExecutionLine = 0;
 	private int instance=0;//This will determine how many instances of same method name are opened
-	private int startLine=0;
+	
+	private int startLine=0;//line offset, to match actual line number to code editor line number
 	private int endLine=0;
 	
 	//column values for highlighting sections of a line
@@ -88,10 +92,12 @@ public class CodeWindow {
 	
 	private final ObservableList strings = FXCollections.observableArrayList(
 			"1");//may not be used
+	
 	private int indexOnScreen;
 			
 	double mousex=0;//may not be used
 	 double mousey=0;//may not be used
+	 
 	 double x =0;
 	 double y=0;
 	 private Group hbox=new Group(); 
@@ -113,7 +119,14 @@ public class CodeWindow {
 				imageView=img;
 			}
 		}
-		
+	
+   public SimpleDoubleProperty getDraggableX(){
+       return super.x;
+   }
+   
+   public SimpleDoubleProperty getDraggableY(){
+       return super.y;
+   }	
 	 
 		public int getWindowWidth(){
 			
@@ -361,6 +374,30 @@ public void setCodeWindowContainer(DraggableNode e){
 												"editor.markText(start,end,\"CodeMirror-LineSection-highlight\");");		
 	}
 	
+	//set CodeWindow background color to Red
+	public void setBackgroundColorToMain()
+	{		
+		setBackgroundColor("FF8C73");
+	}
+		
+	//set CodeWindow background color to Green
+	public void setBackgroundColorToCurrent()
+	{		
+		setBackgroundColor("A3FF7F");
+	}
+	
+	//set CodeWindow background color to Yellow
+	public void setBackgroundColorToPrevious()
+	{		
+		setBackgroundColor("FFFB78");
+	}
+	
+	//set CodeWindow background color to Grey - oldPreviousWindow
+	public void setBackgroundColorToInactive()
+	{		
+		setBackgroundColor("CCCCCC");
+	}
+	
 	//sets the class for the line number indicated to completedLine which styles it white
 	public void setLineColorToCompleted(int lineNum)
 	{
@@ -375,8 +412,8 @@ public void setCodeWindowContainer(DraggableNode e){
 		editor.webview.getEngine().executeScript("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'currentLine');");
 	}
 	
-	//sets the class for the line number indicated to newLine which styles it green
-	public void setLineColorToNew(int lineNum)
+	//sets the class for the line number indicated to newLine which styles it red - for method calls
+	public void setLineColorToMethodCall(int lineNum)
 	{
 		editor.webview.getEngine().executeScript("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'newLine');");
 	}
@@ -458,6 +495,14 @@ public void setCodeWindowContainer(DraggableNode e){
 		codeWindowBackground.setArcHeight(15);
 		codeWindowBackground.setArcWidth(15);
 		return codeWindowBackground;
+	}
+	
+	//helper method to set the background color (of the rectangle)
+	private void setBackgroundColor(String _color)
+	{
+		javafx.scene.paint.Paint codeMirrorBackgroundColor = javafx.scene.paint.Paint.valueOf(_color);//F9FCAC
+
+		cwBackground.setFill(codeMirrorBackgroundColor);
 	}
 	
 	private void addWebviewLoadedChangeListener()
@@ -584,9 +629,9 @@ public void setCodeWindowContainer(DraggableNode e){
         gp.getChildren().addAll(labelHbox, infoHBox);
         
         hbox.getChildren().addAll(gp);
-        codeWindowContainer.getChildren().add(codeWindowBackground);
-        codeWindowContainer.getChildren().add(hbox);
-		hbox.relocate(codeWindowContainer.getLayoutX()+5, codeWindowContainer.getLayoutY()+5);
+        this.getChildren().add(codeWindowBackground);
+        this.getChildren().add(hbox);
+		hbox.relocate(this.getLayoutX()+5, this.getLayoutY()+5);
 		//infoHBox.relocate(codeWindowContainer.getDWidth()-25, codeWindowContainer.getLayoutY()+5);
 		//hbox.toFront();
 		//add code window to root draggable node
@@ -594,9 +639,9 @@ public void setCodeWindowContainer(DraggableNode e){
 		//codeWindowBackground.toBack();
 		
 		//Group groupCont=new Group();
-		codeWindowContainer.getChildren().add(editor);
+		this.getChildren().add(editor);
 		 
-		codeWindowContainer.setDSize(this.windowWidth, this.windowHeight);
+		this.setDSize(this.windowWidth, this.windowHeight);
 
 		//infoHBox.relocate(codeWindowContainer.getLayoutX()+490, codeWindowContainer.getLayoutY());
 

@@ -24,9 +24,7 @@ public class CodeEditor extends StackPane {
 
   /** a snapshot of the code to be edited kept for easy initilization and reversion of editable code. */
   private String editingCode;
-  
-  SimpleIntegerProperty selectedLineNumber = new SimpleIntegerProperty(0);
-  
+    
   
   
   /** applies the editing template to the editing code to create the html+javascript source for a code editor. */
@@ -155,12 +153,12 @@ public class CodeEditor extends StackPane {
     
 //    System.out.println(webview.getEngine().);
   }
-public int getSelectedLineNumber() {
-	return selectedLineNumber.get();
-}
-public void setSelectedLineNumber(int selectedLineNumber) {
-	this.selectedLineNumber.setValue(selectedLineNumber);
-}
+//public int getSelectedLineNumber() {
+//	return selectedLineNumber.get();
+//}
+//public void setSelectedLineNumber(int selectedLineNumber) {
+//	this.selectedLineNumber.setValue(selectedLineNumber);
+//}
 public boolean isReduced() {
 	return isReduced;
 }

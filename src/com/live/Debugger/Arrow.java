@@ -22,7 +22,7 @@ public class Arrow extends Line{
 		startMethodName = startWindow.getMethodName();
 		endMethodName = endWindow.getMethodName();
 		
-		IntegerBinding lineNumber = startWindow.getEditor().selectedLineNumber.add(1);
+		IntegerBinding lineNumber = startWindow.selectedLineNumber.add(1);
 		
 //		lineNumber.add(startWindow.getEditor().selectedLineNumber.add(1));
 		
@@ -30,20 +30,20 @@ public class Arrow extends Line{
 		//calculate the offset for the y position at the start of the arrow
 		//using the current line selected
 		NumberBinding yLineOffset = lineNumber.multiply(startWindow.lineoffset);
-		NumberBinding boundY = yLineOffset.add(startWindow.getCodeWindowContainer().y).add(30);
+		NumberBinding startY = yLineOffset.add(startWindow.getDraggableY()).add(30);
 		
 		//calculate the offset for the x position at the start of the arrow
 		//using the width of the editor
 		SimpleDoubleProperty xOffset = new SimpleDoubleProperty();
-		NumberBinding boundX = xOffset.add(startWindow.getCodeWindowContainer().x).add(startWindow.getEditor().widthProperty());
+		NumberBinding endX = xOffset.add(startWindow.getDraggableX()).add(startWindow.getEditor().widthProperty());
 		
 		//bind the start position of the arrow to the start method
-		this.startXProperty().bind(boundX);
-		this.startYProperty().bind(boundY);
-		
+		this.startXProperty().bind(endX);
+		this.startYProperty().bind(startY);
+				
 		//bind the end position of the arrow to the end method
-		this.endXProperty().bind(endWindow.getCodeWindowContainer().x);
-		this.endYProperty().bind(endWindow.getCodeWindowContainer().y);
+		this.endXProperty().bind(endWindow.getDraggableX());
+		this.endYProperty().bind(endWindow.getDraggableY());
 	}
 			
 			

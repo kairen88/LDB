@@ -134,7 +134,7 @@ public class timeline extends StackPane{
 		
 		for(CodeWindow codeWin : codeWinCallStack)
 		{
-			MethodState methodState = new MethodState(codeWin.getMethodName(), codeWin.getEditor().getSelectedLineNumber());
+			MethodState methodState = new MethodState(codeWin.getMethodName(), codeWin.getSelectedLineNumber());
 			callStack.add(methodState);
 		}
 	}
