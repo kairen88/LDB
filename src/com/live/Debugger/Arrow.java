@@ -1,8 +1,12 @@
-package com.live.Debugger;
-import javax.swing.text.StyleContext.SmallAttributeSet;
+ package com.live.Debugger;
 
+import javax.swing.text.StyleContext.SmallAttributeSet;
+import javax.xml.stream.events.EndElement;
+
+import javafx.beans.binding.IntegerBinding;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.shape.Line;
 
 
@@ -11,23 +15,42 @@ public class Arrow extends Line{
 	String startMethodName;
 	String endMethodName;
 	
-	public Arrow(String _startMethodName, String _endMethodName, int _lineNumber, double _windowWidth,
-			SimpleDoubleProperty _startMethodX, SimpleDoubleProperty _startMethodY, 
-			SimpleDoubleProperty _endMethodX, SimpleDoubleProperty _endMethodY)
+//	SimpleIntegerProperty lineNumber;
+	
+	public Arrow(CodeWindow startWindow, CodeWindow endWindow)
 	{
-		startMethodName = _startMethodName;
-		endMethodName = _endMethodName;
+		startMethodName = startWindow.getMethodName();
+		endMethodName = endWindow.getMethodName();
 		
-		SimpleDoubleProperty yOffset = new SimpleDoubleProperty(_lineNumber * 5);
-		NumberBinding boundY = yOffset.add(_startMethodY);
+		IntegerBinding lineNumber = startWindow.getEditor().selectedLineNumber.add(1);
 		
-		SimpleDoubleProperty xOffset = new SimpleDoubleProperty(_windowWidth);
-		NumberBinding boundX = xOffset.add(_startMethodX);
+//		lineNumber.add(startWindow.getEditor().selectedLineNumber.add(1));
 		
+	
+		//calculate the offset for the y position at the start of the arrow
+		//using the current line selected
+		NumberBinding yLineOffset = lineNumber.multiply(startWindow.lineoffset);
+		NumberBinding boundY = yLineOffset.add(startWindow.getCodeWindowContainer().y).add(30);
+		
+		//calculate the offset for the x position at the start of the arrow
+		//using the width of the editor
+		SimpleDoubleProperty xOffset = new SimpleDoubleProperty();
+		NumberBinding boundX = xOffset.add(startWindow.getCodeWindowContainer().x).add(startWindow.getEditor().widthProperty());
+		
+		//bind the start position of the arrow to the start method
 		this.startXProperty().bind(boundX);
 		this.startYProperty().bind(boundY);
 		
-		this.endXProperty().bind(_endMethodX);
-		this.endYProperty().bind(_endMethodY);
+		//bind the end position of the arrow to the end method
+		this.endXProperty().bind(endWindow.getCodeWindowContainer().x);
+		this.endYProperty().bind(endWindow.getCodeWindowContainer().y);
 	}
+			
+			
+			
+//			prevCodeWindow.getMethodName(), codeWin.getMethodName(), 
+//			prevCodeWindow.getSelectedLineNumber(), prevCodeWindow.getEditor().getWidth(), 
+//			prevCodeWindow.getCodeWindowContainer().x, prevCodeWindow.getCodeWindowContainer().y, 
+//			codeWin.getCodeWindowContainer().x, codeWin.getCodeWindowContainer().y
+	
 }

@@ -119,7 +119,7 @@ public class tick extends HBox{
 		return positionIdx;
 	}
 	
-	public long getTimestamp()
+	public long getTimestamp1()
 	{
 		return timestamp;
 	}
@@ -138,5 +138,10 @@ public class tick extends HBox{
 	      spaceR.setWidth(spaceWidthInitial);
 	      spaceL.setHeight(spaceHeightInitial);
 	      spaceL.setWidth(spaceWidthInitial);
+	}
+
+	public long getTimestamp() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

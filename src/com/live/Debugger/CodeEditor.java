@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 
@@ -24,7 +25,7 @@ public class CodeEditor extends StackPane {
   /** a snapshot of the code to be edited kept for easy initilization and reversion of editable code. */
   private String editingCode;
   
-  private int selectedLineNumber=0;
+  SimpleIntegerProperty selectedLineNumber = new SimpleIntegerProperty(0);
   
   
   
@@ -155,10 +156,10 @@ public class CodeEditor extends StackPane {
 //    System.out.println(webview.getEngine().);
   }
 public int getSelectedLineNumber() {
-	return selectedLineNumber;
+	return selectedLineNumber.get();
 }
 public void setSelectedLineNumber(int selectedLineNumber) {
-	this.selectedLineNumber = selectedLineNumber;
+	this.selectedLineNumber.setValue(selectedLineNumber);
 }
 public boolean isReduced() {
 	return isReduced;

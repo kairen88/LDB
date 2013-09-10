@@ -127,6 +127,7 @@ public class liveDebugging extends Application {
 	int lineNumberOffset;
 //	ArrayList<Long> childEventsTimestamps;
 	private HashMap displayedCodeWindowsList; //list of code windows currently displayed on screen
+	private ArrayList<CodeWindow> CodeWindowCallStack; //maintains a list that represents the call stack
 	Pane timelineSectionNew;
 	Pane timelineSection=new Pane ();
 
@@ -245,6 +246,7 @@ public class liveDebugging extends Application {
 		codeWindowStack = new Stack<>();
 		timelineStack=new Stack<>();
 		displayedCodeWindowsList = new HashMap<>();
+		CodeWindowCallStack = new ArrayList<CodeWindow>();
 		//vb.setSpacing(5);
 
 		codeWindowAry = new ArrayList<CodeWindow>();
@@ -258,7 +260,8 @@ public class liveDebugging extends Application {
 				//"#codeWindowSection");
 		codeWindowAreaNew = (Pane) getRootAnchorPane().lookup(
 				"#codeWindowSection");//new StackPane();
-
+		codeWindowArea = new Pane ();		
+		
 		/*
 		 * //adding 1st code window setting it as current CodeWindow editor =
 		 * new CodeWindow(path, 300, 300);
@@ -426,11 +429,10 @@ public class liveDebugging extends Application {
 			s1.setContent(codeWindowArea);
 			codeWindowAreaNew.getChildren().add(s1);
 			displayedCodeWindowsList.put(methodName, 0);
+			CodeWindowCallStack.add(editor);
 			codeWindowStack.push(currentCodeWindow);
 			
-			
-			codeWindowAreaNew.getChildren().add(createUMLArrow());
-			
+						
 //			ILogEvent curEvent = eventUtils.getCurrentEvent();
 			//currentCodeWindow.getPinBtn().setVisible(false);
 			//ILogEvent nextEvent= eventUtils.forwardStepInto();
@@ -629,11 +631,12 @@ public class liveDebugging extends Application {
 		cd.relocate(0, 0);
 		
 		for(int j=1;j<codeWindowArea.getChildren().size();j=j+2){
-			Polygon cArrow=(Polygon)(codeWindowArea.getChildren().get(j+1));
+			Arrow cArrow=(Arrow)(codeWindowArea.getChildren().get(j+1));
 			int ax=calculateArrowX(cd);
 			int ay=calculateArrowY(cd,((CodeEditor)(cd.getChildren().get(2))).getSelectedLineNumber());
-			cArrow.relocate(ax, ay);	
-			codeWindowArea.getChildren().set(j+1,cArrow);
+//			cArrow.relocate(ax, ay);	
+//			cArrow.updatePosition(ax, ay);
+//			codeWindowArea.getChildren().set(j+1,cArrow);
 			
 			DraggableNode newCd=(DraggableNode) codeWindowArea.getChildren().get(j);
 			int x=calculateWindowX(cd);
@@ -641,6 +644,8 @@ public class liveDebugging extends Application {
 			
 			codeWindowArea.getChildren().set(j,newCd);			
 			newCd.relocate(x, y);
+			newCd.x.set(x);
+			newCd.y.set(y);
 
 			cd=newCd;
 		}
@@ -701,6 +706,14 @@ public class liveDebugging extends Application {
 			//prevCodeWindow.reduceWindowSize();
 			}
 			
+			//since we are stepping out of the method, remove it from the call stack
+			//check if the current code window is the last method in the call stack, remove it
+			if(CodeWindowCallStack.get(CodeWindowCallStack.size() - 1).getMethodName().equalsIgnoreCase(currentCodeWindow.getMethodName()))
+				CodeWindowCallStack.remove(CodeWindowCallStack.size() - 1);
+			
+			//print out call stack for debugging 
+//			printCallStack();
+			
 			//stash the previous window
 			CodeWindow oldPreviousWindow=prevCodeWindow;
 			//set current window as previous
@@ -712,6 +725,8 @@ public class liveDebugging extends Application {
 			if (!codeWindowStack.empty()){
 				currentCodeWindow= codeWindowStack.pop();
 				currentTimeline=timelineStack.pop();
+				
+				currentTimeline.printCallStack(); //for debugging
 			}
 			if(oldPreviousWindow!=currentCodeWindow){
 				oldPreviousWindow.reduceWindowSize();//prevCodeWindow.normalWindowSize();
@@ -785,6 +800,14 @@ public class liveDebugging extends Application {
 					codeWindowArea.getChildren().set(codeWin.getIndexOnScreen(), codeWin.getRootNode());
 				}
 				
+				//update the selected line of the last method call
+				CodeWindowCallStack.get(CodeWindowCallStack.size() - 1).getEditor().setSelectedLineNumber(clineNum);
+				//add the new method to the call stack
+				CodeWindowCallStack.add(codeWin);
+				//print out for debugging
+//				printCallStack();
+				
+				
 				//highlight the line of the method call in the current window
 				int lineNum=eventUtils.getLineNum(nextEvent) - lineNumberOffset - 1;
 				currentCodeWindow.setLineColorToNew(lineNum);
@@ -823,14 +846,22 @@ public class liveDebugging extends Application {
 
 				prevTimeline=currentTimeline;
 				currentTimeline= tLine;
+				
+				currentTimeline.printCallStack(); //for debugging
+				
+				//set the line number which initiated the method call so we know where to palce the arrow
+				prevCodeWindow.getEditor().setSelectedLineNumber(lineNum);
 
 				//if we added a new code window, add an arrow
 				if(!isExist){
 					Polygon arrow = createUMLArrow();
-					codeWindowArea.getChildren().add(arrow);
+					
+					Arrow arrowNew = new Arrow(prevCodeWindow, codeWin);
+					
+//					codeWindowArea.getChildren().add(arrow);
+					codeWindowArea.getChildren().add(arrowNew);
 				}
-				//set the line number which initiated the method call so we know where to palce the arrow
-				prevCodeWindow.getEditor().setSelectedLineNumber(lineNum);
+				
 				
 				highlightGutters(nextEvent);
 				initializeGrid();
@@ -854,6 +885,8 @@ public class liveDebugging extends Application {
 			currentCodeWindow.getEditor().setSelectedLineNumber(line);
 			
 			setTick(currentTimeline);
+			
+			currentTimeline.printCallStack(); //for debugging
 			
 			//event writes to a variable, we handle inputing/updates values on the variable pane (grid pane)
 			if(eventUtils.isWriteEvent(nextEvent)){
@@ -1142,7 +1175,7 @@ public class liveDebugging extends Application {
 
 		ArrayList<Long> childEventsTimestamps = eventUtils.getChildEventTimestamps(event);
 		
-		timeline timeline = new timeline(childEventsTimestamps, eventUtils.getMethodName(event), this);
+		timeline timeline = new timeline(childEventsTimestamps, eventUtils.getMethodName(event), CodeWindowCallStack);
 
 		posX=timelineLocationX();
 		posY=timelineLocationY();
@@ -1151,6 +1184,12 @@ public class liveDebugging extends Application {
 		timeline.relocate(posX,posY);
 
 		return timeline;
+	}
+	
+	private void printCallStack()
+	{
+		for(CodeWindow codeWin : CodeWindowCallStack)
+			System.out.println(codeWin.getMethodName() + "\n");
 	}
 
 }

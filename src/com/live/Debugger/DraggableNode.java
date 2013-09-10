@@ -1,5 +1,7 @@
 package com.live.Debugger;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -11,8 +13,8 @@ public class DraggableNode extends Group{
 
    //ATTRIBUTES
    //X AND Y postion of Node
-   double x = 0;
-   double y = 0;
+   SimpleDoubleProperty x = new SimpleDoubleProperty(0);
+   SimpleDoubleProperty y = new SimpleDoubleProperty(0);
    //X AND Y position of mouse
    double mousex=0;
    double mousey=0;
@@ -43,14 +45,13 @@ public class DraggableNode extends Group{
        //EventListener for MousePressed
        onMousePressedProperty().set(new EventHandler<MouseEvent>(){
 
-           @Override
            public void handle(MouseEvent event) {
               //record the current mouse X and Y position on Node
               mousex = event.getSceneX();
               mousey= event.getSceneY();
               //get the x and y position measure from Left-Top
-              x = getLayoutX();
-              y = getLayoutY();
+              x.setValue(getLayoutX());
+              y.setValue(getLayoutY());
            }
 
        });
@@ -58,20 +59,20 @@ public class DraggableNode extends Group{
        //Event Listener for MouseDragged
        onMouseDraggedProperty().set(new EventHandler<MouseEvent>(){
 
-           @Override
            public void handle(MouseEvent event) {
                //Get the exact moved X and Y
-               x += event.getSceneX()-mousex ;
-               y += event.getSceneY()-mousey ;
-               System.out.println("Value of X = "+x);
-               System.out.println("Value of Y = "+y);
+               x.setValue(x.get() + event.getSceneX()-mousex) ;
+               y.setValue(y.get() + event.getSceneY()-mousey) ;
+               
+//               System.out.println("Value of X = "+x.get());
+//               System.out.println("Value of Y = "+y.get());
                
               /* if(x>=0&&x<=640&&y<700&&y>=0){
             	*/
                
                //set the positon of Node after calculation
-               setLayoutX(x);
-               setLayoutY(y);
+               setLayoutX(x.get());
+               setLayoutY(y.get());
 
                //again set current Mouse x AND y position
                mousex = event.getSceneX();

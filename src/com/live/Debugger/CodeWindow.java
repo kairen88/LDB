@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableIntegerValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -64,7 +66,8 @@ public class CodeWindow {
 	private LinkedHashMap<String,ArrayList> localVariables= new LinkedHashMap<>();//store variables and value history
 	private ArrayList<LinkedHashMap<String,ArrayList>> localVariablesList= new ArrayList<>();//list of localVariables hashmaps to correspond the current iteration of the window
 	private String methodName;
-	private int selectedLineNumber=0;
+	SimpleIntegerProperty selectedLineNumber = new SimpleIntegerProperty(0);
+	SimpleIntegerProperty lineoffset = new SimpleIntegerProperty(9); //amount to offset the position of the arrow for each line according to selectedLineNumber
 	private int windowWidth;
 	private int windowHeight;
 	private int padding = 10;
@@ -185,7 +188,7 @@ public void setCodeWindowContainer(DraggableNode e){
 			this.windowHeight= 600;
 		else*/
 			this.windowHeight= _windowHeight;
-		
+					
 		//construct the code window
 		constructCodeWindow(editingCode,methodName);	
 		initializeGrid();
@@ -237,6 +240,8 @@ public void setCodeWindowContainer(DraggableNode e){
     
 		this.editor.webview.setPrefSize(this.windowWidth, this.windowHeight);
 		this.editor.webview.setMinSize(this.windowWidth, this.windowHeight);
+		
+		this.lineoffset.setValue(0);
 
 		//resizing grid pane - grip pane contains method name label, iternation box and pin
 		GridPane gp=((GridPane)(this.hbox.getChildren().get(0)));
@@ -279,6 +284,8 @@ public void setCodeWindowContainer(DraggableNode e){
     
 		this.editor.webview.setPrefSize(this.windowWidth, this.windowHeight);
 		this.editor.webview.setMinSize(this.windowWidth, this.windowHeight);
+		
+		this.lineoffset.setValue(9);
 		
 		//this.hbox.relocate(codeWindowContainer.getLayoutX()+510, codeWindowContainer.getLayoutY());  
 		//this.hbox.relocate(codeWindowContainer.getLayoutX()+5, codeWindowContainer.getLayoutY()+5);
@@ -657,10 +664,10 @@ public void setCodeWindowContainer(DraggableNode e){
 		this.localVariables = localVariables;
 	}
 	public int getSelectedLineNumber() {
-		return selectedLineNumber;
+		return selectedLineNumber.get();
 	}
 	public void setSelectedLineNumber(int selectedLineNumber) {
-		this.selectedLineNumber = selectedLineNumber;
+		this.selectedLineNumber.setValue(selectedLineNumber);
 	}/*
 	public GridPane getGridPane() {
 		return gridPane;

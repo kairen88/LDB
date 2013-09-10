@@ -18,24 +18,25 @@ public class timeline extends StackPane{
 	private int prevSelectedTickIdx;
 	private String methodName;
 	private int currentValue;
+	private ArrayList<MethodState> callStack;
 	
 	private HBox tickBox;
 	private ArrayList<tick> tickList;
 	
-	private liveDebugging liveDBug;
 	
-	timeline(ArrayList<Long> _timestamps, String _methodName, liveDebugging _liveDBug)
+	timeline(ArrayList<Long> _timestamps, String _methodName, ArrayList<CodeWindow> codeWinCallStack)
 	{
 		timestamps = _timestamps;
 		methodName = _methodName;
 		currentValue = 0;
+		
+		getCallStack(codeWinCallStack);
+		
 		//stores the idx of the last tick that was selected
 		//prev tick idx has not been set, initialized to -1
 		prevSelectedTickIdx = -1;
 		tickList = new ArrayList<tick>();
-		
-		liveDBug = _liveDBug;
-		
+				
 		this.setMinHeight(30);
 		this.setMinWidth(300);
 		this.setStyle("-fx-background-color: #336699;");
@@ -61,20 +62,8 @@ public class timeline extends StackPane{
 			tickList.add(tk);
 			tk.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			   public void handle(MouseEvent arg0) {
-
-//				   //set the previously selected tick to false, enable mousout resizing
-//				  if(prevSelectedTickIdx != -1)
-//				  {
-//					  tickList.get(prevSelectedTickIdx).setIsSelected(false);
-//					  tickList.get(prevSelectedTickIdx).setTickSizeToInitial();
-//				  }
-//				  tk.setIsSelected(true);
-//				  tk.setTickColorSelected();
-//				  currentValue = tk.getPositionIdx() + 1;//position index is 0 based so we add 1
-//				  prevSelectedTickIdx = tk.getPositionIdx();
 				   
 				   setTick(tk);
-//				   navigateToEvent(tk);
 			   }
 			});
 			
@@ -95,29 +84,6 @@ public class timeline extends StackPane{
 		  tk.setTickColorSelected();
 		  currentValue = tk.getPositionIdx() + 1;//position index is 0 based so we add 1
 		  prevSelectedTickIdx = tk.getPositionIdx();
-	}
-	
-	private void navigateToEvent(tick _tick)
-	{
-		ILogEvent currentEvent = liveDBug.eventUtils.getCurrentEvent();
-		
-		long tickTimestamp = _tick.getTimestamp();
-		while(currentEvent.getTimestamp() != tickTimestamp)
-		{
-			if(currentEvent.getTimestamp() < tickTimestamp)
-			{
-				liveDBug.stepForward(currentEvent);
-				currentEvent = liveDBug.eventUtils.getCurrentEvent();
-				if(currentEvent.getTimestamp() > tickTimestamp)
-					break;
-			}else 
-			{
-				liveDBug.stepBackward(currentEvent);
-				currentEvent = liveDBug.eventUtils.getCurrentEvent();
-				if(currentEvent.getTimestamp() < tickTimestamp)
-					break;
-			}
-		}
 	}
 	
 	public void setValue(double val)
@@ -146,20 +112,41 @@ public class timeline extends StackPane{
 	public void setColor(String _color)
 	{
 		this.setStyle("-fx-background-color: #" + _color + ";");
-//		switch(_color){
-//			case "FF8C73": // red
-//				this.setStyle("-fx-background-color: #" + _color + ";");
-//				break;
-//	
-//			case	"CCCCCC": // grey
-//				this.setStyle("-fx-background-color: #" + _color + ";");
-//
-//	
-//			case	"A3FF7F": // green
-//				this.setStyle("-fx-background-color: #" + _color + ";");
-//
-//	
-//			case	"FFFB78": // yellow
-//		}
+	}
+	
+	//for debugging purposes
+	public void printCallStack()
+	{
+		System.out.println("Call Stack for " + methodName + " timeline: \n");
+		
+		for(MethodState methodState : callStack)
+		{
+			System.out.println("method: " + methodState.methodName + " Line: " + methodState.selectedLine + "\n");
+		}
+	}
+	
+	//each timeline maintains a call stack of it's parent methods
+	//for recreating the windows in the display area when we navigate to an event by selecting the ticks
+	//**IMPORTANT currently, line numbers are WRONG
+	private void getCallStack(ArrayList<CodeWindow> codeWinCallStack)
+	{
+		callStack = new ArrayList<MethodState>();
+		
+		for(CodeWindow codeWin : codeWinCallStack)
+		{
+			MethodState methodState = new MethodState(codeWin.getMethodName(), codeWin.getEditor().getSelectedLineNumber());
+			callStack.add(methodState);
+		}
+	}
+	
+	class  MethodState{
+		String methodName;
+		int selectedLine;
+		
+		MethodState(String _methodName, int _selectedLine)
+		{
+			methodName = _methodName;
+			selectedLine = _selectedLine;
+		}
 	}
 }
