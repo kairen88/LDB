@@ -68,7 +68,7 @@ public class CodeWindow extends DraggableNode{
 	private LinkedHashMap<String,ArrayList> localVariables= new LinkedHashMap<>();//store variables and value history
 	private ArrayList<LinkedHashMap<String,ArrayList>> localVariablesList= new ArrayList<>();//list of localVariables hashmaps to correspond the current iteration of the window
 	private String methodName;
-	SimpleIntegerProperty selectedLineNumber = new SimpleIntegerProperty(0);
+	SimpleIntegerProperty selectedLineNumber = new SimpleIntegerProperty(0);//linenumber of the method call
 	SimpleIntegerProperty lineoffset = new SimpleIntegerProperty(9); //amount to offset the position of the arrow for each line according to selectedLineNumber
 	
 	private int windowWidth;
@@ -145,6 +145,16 @@ public class CodeWindow extends DraggableNode{
 	public CodeEditor getEditor(){
 		
 		return this.editor;
+	}
+	
+	//increment the current iteration in the iteration combo box
+	public void incrementIteration()
+	{
+		int currentIteration = iterationBox.getItems().size() + 1;
+		iterationBox.getItems().add(currentIteration);
+		
+		//set the last item in the iteration Box as it's displayed value
+		iterationBox.setValue( iterationBox.getItems().get(iterationBox.getItems().size() - 1) );
 	}
 	
 public void setIterationBox(ComboBox e){
@@ -707,6 +717,14 @@ public void setCodeWindowContainer(DraggableNode e){
 			localVariablesList.add(value-1,localVariables);
 		}
 		this.localVariables = localVariables;
+	}
+	public int getExecutedLine()
+	{
+		return currentExecutionLine;
+	}
+	public void setExecutedLine(int _line)
+	{
+		currentExecutionLine = _line;
 	}
 	public int getSelectedLineNumber() {
 		return selectedLineNumber.get();

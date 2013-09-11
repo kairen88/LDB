@@ -217,7 +217,7 @@ public class liveDebugging extends Application {
 		lineNumberOffset = 0;
 		codeWindowStack = new Stack<>();
 		timelineStack=new Stack<>();
-		displayedCodeWindowsList = new HashMap<>();
+		displayedCodeWindowsList = new HashMap<String, Integer>();
 		CodeWindowCallStack = new ArrayList<CodeWindow>();
 		codeWindowAry = new ArrayList<CodeWindow>();
 
@@ -556,15 +556,19 @@ public class liveDebugging extends Application {
 		}
 	}
 	//This method is used to proceed towards a next line
-	private void processNextLine(int clineNum, ILogEvent curEvent,
-			ILogEvent nextEvent) {
+	private void processNextLine(ILogEvent curEvent, ILogEvent nextEvent) {
+		
+		int clineNum = eventUtils.getLineNum(curEvent);
+		
 		//handle special case - check if this is still valid
 		if (clineNum - lineNumberOffset < 0) {
 
 			clineNum = lineNumberOffset + 1;
 		}
+		
 		//sets current line to white - remove highlight
-		currentCodeWindow.setLineColorToCompleted(clineNum - currentCodeWindow.getStartLine() - 1);
+//		currentCodeWindow.setLineColorToCompleted(clineNum - currentCodeWindow.getStartLine() - 1);
+		currentCodeWindow.setLineColorToCompleted(currentCodeWindow.getExecutedLine());
 		
 		//Case: Method return - 
 		//if depth of next event > current, we have returned to parent method
@@ -608,7 +612,7 @@ public class liveDebugging extends Application {
 			
 			currentCodeWindow.setLineColorToCurrent(line);
 			
-			currentCodeWindow.setSelectedLineNumber(line);//so we know the start point of the arrow
+			currentCodeWindow.setExecutedLine(line);//so we know the start point of the arrow
 			
 			setTick(currentTimeline);
 			
@@ -631,23 +635,49 @@ public class liveDebugging extends Application {
 				int nextLine = eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
 				currentCodeWindow.setLineColorToCurrent(nextLine);
 				
-				currentCodeWindow.setSelectedLineNumber(nextLine);
+				currentCodeWindow.setExecutedLine(nextLine);
 			}
 			//ELSE it is a method call and we need to add a new code window
 			else {
-
-				// get the code window 
-				CodeWindow codeWin = codeFragments.getCodeFragment(methodName);
+				
 				timeline tLine = createTimeLine(nextEvent,methodName);
-
-				//add the new code window to the screen, store it's position index in the container
-				codeWindowArea.getChildren().add(codeWin);
-				codeWin.setIndexOnScreen(codeWindowArea.getChildren().size() - 1);// IndexOnScreen = index of element (eg. codeWindow) as a child of the code area pane
+				
+				CodeWindow codeWin = null;				
+				boolean addedNewWindow = false;
+				
+				//if code window does not exist in display container
+				//add new code window
+				if(!displayedCodeWindowsList.containsKey(methodName))
+				{
+					// get the code window 
+					codeWin = codeFragments.getCodeFragment(methodName);					
+	
+					//add the new code window to the screen, store it's position index in the container
+					codeWindowArea.getChildren().add(codeWin);
+					codeWin.setIndexOnScreen(codeWindowArea.getChildren().size() - 1);// IndexOnScreen = index of element (eg. codeWindow) as a child of the code area pane
+					//add code window to list of displayed windows and store it's position in the container
+					displayedCodeWindowsList.put(methodName, codeWindowArea.getChildren().size() - 1);
+					
+					addedNewWindow = true;
+				}
+				else //code window already exists in display container
+					//get the code window and increment it's iteration
+				{ 
+					codeWin = (CodeWindow) codeWindowArea.getChildren().get((int) displayedCodeWindowsList.get(methodName));
+					
+					codeWin.incrementIteration();
+					//set new grid pane
+					
+					
+					codeWin.normalWindowSize();
+				}
 				
 				//update the selected line of the last method call
 				//add the new method to the call stack
-				CodeWindowCallStack.get(CodeWindowCallStack.size() - 1).setSelectedLineNumber(clineNum);				
+				CodeWindowCallStack.get(CodeWindowCallStack.size() - 1).setExecutedLine(clineNum);				
 				CodeWindowCallStack.add(codeWin);
+				
+				
 				
 //print out for debugging
 //printCallStack();				
@@ -658,6 +688,7 @@ public class liveDebugging extends Application {
 				
 				//set the line number which initiated the method call so we know where to palce the arrow
 				currentCodeWindow.setSelectedLineNumber(lineNum);
+				currentCodeWindow.setExecutedLine(lineNum);
 				
 //				lineNumberOffset = codeFragments.getLineNumberOffset(methodName);
 				
@@ -695,10 +726,13 @@ public class liveDebugging extends Application {
 					//prevCodeWindow.getPinBtn().setVisible(true);
 				}
 				
+				//if we added a new window
 				//add an Arrow connecting the new and previous windows
-				Arrow arrowNew = new Arrow(prevCodeWindow, currentCodeWindow);
-				codeWindowArea.getChildren().add(arrowNew);
-
+				if(addedNewWindow)
+				{
+					Arrow arrowNew = new Arrow(prevCodeWindow, currentCodeWindow);
+					codeWindowArea.getChildren().add(arrowNew);
+				}
 				highlightGutters(nextEvent);
 				initializeGrid();
 //				reposition();
@@ -711,7 +745,7 @@ public class liveDebugging extends Application {
 			int line=eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
 			
 			currentCodeWindow.setLineColorToCurrent(line);
-			currentCodeWindow.setSelectedLineNumber(line);
+			currentCodeWindow.setExecutedLine(line);
 			
 			setTick(currentTimeline);
 			
@@ -858,7 +892,7 @@ public class liveDebugging extends Application {
 				int clineNum = eventUtils.getLineNum(curEvent);
 				int nextlineNum = eventUtils.getLineNum(nextEvent);
 				
-					processNextLine(clineNum, curEvent, nextEvent);
+					processNextLine(curEvent, nextEvent);
 			
 			//handling the window minimizing image (pin) here
 //			if(prevCodeWindow!=null){
