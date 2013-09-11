@@ -741,13 +741,47 @@ public void setCodeWindowContainer(DraggableNode e){
 	}
 
 	public GridPane getGridPane() {
-		// TODO Auto-generated method stub
-		gridPane=ld.initGridPane();
+		gridPane = initGridPane();
 		int value=Integer.parseInt(iterationBox.getValue().toString());
 		if(gridPaneList.size()>0 && value<=gridPaneList.size()){
 				gridPane=gridPaneList.get(value-1);
 		}
 		return gridPane;
+	}
+	
+	public GridPane initGridPane(){
+		GridPane gridPane=new GridPane();
+	    gridPane.setMaxSize(230, 800);
+		gridPane.setPadding(new Insets(18, 18, 18, 18));
+        gridPane.setGridLinesVisible(true);
+        RowConstraints rowinfo = new RowConstraints();
+        rowinfo.setPercentHeight(50);
+        
+        ColumnConstraints colInfo1 = new ColumnConstraints();
+        colInfo1.setPercentWidth(40);
+ 
+        ColumnConstraints colInfo2 = new ColumnConstraints();
+        colInfo2.setPercentWidth(60);
+ 
+        gridPane.getRowConstraints().add(rowinfo);//2*50 percent
+        //gridPane.getRowConstraints().add(rowinfo);
+ 
+        gridPane.getColumnConstraints().add(colInfo1); //25 percent
+        gridPane.getColumnConstraints().add(colInfo2); //30 percent
+        
+ 
+        Label nameLabel = new Label("Name");
+        GridPane.setMargin(nameLabel, new Insets(0, 5, 0, 10));
+        //GridPane.setHalignment(nameLabel, HPos.LEFT);
+        
+        GridPane.setConstraints(nameLabel, 0, 0);
+        Label variableValue = new Label("Variable");
+        GridPane.setMargin(variableValue, new Insets(0, 0, 0, 10));
+        GridPane.setConstraints(variableValue, 1, 0);
+ 
+		
+        gridPane.getChildren().addAll(nameLabel, variableValue);
+        return gridPane;
 	}
 
 	public int getIndexOnScreen() {

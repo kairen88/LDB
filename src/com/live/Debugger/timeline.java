@@ -3,13 +3,19 @@ import java.util.ArrayList;
 
 import tod.core.database.event.ILogEvent;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 
 public class timeline extends StackPane{
@@ -17,18 +23,20 @@ public class timeline extends StackPane{
 	private ArrayList<Long> timestamps;
 	private int prevSelectedTickIdx;
 	private String methodName;
-	private int currentValue;
+	private SimpleIntegerProperty currentValue;
 	private ArrayList<MethodState> callStack;
 	
 	private HBox tickBox;
 	private ArrayList<tick> tickList;
+	Label methodLabel;
+	Label valueLabel;
 	
 	
 	timeline(ArrayList<Long> _timestamps, String _methodName, ArrayList<CodeWindow> codeWinCallStack)
 	{
 		timestamps = _timestamps;
 		methodName = _methodName;
-		currentValue = 0;
+		currentValue = new SimpleIntegerProperty(0);
 		
 		getCallStack(codeWinCallStack);
 		
@@ -37,21 +45,44 @@ public class timeline extends StackPane{
 		prevSelectedTickIdx = -1;
 		tickList = new ArrayList<tick>();
 				
-		this.setMinHeight(30);
-		this.setMinWidth(300);
-		this.setStyle("-fx-background-color: #336699;");
+		//space for 1 tick * number of ticks + size of 1 expanded tick
+		//refer to tick class for values
+		int timelineLength = (3 + 5 + 5) * timestamps.size() + (3 + 10 + 10) ;
+		
+		this.setMinHeight(15);
+		this.setMinWidth(timelineLength);
+		this.setStyle("-fx-background-color: #D8BFD8;");
 		
 		tickBox = new HBox();
 		createTicks();
 		
-		Label methodLabel = new Label(methodName);
-		methodLabel.setTextFill(Color.web("#FFFFFF"));
+		Pane labelBox = new Pane();		
+		Font fontSize = new Font(9);
 		
-		this.getChildren().add(methodLabel);
+		methodLabel = new Label(methodName);		
+		methodLabel.setTextFill(Color.web("#1E90FF"));
+		methodLabel.setFont(fontSize);
+		
+		valueLabel = new Label(currentValue.getValue().toString());
+		valueLabel.setFont(fontSize);
+		
+		labelBox.getChildren().addAll(methodLabel, valueLabel);
+		
+		//relocate the labels in the timeline
+		methodLabel.relocate(0, 10);
+		valueLabel.relocate(timelineLength, 10);		
+		
+		this.getChildren().add(labelBox);
 		this.getChildren().add(tickBox);
-		
-		
-		StackPane.setAlignment(methodLabel, Pos.BOTTOM_LEFT);
+				
+		//add listener to update valueLabel
+		currentValue.addListener(new ChangeListener<Object>(){
+
+			public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
+				// TODO Auto-generated method stub
+				valueLabel.setText( ((Integer)newVal).toString() );
+			}
+	      });		
 	}
 	
 	private void createTicks()
@@ -82,8 +113,27 @@ public class timeline extends StackPane{
 		  tk.setIsSelected(true);		  
 		  tk.setTickSizeToExpanded();
 		  tk.setTickColorSelected();
-		  currentValue = tk.getPositionIdx() + 1;//position index is 0 based so we add 1
+		  currentValue.setValue(tk.getPositionIdx() + 1);//position index is 0 based so we add 1
 		  prevSelectedTickIdx = tk.getPositionIdx();
+	}
+	
+	private int getIndexFromTimestamp(long _timestamp)
+	{
+		int index = -1;
+		for(int i = 0; i < timestamps.size(); i++)
+		{
+			if(_timestamp == timestamps.get(i))
+			{
+				index = i;
+				break;
+			}
+		}
+		return index;
+	}
+	
+	public String getMethodName()
+	{
+		return methodName;
 	}
 	
 	public void setValue(double val)
@@ -92,9 +142,19 @@ public class timeline extends StackPane{
 		setTick(tk);
 	}
 	
+	public void setTick(long _timestamp) {
+		int index = getIndexFromTimestamp(_timestamp);
+		
+		if(index != -1)
+		{
+			tick tk = tickList.get(index);
+			setTick(tk);
+		}			
+	}
+	
 	public int getValue()
 	{
-		return currentValue;
+		return currentValue.getValue();
 	}
 	
 	//returns the index of the 1st tick in ticklist
@@ -149,4 +209,6 @@ public class timeline extends StackPane{
 			selectedLine = _selectedLine;
 		}
 	}
+
+	
 }

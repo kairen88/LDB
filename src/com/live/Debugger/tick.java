@@ -22,15 +22,15 @@ public class tick extends HBox{
 	private Color mouseOverColor = Color.LIGHTBLUE;
 	private Color selectedColor = Color.ORANGE;
 	
-	private int tickHeightInitial = 10;
-	private int tickWidthInitial = 5;
-	private int spaceHeightInitial = 15;
+	private int tickHeightInitial = 8;
+	private int tickWidthInitial = 3;
+	private int spaceHeightInitial = 20;
 	private int spaceWidthInitial = 5;
 	
-	private int tickHeightExpanded = 20;
-	private int tickWidthExpanded = 5;
-	private int spaceHeightExpanded = 25;
-	private int spaceWidthExpanded = 20;
+	private int tickHeightExpanded = 15;
+	private int tickWidthExpanded = 3;
+	private int spaceHeightExpanded = 20;
+	private int spaceWidthExpanded = 10;
 	
 	private long timestamp;
 	private boolean isSelected;

@@ -127,7 +127,8 @@ public class liveDebugging extends Application {
 	int lineNumberOffset;
 	private HashMap displayedCodeWindowsList; //list of code windows currently displayed on screen
 	private ArrayList<CodeWindow> CodeWindowCallStack; //maintains a list that represents the call stack
-	Pane timelineSectionNew;
+	
+	private HashMap<String, Integer> displayedTimelineList;//list of timelines displayed on screen, value = index of element in container (latest instance of a particular timeline)
 	Pane timelineSection=new Pane ();
 
 	//timeline positions
@@ -165,40 +166,40 @@ public class liveDebugging extends Application {
 			tl.setColor(color);//comment out for now to implement new timeline
 		}
 	}
-	public GridPane initGridPane(){
-		gridPane=new GridPane();
-	    gridPane.setMaxSize(230, 800);
-		gridPane.setPadding(new Insets(18, 18, 18, 18));
-        gridPane.setGridLinesVisible(true);
-        RowConstraints rowinfo = new RowConstraints();
-        rowinfo.setPercentHeight(50);
-        
-        ColumnConstraints colInfo1 = new ColumnConstraints();
-        colInfo1.setPercentWidth(40);
- 
-        ColumnConstraints colInfo2 = new ColumnConstraints();
-        colInfo2.setPercentWidth(60);
- 
-        gridPane.getRowConstraints().add(rowinfo);//2*50 percent
-        //gridPane.getRowConstraints().add(rowinfo);
- 
-        gridPane.getColumnConstraints().add(colInfo1); //25 percent
-        gridPane.getColumnConstraints().add(colInfo2); //30 percent
-        
- 
-        Label nameLabel = new Label("Name");
-        GridPane.setMargin(nameLabel, new Insets(0, 5, 0, 10));
-        //GridPane.setHalignment(nameLabel, HPos.LEFT);
-        
-        GridPane.setConstraints(nameLabel, 0, 0);
-        Label variableValue = new Label("Variable");
-        GridPane.setMargin(variableValue, new Insets(0, 0, 0, 10));
-        GridPane.setConstraints(variableValue, 1, 0);
- 
-		
-        gridPane.getChildren().addAll(nameLabel, variableValue);
-        return gridPane;
-	}
+//	public GridPane initGridPane(){
+//		gridPane=new GridPane();
+//	    gridPane.setMaxSize(230, 800);
+//		gridPane.setPadding(new Insets(18, 18, 18, 18));
+//        gridPane.setGridLinesVisible(true);
+//        RowConstraints rowinfo = new RowConstraints();
+//        rowinfo.setPercentHeight(50);
+//        
+//        ColumnConstraints colInfo1 = new ColumnConstraints();
+//        colInfo1.setPercentWidth(40);
+// 
+//        ColumnConstraints colInfo2 = new ColumnConstraints();
+//        colInfo2.setPercentWidth(60);
+// 
+//        gridPane.getRowConstraints().add(rowinfo);//2*50 percent
+//        //gridPane.getRowConstraints().add(rowinfo);
+// 
+//        gridPane.getColumnConstraints().add(colInfo1); //25 percent
+//        gridPane.getColumnConstraints().add(colInfo2); //30 percent
+//        
+// 
+//        Label nameLabel = new Label("Name");
+//        GridPane.setMargin(nameLabel, new Insets(0, 5, 0, 10));
+//        //GridPane.setHalignment(nameLabel, HPos.LEFT);
+//        
+//        GridPane.setConstraints(nameLabel, 0, 0);
+//        Label variableValue = new Label("Variable");
+//        GridPane.setMargin(variableValue, new Insets(0, 0, 0, 10));
+//        GridPane.setConstraints(variableValue, 1, 0);
+// 
+//		
+//        gridPane.getChildren().addAll(nameLabel, variableValue);
+//        return gridPane;
+//	}
 
 	@Override
 	public void start(Stage primaryStage) throws IOException {
@@ -218,6 +219,7 @@ public class liveDebugging extends Application {
 		codeWindowStack = new Stack<>();
 		timelineStack=new Stack<>();
 		displayedCodeWindowsList = new HashMap<String, Integer>();
+		displayedTimelineList = new HashMap<>();
 		CodeWindowCallStack = new ArrayList<CodeWindow>();
 		codeWindowAry = new ArrayList<CodeWindow>();
 
@@ -230,7 +232,7 @@ public class liveDebugging extends Application {
 
 		//initialize variable pane window
 		variablePane = (Pane) getRootAnchorPane().lookup("#VariablePane");
-		initGridPane();
+		gridPane = currentCodeWindow.initGridPane();
         variablePane.getChildren().add(gridPane);
 
         //initializing timeline section
@@ -240,16 +242,17 @@ public class liveDebugging extends Application {
 		sc.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 		sc.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);		
 		
-		timelineSectionNew = (Pane) getRootAnchorPane().lookup("#naviBarSection");
+		Pane timelineSectionNew = (Pane) getRootAnchorPane().lookup("#naviBarSection");
 		timelineSectionNew.getChildren().add(sc);
 		
 		
 		
 		//creating timeline for "main" method
-		timeline tLine = createTimeLine(mainEvent,"main");
+		timeline tLine = createTimeLine(null, mainEvent);
 		currentTimeline = tLine;
 		mainTH=currentTimeline;
-		timelineStack.push(currentTimeline);
+		displayedTimelineList.put("main", 0);
+//		timelineStack.push(currentTimeline);
 
 		//setting the main code window and timeline color to red
 //		ColorAdjust c=new ColorAdjust(-0.047,0.793,0.476,0);//0.476
@@ -325,12 +328,13 @@ public class liveDebugging extends Application {
 		
 	}
 	//This method is used to increment the slider value by 1
-	private void setTick(timeline currentTimeline2){
+	private void setTick(timeline currentTimeline2, ILogEvent event){
 		double tick=currentTimeline2.getValue();
+		long timestamp = event.getTimestamp();
 		try{
 			tick++;
 			if(tick<=currentTimeline2.getMax()){
-				currentTimeline2.setValue(tick);
+				currentTimeline2.setTick(timestamp);
 			}
 		}
 		catch (Exception ex){
@@ -403,7 +407,7 @@ public class liveDebugging extends Application {
 			currentCodeWindow.setSelectedLineNumber(line);
 			
 			decrementTick(currentTimeline);//kai
-//			reposition();
+			reposition();
 		} else if (eventUtils.isMethodCall(curEvent)){// (curEvent.getDepth() < prevEvent.getDepth()) {
 			// we have stepped backwards into a method
 			
@@ -442,7 +446,7 @@ public class liveDebugging extends Application {
 			currentCodeWindow.setSelectedLineNumber(linenum);
 				
 			decrementTick(currentTimeline);//kai
-//			reposition();
+			reposition();
 		} 
 		
 		else {
@@ -478,45 +482,47 @@ public class liveDebugging extends Application {
 	}
 	
 	//calculate the position of code fragment window at x axis
-	private int calculateWindowX(DraggableNode cd) {
-		CodeEditor ed=((CodeEditor)(cd.getChildren().get(2)));
+	private int calculateWindowX(CodeWindow cd) {
+		CodeEditor ed= cd.getEditor();
 		if(!ed.isReduced()){
 			return	(int)cd.getLayoutX()+630;
 		}else
-			return (int)(cd.getLayoutX()+ cd.getDWidth()+40);
+			return (int)(cd.getLayoutX()+ cd.getWindowWidth() +80);
 	}
 	
 	//calculate the position of code fragment window at y axis
-	private int calculateWindowY(DraggableNode cd,int linenum) {
+	private int calculateWindowY(CodeWindow cd,int linenum) {
 		// TODO Auto-generated method stub
-		CodeEditor ed=((CodeEditor)(cd.getChildren().get(2)));
-		if(!ed.isReduced()){
-		return (int)cd.getLayoutY()+(linenum+1)*9;
-		}
-		else
-			return (int)(cd.getLayoutY()+cd.getDHeigth());//(int)(((int)ed.getLayoutY()+ed.getHeight()));//(linenum+1)*9)*0.3);
+		CodeEditor ed = cd.getEditor();
+//		if(!ed.isReduced()){
+		return (int)cd.getLayoutY()+(linenum+1)*cd.lineoffset.getValue() + 30;
+//		}
+//		else
+//			return (int)(cd.getLayoutY()+ ed.getHeight() + 80);//(int)(((int)ed.getLayoutY()+ed.getHeight()));//(linenum+1)*9)*0.3);
 
 	}
 	//elocate all the existing added arrows and code fragment windows over the screen
 	public void reposition(){
 		
-		DraggableNode cd=(DraggableNode)codeWindowArea.getChildren().get(0);
+		//set main to the top left corner of the area
+		CodeWindow cd=(CodeWindow)codeWindowArea.getChildren().get(0);
 		codeWindowArea.getChildren().set(0,cd);
 		cd.relocate(0, 0);
 		
 		for(int j=1;j<codeWindowArea.getChildren().size();j=j+2){
-			Arrow cArrow=(Arrow)(codeWindowArea.getChildren().get(j+1));
-			int ax=calculateArrowX(cd);
-			int ay=calculateArrowY(cd,((CodeWindow)cd).getSelectedLineNumber());
+//			Arrow cArrow=(Arrow)(codeWindowArea.getChildren().get(j+1));
+//			int ax=calculateArrowX(cd);
+//			int ay=calculateArrowY(cd,((CodeWindow)cd).getSelectedLineNumber());
 			
-			DraggableNode newCd=(DraggableNode) codeWindowArea.getChildren().get(j);
+			CodeWindow newCd=(CodeWindow) codeWindowArea.getChildren().get(j);
 			int x=calculateWindowX(cd);
 			int y=calculateWindowY(cd,((CodeWindow)cd).getSelectedLineNumber());
 			
-			codeWindowArea.getChildren().set(j,newCd);			
+//			codeWindowArea.getChildren().set(j,newCd);			
 			newCd.relocate(x, y);
-			newCd.x.set(x);
-			newCd.y.set(y);
+			//set the x and y property of the parent DraggableNode class
+			newCd.getDraggableX().set(x);
+			newCd.getDraggableY().set(y);
 
 			cd=newCd;
 		}
@@ -567,7 +573,6 @@ public class liveDebugging extends Application {
 		}
 		
 		//sets current line to white - remove highlight
-//		currentCodeWindow.setLineColorToCompleted(clineNum - currentCodeWindow.getStartLine() - 1);
 		currentCodeWindow.setLineColorToCompleted(currentCodeWindow.getExecutedLine());
 		
 		//Case: Method return - 
@@ -579,22 +584,19 @@ public class liveDebugging extends Application {
 			if(CodeWindowCallStack.get(CodeWindowCallStack.size() - 1).getMethodName().equalsIgnoreCase(currentCodeWindow.getMethodName()))
 				CodeWindowCallStack.remove(CodeWindowCallStack.size() - 1);
 			
-//print out call stack for debugging 
-//printCallStack();
-			
 			//stash the previous window
 			CodeWindow oldPreviousWindow=prevCodeWindow;
-			//set current window as previous
 			prevCodeWindow = currentCodeWindow;
 			
+			timeline oldPreviousTimeline = prevTimeline;
 			prevTimeline=currentTimeline;
 			
 			//current code window is now from the code window stack
 			if (!CodeWindowCallStack.isEmpty()){
 				currentCodeWindow= CodeWindowCallStack.get(CodeWindowCallStack.size() - 1);//return the 2nd last element in the call stack
-//				currentTimeline=timelineStack.pop();
+				currentTimeline=timelineStack.pop();
 				
-				currentTimeline.printCallStack(); //for debugging
+//				currentTimeline.printCallStack(); //for debugging
 			}
 			if(oldPreviousWindow!=currentCodeWindow){
 				oldPreviousWindow.setBackgroundColorToInactive();
@@ -603,6 +605,8 @@ public class liveDebugging extends Application {
 				//oldPreviousWindow.getPinBtn().setVisible(true);
 				currentCodeWindow.normalWindowSize();
 			}
+			//ensure current window is maximixed
+			currentCodeWindow.normalWindowSize();
 			
 			// highlight next line to be executed
 			int lineNum = eventUtils.getLineNum(nextEvent);
@@ -614,18 +618,22 @@ public class liveDebugging extends Application {
 			
 			currentCodeWindow.setExecutedLine(line);//so we know the start point of the arrow
 			
-			setTick(currentTimeline);
+			oldPreviousTimeline.setColor("CCCCCC");
+			prevTimeline.setColor("FFFB78");
+			currentTimeline.setColor("A3FF7F");
+			
+			setTick(currentTimeline, nextEvent);
 			
 			gridPane=currentCodeWindow.getGridPane();
 			variablePane.getChildren().set(0,gridPane);
-//			reposition();
+			reposition();
 		}
 //-----------------------------------------------------------Method Call-----------------------------------------------		
 		// Case: Method call
 		else if (eventUtils.isMethodCall(nextEvent)) {
 			String methodName = eventUtils.getMethodName(nextEvent);
 			
-			setTick(currentTimeline);
+			setTick(currentTimeline, nextEvent);
 			
 			//event is a SYSTEM method call
 			//just highlight the next line
@@ -640,7 +648,7 @@ public class liveDebugging extends Application {
 			//ELSE it is a method call and we need to add a new code window
 			else {
 				
-				timeline tLine = createTimeLine(nextEvent,methodName);
+				timeline tLine = createTimeLine(curEvent, nextEvent);
 				
 				CodeWindow codeWin = null;				
 				boolean addedNewWindow = false;
@@ -666,10 +674,6 @@ public class liveDebugging extends Application {
 					codeWin = (CodeWindow) codeWindowArea.getChildren().get((int) displayedCodeWindowsList.get(methodName));
 					
 					codeWin.incrementIteration();
-					//set new grid pane
-					
-					
-					codeWin.normalWindowSize();
 				}
 				
 				//update the selected line of the last method call
@@ -708,6 +712,15 @@ public class liveDebugging extends Application {
 				prevTimeline=currentTimeline;
 				currentTimeline= tLine;
 				
+				timelineStack.push(prevTimeline);
+				
+				//set timeline colors
+				if(oldPrevTimeline != null && oldPrevTimeline != mainTH)
+					oldPrevTimeline.setColor("CCCCCC");
+				if(prevTimeline != null && prevTimeline != mainTH)
+					prevTimeline.setColor("FFFB78");
+				currentTimeline.setColor("A3FF7F");
+				
 				//set codeWindow background colors
 				if(oldPrevWindow!=mainCWH && oldPrevTimeline != null)
 				{
@@ -726,6 +739,9 @@ public class liveDebugging extends Application {
 					//prevCodeWindow.getPinBtn().setVisible(true);
 				}
 				
+				//maximise current window
+				currentCodeWindow.normalWindowSize();
+				
 				//if we added a new window
 				//add an Arrow connecting the new and previous windows
 				if(addedNewWindow)
@@ -735,7 +751,7 @@ public class liveDebugging extends Application {
 				}
 				highlightGutters(nextEvent);
 				initializeGrid();
-//				reposition();
+				reposition();
 				
 			} 
 		}
@@ -747,7 +763,7 @@ public class liveDebugging extends Application {
 			currentCodeWindow.setLineColorToCurrent(line);
 			currentCodeWindow.setExecutedLine(line);
 			
-			setTick(currentTimeline);
+			setTick(currentTimeline, nextEvent);
 			
 			currentTimeline.printCallStack(); //for debugging
 			
@@ -899,20 +915,20 @@ public class liveDebugging extends Application {
 //			prevCodeWindow.getPinBtn().setVisible(false);
 //			}
 			
-			//set current code window to green
-			if(mainCWH!=currentCodeWindow ){
-				ColorAdjust c=new ColorAdjust(0.426,0.63,0.075,0.015);
-				String color="A3FF7F";//green
-
-				highlighter(currentCodeWindow,currentTimeline,c,color);
-			}
-			//set previous code window to yellow
-			if(mainCWH!=prevCodeWindow){
-				//highlightPrevious();
-				ColorAdjust c=new ColorAdjust(0.3,1,0.218,0.38);
-				String color="FFFB78";//yellow
-				highlighter(prevCodeWindow,prevTimeline,c,color);
-			}
+//			//set current code window to green
+//			if(mainCWH!=currentCodeWindow ){
+//				ColorAdjust c=new ColorAdjust(0.426,0.63,0.075,0.015);
+//				String color="A3FF7F";//green
+//
+//				highlighter(currentCodeWindow,currentTimeline,c,color);
+//			}
+//			//set previous code window to yellow
+//			if(mainCWH!=prevCodeWindow){
+//				//highlightPrevious();
+//				ColorAdjust c=new ColorAdjust(0.3,1,0.218,0.38);
+//				String color="FFFB78";//yellow
+//				highlighter(prevCodeWindow,prevTimeline,c,color);
+//			}
 
 		}
 	}
@@ -942,31 +958,37 @@ public class liveDebugging extends Application {
 	}
 	
 	//This method relocates the timeline position along x-axis 
-	private int timelineLocationX(){
+	private int timelineLocationX(String _methodName){
 		int x=0;
-		if(!timelineStack.empty()){
-			for(int i=0;i<timelineStack.size();i++){
+		
+		if(_methodName != null){
+			
+			int index = displayedTimelineList.get(_methodName);
 
-				timeline s=timelineStack.get(i);
-				x=x+(int)(s.getLayoutX())+(int)(s.getValue()*1.6);
-
-			}
+			timeline s=(timeline) timelineSection.getChildren().get(index);
+			
+			//current x pos of prev timeline + ((current number of ticks - 1) * space of 1 tick) + space of the Last(selected) tick
+			x = (int) (s.getLayoutX() + s.getValue() * (5 + 3 + 5) );
 		}
-		else{
+		else{//this is to handle the case for "main" method where there is no parent method
 			x=5;
 		}
 		return x;
 	}
 	
 	//This method relocates the timeline position along y-axis 
-	private int timelineLocationY(){
+	private int timelineLocationY(String _methodName){
 		int y=0;
-		if(timelineStack.empty()){
-			y=5;
+		
+		if(_methodName != null){
+			
+			int index = displayedTimelineList.get(_methodName);
+			
+			y = (index + 1) * 40;
 		}
-		else{
+		else{//this is to handle the case for "main" method where there is no parent method
 
-			y=timelineStack.size()*40;
+			y = 5;
 		}
 		return y;
 	}
@@ -994,17 +1016,32 @@ public class liveDebugging extends Application {
 
 	// get a list of child events timestamps
 	//creates a tick for each event and returns a timeline object
-	private timeline createTimeLine(ILogEvent event,String methodName) {
+	private timeline createTimeLine(ILogEvent curEvent,ILogEvent nextEvent) {
 
-		ArrayList<Long> childEventsTimestamps = eventUtils.getChildEventTimestamps(event);
+		ArrayList<Long> childEventsTimestamps = eventUtils.getChildEventTimestamps(nextEvent);
 		
-		timeline timeline = new timeline(childEventsTimestamps, eventUtils.getMethodName(event), CodeWindowCallStack);
+		String parentMethodName = eventUtils.getMethodName(curEvent);
+		String newMethodName = eventUtils.getMethodName(nextEvent);
+		
+		//handle the case where the next event is not "main"
+		//but getting method name from the current event returns a null
+		if(newMethodName.compareToIgnoreCase("main") != 0)
+			if(parentMethodName == null)
+					parentMethodName = eventUtils.getMethodName(curEvent.getParent());
+		
+		timeline timeline = new timeline(childEventsTimestamps, newMethodName, CodeWindowCallStack);
 
-		posX=timelineLocationX();
-		posY=timelineLocationY();
-
+		//if the next method is "main", we pass in a null since there is no parent method to calculate the offset from
+		posX=timelineLocationX(parentMethodName);
+		posY=timelineLocationY(parentMethodName);
+		
 		timelineSection.getChildren().add(timeline);
 		timeline.relocate(posX,posY);
+		
+		//store the index of the timeline in container (timelineSection)
+		displayedTimelineList.put(newMethodName, timelineSection.getChildren().size() - 1);
+		//maintain the timeline callstack
+//		timelineStack.push(timeline);
 
 		return timeline;
 	}

@@ -187,15 +187,16 @@ public class EventUtils {
 			//get child event browser
 			MethodCallEvent callEvent = (MethodCallEvent)_event;
 			IEventBrowser childBrowser = callEvent.getChildrenBrowser();
-			IEventBrowser browser = childBrowser.createIntersection(
-										logBrowser.createDepthFilter(callEvent.getDepth() + 1));
+//			IEventBrowser browser = childBrowser.createIntersection(
+//										logBrowser.createDepthFilter(callEvent.getDepth() + 1));
 			ArrayList<Long> timeStamps = new ArrayList<Long>();
 			
-			browser.setPreviousEvent(_event);
-			while(browser.hasNext())
+//			childBrowser.setPreviousEvent(_event);
+			childBrowser.setNextTimestamp(_event.getTimestamp());
+			while(childBrowser.hasNext())
 			{
 				//get child event
-				ILogEvent childEvent = browser.next();
+				ILogEvent childEvent = childBrowser.next();
 				timeStamps.add(childEvent.getTimestamp());
 				
 			}
