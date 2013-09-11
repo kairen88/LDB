@@ -17,12 +17,15 @@ public class CodeFragments {
 	private HashMap lineNumToMethodMap;
 	private ArrayList<String> originalClass;
 	ArrayList<int[]> fragmentList;
+	liveDebugging ld;
 	
 	public CodeFragments(){
 		
 	}
-	public CodeFragments(Path _editingCodePath, liveDebugging ld)
+	public CodeFragments(Path _editingCodePath, liveDebugging _ld)
 	{
+		ld = _ld;
+		
 		codeFragmentArray = new HashMap<String, CodeWindow>();
 		lineNumToMethodMap = new HashMap<String, Integer>();
 		
@@ -59,14 +62,14 @@ public class CodeFragments {
 		//we convert line number to array index here to avoid confusion
 		convertLineNumToAryIdx();
 		
-		createCodeFragments(fragmentList,ld);
+		createCodeFragments(fragmentList,_ld);
 	}
 	
 	public CodeWindow getCodeFragment(String _methodName)
 	{
 		CodeWindow cdw=(CodeWindow)codeFragmentArray.get(_methodName);
-		
 		return cdw;
+//		return createSingleFragment(_methodName);
 	}
 	private int returnIndexofValue(String name){
 		int i=0;
@@ -127,7 +130,29 @@ public class CodeFragments {
 			//map method name to line number so we can convert line num 
 			//from event to actual line number in the codefragment window
 			lineNumToMethodMap.put(methodName, fragmentIdx[0]);
+			
+//			createSingleFragment(fragmentIdx[0], fragmentIdx[1], ld);
 		}
+	}
+	
+	private CodeWindow createSingleFragment(String _methodName)
+	{
+			Object[] obj= (Object[]) codeFragmentArray.get(_methodName);
+			String fragment = (String)obj[0];
+			int width = 600;//(int)obj[1];
+//			String methodName = getMethodName(obj[2]);
+			int height= calculateHeight((int)obj[2], (int)obj[3]);
+			CodeWindow codeWin = new CodeWindow(fragment, width, height,_methodName, ld);
+			codeWin.setMethodName(_methodName);
+			codeWin.setStartLine((int)obj[2]);
+			codeWin.setEndLine((int)obj[3]);
+//			codeFragmentArray.put(methodName, codeWin);
+			
+			//map method name to line number so we can convert line num 
+			//from event to actual line number in the codefragment window
+			lineNumToMethodMap.put(_methodName, (int)obj[2]);
+			
+			return codeWin;
 	}
 	/*
 	public CodeWindow createCodeFragments(CodeWindow codeFragment,int instance){
@@ -188,7 +213,7 @@ public class CodeFragments {
 	
 	private Object getCodeFragmentString(int _startLine, int _endLine)
 	{
-		Object []obj=new Object[2];
+		Object []obj=new Object[4];
 		String fragment = "";
 		int max=0;
 		for(int i = _startLine; i <= _endLine; i++)
@@ -201,6 +226,8 @@ public class CodeFragments {
 		}
 		obj[0]=fragment;
 		obj[1]=calculateWidth(max);
+//		obj[2] = _startLine;
+//		obj[3] = _endLine;
 		return obj;
 	}
 

@@ -563,27 +563,20 @@ public class liveDebugging extends Application {
 
 			clineNum = lineNumberOffset + 1;
 		}
-		currentCodeWindow.setLineColorToCompleted(clineNum - lineNumberOffset - 1);
+		//sets current line to white - remove highlight
+		currentCodeWindow.setLineColorToCompleted(clineNum - currentCodeWindow.getStartLine() - 1);
 		
 		//Case: Method return - 
 		//if depth of next event > current, we have returned to parent method
 		if (curEvent.getDepth() > nextEvent.getDepth()) {
-			
-			// set previous code window color to grey
-			if(prevCodeWindow!=mainCWH){
-			ColorAdjust c=new ColorAdjust(0,0,0,0);
-			String color="CCCCCC";//grey
-			highlighter(prevCodeWindow,prevTimeline,c,color);
-			//prevCodeWindow.reduceWindowSize();
-			}
 			
 			//since we are stepping out of the method, remove it from the call stack
 			//check if the current code window is the last method in the call stack, remove it
 			if(CodeWindowCallStack.get(CodeWindowCallStack.size() - 1).getMethodName().equalsIgnoreCase(currentCodeWindow.getMethodName()))
 				CodeWindowCallStack.remove(CodeWindowCallStack.size() - 1);
 			
-			//print out call stack for debugging 
-//			printCallStack();
+//print out call stack for debugging 
+//printCallStack();
 			
 			//stash the previous window
 			CodeWindow oldPreviousWindow=prevCodeWindow;
@@ -593,13 +586,14 @@ public class liveDebugging extends Application {
 			prevTimeline=currentTimeline;
 			
 			//current code window is now from the code window stack
-			if (!codeWindowStack.empty()){
-				currentCodeWindow= codeWindowStack.pop();
-				currentTimeline=timelineStack.pop();
+			if (!CodeWindowCallStack.isEmpty()){
+				currentCodeWindow= CodeWindowCallStack.get(CodeWindowCallStack.size() - 1);//return the 2nd last element in the call stack
+//				currentTimeline=timelineStack.pop();
 				
 				currentTimeline.printCallStack(); //for debugging
 			}
 			if(oldPreviousWindow!=currentCodeWindow){
+				oldPreviousWindow.setBackgroundColorToInactive();
 				oldPreviousWindow.reduceWindowSize();//prevCodeWindow.normalWindowSize();
 				oldPreviousWindow.setPinBtn("plus");
 				//oldPreviousWindow.getPinBtn().setVisible(true);
@@ -609,14 +603,12 @@ public class liveDebugging extends Application {
 			// highlight next line to be executed
 			int lineNum = eventUtils.getLineNum(nextEvent);
 			
-			lineNumberOffset = codeFragments
-					.getLineNumberOffset(currentCodeWindow.getMethodName());
-			int line=lineNum - lineNumberOffset- 1;
+			lineNumberOffset = codeFragments.getLineNumberOffset(currentCodeWindow.getMethodName());
+			int line=lineNum - currentCodeWindow.getStartLine()- 1;
 			
 			currentCodeWindow.setLineColorToCurrent(line);
 			
 			currentCodeWindow.setSelectedLineNumber(line);//so we know the start point of the arrow
-			currentCodeWindow.setSelectedLineNumber(line);
 			
 			setTick(currentTimeline);
 			
@@ -636,7 +628,7 @@ public class liveDebugging extends Application {
 			if (!codeFragments.codeFragmentExist(methodName)) 
 			{
 				//get the next line number and highlight it
-				int nextLine = eventUtils.getLineNum(nextEvent) - lineNumberOffset - 1;
+				int nextLine = eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
 				currentCodeWindow.setLineColorToCurrent(nextLine);
 				
 				currentCodeWindow.setSelectedLineNumber(nextLine);
@@ -661,7 +653,7 @@ public class liveDebugging extends Application {
 //printCallStack();				
 				
 				//highlight the line of the method call in the current window
-				int lineNum=eventUtils.getLineNum(nextEvent) - lineNumberOffset - 1;
+				int lineNum=eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
 				currentCodeWindow.setLineColorToMethodCall(lineNum);
 				
 				//set the line number which initiated the method call so we know where to palce the arrow
@@ -716,10 +708,9 @@ public class liveDebugging extends Application {
 //-----------------------------------------------------------Method Call END-----------------------------------------------		
 		// Case: Next Line
 		else {
-			int line=eventUtils.getLineNum(nextEvent) - lineNumberOffset - 1;
+			int line=eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
 			
 			currentCodeWindow.setLineColorToCurrent(line);
-			currentCodeWindow.setSelectedLineNumber(line);
 			currentCodeWindow.setSelectedLineNumber(line);
 			
 			setTick(currentTimeline);
@@ -731,6 +722,10 @@ public class liveDebugging extends Application {
 				//List<LocalVariableInfo> locVariablesList=eventUtils.getLocalVariables(nextEvent);
 				String varName= eventUtils.getWriteEventVarName(nextEvent);			
 				String varValue=eventUtils.getWriteEventValue(nextEvent);
+				
+				//just a hack for now to remove "UID:" from the var value, need to find out more
+				if(varValue.contains("UID:"))
+					varValue = varValue.substring(4);
 				
 				LinkedHashMap<String,ArrayList> localVariableInfo=currentCodeWindow.getLocalVariables();
 				
