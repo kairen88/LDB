@@ -106,8 +106,6 @@ public class liveDebugging extends Application {
 
 	int currentWindowIdx = 0;
 
-	ArrayList<CodeWindow> codeWindowAry;
-
 	Stack<CodeWindow> codeWindowStack;
 	Stack<timeline> timelineStack;
 	
@@ -151,56 +149,6 @@ public class liveDebugging extends Application {
 		_args = args;
 	}
 
-	public void highlighter(CodeWindow cd , timeline tl,ColorAdjust c, String color){
-		
-		if(cd!=null&&tl!=null){
-			
-			Rectangle r=(Rectangle)(cd.getChildren().get(0));
-			javafx.scene.paint.Paint codeMirrorBackgroundColor = javafx.scene.paint.Paint.valueOf(color);//F9FCAC
-			r.setFill(codeMirrorBackgroundColor);
-			
-			cd.getChildren().set(0,r);
-//			Object group=(cd.getCodeWindowContainer().getChildren().get(1));
-//			Object codeEditor=(cd.getCodeWindowContainer().getChildren().get(2));
-			
-			tl.setColor(color);//comment out for now to implement new timeline
-		}
-	}
-//	public GridPane initGridPane(){
-//		gridPane=new GridPane();
-//	    gridPane.setMaxSize(230, 800);
-//		gridPane.setPadding(new Insets(18, 18, 18, 18));
-//        gridPane.setGridLinesVisible(true);
-//        RowConstraints rowinfo = new RowConstraints();
-//        rowinfo.setPercentHeight(50);
-//        
-//        ColumnConstraints colInfo1 = new ColumnConstraints();
-//        colInfo1.setPercentWidth(40);
-// 
-//        ColumnConstraints colInfo2 = new ColumnConstraints();
-//        colInfo2.setPercentWidth(60);
-// 
-//        gridPane.getRowConstraints().add(rowinfo);//2*50 percent
-//        //gridPane.getRowConstraints().add(rowinfo);
-// 
-//        gridPane.getColumnConstraints().add(colInfo1); //25 percent
-//        gridPane.getColumnConstraints().add(colInfo2); //30 percent
-//        
-// 
-//        Label nameLabel = new Label("Name");
-//        GridPane.setMargin(nameLabel, new Insets(0, 5, 0, 10));
-//        //GridPane.setHalignment(nameLabel, HPos.LEFT);
-//        
-//        GridPane.setConstraints(nameLabel, 0, 0);
-//        Label variableValue = new Label("Variable");
-//        GridPane.setMargin(variableValue, new Insets(0, 0, 0, 10));
-//        GridPane.setConstraints(variableValue, 1, 0);
-// 
-//		
-//        gridPane.getChildren().addAll(nameLabel, variableValue);
-//        return gridPane;
-//	}
-
 	@Override
 	public void start(Stage primaryStage) throws IOException {
 
@@ -221,7 +169,6 @@ public class liveDebugging extends Application {
 		displayedCodeWindowsList = new HashMap<String, Integer>();
 		displayedTimelineList = new HashMap<>();
 		CodeWindowCallStack = new ArrayList<CodeWindow>();
-		codeWindowAry = new ArrayList<CodeWindow>();
 
 		codeWindowAreaNew = (Pane) getRootAnchorPane().lookup("#codeWindowSection");
 		
@@ -252,12 +199,9 @@ public class liveDebugging extends Application {
 		currentTimeline = tLine;
 		mainTH=currentTimeline;
 		displayedTimelineList.put("main", 0);
-//		timelineStack.push(currentTimeline);
 
 		//setting the main code window and timeline color to red
-//		ColorAdjust c=new ColorAdjust(-0.047,0.793,0.476,0);//0.476
 		String color="FF8C73"; //red
-//		highlighter(mainCWH,mainTH,c,color);
 		mainCWH.setBackgroundColorToMain();
 		mainTH.setColor(color);
 		
@@ -269,7 +213,7 @@ public class liveDebugging extends Application {
 		primaryStage.setTitle("Swift Debugger");
 		primaryStage.setScene(s);
 		primaryStage.setWidth(1830);
-		primaryStage.setHeight(800);
+		primaryStage.setHeight(1000);
 		primaryStage.show();
 	}
 
@@ -306,8 +250,6 @@ public class liveDebugging extends Application {
 
 			// set line number offset
 			lineNumberOffset = codeFragments.getLineNumberOffset(methodName);
-
-			codeWindowAry.add(editor);
 
 			currentCodeWindow = editor;
 		    s1.setPrefSize(1600, 600);
@@ -379,7 +321,7 @@ public class liveDebugging extends Application {
 			if(prevCodeWindow!=mainCWH){
 			ColorAdjust c=new ColorAdjust(0,0,0,0);
 			String color="CCCCCC";//grey
-			highlighter(prevCodeWindow,prevTimeline,c,color);
+//			highlighter(prevCodeWindow,prevTimeline,c,color);
 			prevCodeWindow.reduceWindowSize();
 			}else{
 				if(prevCodeWindow!=null)
@@ -417,7 +359,7 @@ public class liveDebugging extends Application {
 			if(prevCodeWindow!=mainCWH){
 				ColorAdjust c=new ColorAdjust(0,0,0,0);
 				String color="CCCCCC";//grey
-				highlighter(prevCodeWindow,prevTimeline,c,color);
+//				highlighter(prevCodeWindow,prevTimeline,c,color);
 				prevCodeWindow.reduceWindowSize();
 				}
 			else{
@@ -575,7 +517,8 @@ public class liveDebugging extends Application {
 		//sets current line to white - remove highlight
 		currentCodeWindow.setLineColorToCompleted(currentCodeWindow.getExecutedLine());
 		
-		//Case: Method return - 
+//-----------------------------------------------------------Case: Method return-----------------------------------------------		
+
 		//if depth of next event > current, we have returned to parent method
 		if (curEvent.getDepth() > nextEvent.getDepth()) {
 			
@@ -628,8 +571,7 @@ public class liveDebugging extends Application {
 			variablePane.getChildren().set(0,gridPane);
 			reposition();
 		}
-//-----------------------------------------------------------Method Call-----------------------------------------------		
-		// Case: Method call
+//-----------------------------------------------------------Case: Method call-----------------------------------------------		
 		else if (eventUtils.isMethodCall(nextEvent)) {
 			String methodName = eventUtils.getMethodName(nextEvent);
 			
@@ -680,11 +622,7 @@ public class liveDebugging extends Application {
 				//add the new method to the call stack
 				CodeWindowCallStack.get(CodeWindowCallStack.size() - 1).setExecutedLine(clineNum);				
 				CodeWindowCallStack.add(codeWin);
-				
-				
-				
-//print out for debugging
-//printCallStack();				
+					
 				
 				//highlight the line of the method call in the current window
 				int lineNum=eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
@@ -693,12 +631,6 @@ public class liveDebugging extends Application {
 				//set the line number which initiated the method call so we know where to palce the arrow
 				currentCodeWindow.setSelectedLineNumber(lineNum);
 				currentCodeWindow.setExecutedLine(lineNum);
-				
-//				lineNumberOffset = codeFragments.getLineNumberOffset(methodName);
-				
-				//Push the current codewindow and timeline onto stack 
-//				codeWindowStack.push(currentCodeWindow);
-//				timelineStack.push(currentTimeline);
 				
 				//store the current grid pane in the current code window
 				currentCodeWindow.setGridPane(gridPane);
@@ -755,8 +687,7 @@ public class liveDebugging extends Application {
 				
 			} 
 		}
-//-----------------------------------------------------------Method Call END-----------------------------------------------		
-		// Case: Next Line
+//-----------------------------------------------------------Case: Go To Next Line-----------------------------------------------		
 		else {
 			int line=eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
 			
@@ -793,6 +724,7 @@ public class liveDebugging extends Application {
 					
 					//variable may not exist in our list in which index will be -1
 					int index=returnIndexofValue(varName,localVariableInfo);
+					//variable exists
 					if(index!=-1){
 				        currentCodeWindow.setLocalVariables(localVariableInfo);//set the updated variable hashmap
 				        index=2+2*index+2;
@@ -817,15 +749,18 @@ public class liveDebugging extends Application {
 			        }
 				}
 				else{ //if it does not exist in our hashmap, create the elements and add it to the variable pane
+					
+					//each time we add a variable we add 2 child elements
+					//number of rows = no. of child elements / 2
 					int rows=((gridPane.getChildren().size())/2);
-					removeGridStyles(gridPane);
+					
 					Label nameLabel = new Label(varName);
 					
+					//remove previous highlights and highlight the new var
+					removeGridStyles(gridPane);
 					nameLabel.setTextFill(Color.web("#ff9999"));
-					gridPane.setMargin(nameLabel, new Insets(10, 10, 10, 10));
-			        
-					gridPane.setConstraints(nameLabel, 0,rows);
-			        
+					
+			        			        
 			        ComboBox valueBox= new ComboBox();
 			        valueBox.setScaleX(1);
 			        valueBox.setScaleY(1);
@@ -833,11 +768,11 @@ public class liveDebugging extends Application {
 			        valueBox.getItems().add(varValue);
 			        valueBox.setValue(varValue);
 			        
-			        
+			        gridPane.setMargin(nameLabel, new Insets(10, 10, 10, 10));
 			        gridPane.setMargin(valueBox, new Insets(10, 10, 10, 10));
 			        
-			        gridPane.setConstraints(valueBox, 1,rows);
-			       gridPane.getChildren().addAll(nameLabel,valueBox);
+			        gridPane.add(nameLabel, 0, rows);
+			        gridPane.add(valueBox, 1, rows);
 			       
 			       
 			       //add the new var and value in local var hashmap and update the hashmap in the current code window
@@ -853,21 +788,21 @@ public class liveDebugging extends Application {
 	
 	//This method is used to create arrow head
 	//additional note, arrows need indexOnScreen as well to get them from the child array and reposition them
-	public static Polygon createUMLArrow() {
-		Polygon polygon = new Polygon(new double[]{
-				7.5, 0,
-				15, 15,
-				7.51, 15,
-				7.51, 40,
-				7.49, 40,
-				7.49, 15,
-				0, 15
-		});
-		polygon.setFill(Color.WHITE);
-		polygon.setStroke(Color.BLACK);
-		polygon.setRotate(90);
-		return polygon;
-	}
+//	public static Polygon createUMLArrow() {
+//		Polygon polygon = new Polygon(new double[]{
+//				7.5, 0,
+//				15, 15,
+//				7.51, 15,
+//				7.51, 40,
+//				7.49, 40,
+//				7.49, 15,
+//				0, 15
+//		});
+//		polygon.setFill(Color.WHITE);
+//		polygon.setStroke(Color.BLACK);
+//		polygon.setRotate(90);
+//		return polygon;
+//	}
 	
 	private void initializeElementControl() {
 		Button nextBtn = (Button) getRootAnchorPane().lookup("#NextBtn");
@@ -909,25 +844,7 @@ public class liveDebugging extends Application {
 				int nextlineNum = eventUtils.getLineNum(nextEvent);
 				
 					processNextLine(curEvent, nextEvent);
-			
-			//handling the window minimizing image (pin) here
-//			if(prevCodeWindow!=null){
-//			prevCodeWindow.getPinBtn().setVisible(false);
-//			}
-			
-//			//set current code window to green
-//			if(mainCWH!=currentCodeWindow ){
-//				ColorAdjust c=new ColorAdjust(0.426,0.63,0.075,0.015);
-//				String color="A3FF7F";//green
-//
-//				highlighter(currentCodeWindow,currentTimeline,c,color);
-//			}
-//			//set previous code window to yellow
-//			if(mainCWH!=prevCodeWindow){
-//				//highlightPrevious();
-//				ColorAdjust c=new ColorAdjust(0.3,1,0.218,0.38);
-//				String color="FFFB78";//yellow
-//				highlighter(prevCodeWindow,prevTimeline,c,color);
+
 //			}
 
 		}
@@ -946,12 +863,12 @@ public class liveDebugging extends Application {
 				ColorAdjust c=new ColorAdjust(0.426,0.63,0.075,0.015);
 				String color="A3FF7F";//green
 
-				highlighter(currentCodeWindow,currentTimeline,c,color);
+//				highlighter(currentCodeWindow,currentTimeline,c,color);
 			}
 			if(mainCWH!=prevCodeWindow){
 				ColorAdjust c=new ColorAdjust(0.3,1,0.218,0.38);
 				String color="FFFB78";//yellow
-				highlighter(prevCodeWindow,prevTimeline,c,color);
+//				highlighter(prevCodeWindow,prevTimeline,c,color);
 			}
 			
 		}

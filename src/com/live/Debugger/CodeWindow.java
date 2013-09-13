@@ -741,10 +741,16 @@ public void setCodeWindowContainer(DraggableNode e){
 	}
 
 	public GridPane getGridPane() {
-		gridPane = initGridPane();
+		
 		int value=Integer.parseInt(iterationBox.getValue().toString());
+		
+		//check if the current iteration of the code window already has a grid pane
+		//if it exists return it
 		if(gridPaneList.size()>0 && value<=gridPaneList.size()){
 				gridPane=gridPaneList.get(value-1);
+		}else
+		{
+			gridPane = initGridPane();
 		}
 		return gridPane;
 	}
@@ -755,7 +761,7 @@ public void setCodeWindowContainer(DraggableNode e){
 		gridPane.setPadding(new Insets(18, 18, 18, 18));
         gridPane.setGridLinesVisible(true);
         RowConstraints rowinfo = new RowConstraints();
-        rowinfo.setPercentHeight(50);
+        gridPane.setMinWidth(230);
         
         ColumnConstraints colInfo1 = new ColumnConstraints();
         colInfo1.setPercentWidth(40);
@@ -763,16 +769,12 @@ public void setCodeWindowContainer(DraggableNode e){
         ColumnConstraints colInfo2 = new ColumnConstraints();
         colInfo2.setPercentWidth(60);
  
-        gridPane.getRowConstraints().add(rowinfo);//2*50 percent
-        //gridPane.getRowConstraints().add(rowinfo);
- 
         gridPane.getColumnConstraints().add(colInfo1); //25 percent
         gridPane.getColumnConstraints().add(colInfo2); //30 percent
         
  
         Label nameLabel = new Label("Name");
         GridPane.setMargin(nameLabel, new Insets(0, 5, 0, 10));
-        //GridPane.setHalignment(nameLabel, HPos.LEFT);
         
         GridPane.setConstraints(nameLabel, 0, 0);
         Label variableValue = new Label("Variable");
