@@ -644,6 +644,16 @@ public class liveDebugging extends Application {
 				prevTimeline=currentTimeline;
 				currentTimeline= tLine;
 				
+				//reduce the previous child timeline
+				int childTimelineIdx = prevTimeline.getChildTimelineIdx();
+				if(childTimelineIdx != -1)
+				{
+					timeline tl = (timeline) timelineSection.getChildren().get(childTimelineIdx);
+					tl.reduceTimeline();
+				}
+				//update the idx to the latest child timeline
+				prevTimeline.setChildTimelineIdx(timelineSection.getChildren().size() - 1);
+				
 				timelineStack.push(prevTimeline);
 				
 				//set timeline colors
@@ -654,11 +664,11 @@ public class liveDebugging extends Application {
 				currentTimeline.setColor("A3FF7F");
 				
 				//set codeWindow background colors
-				if(oldPrevWindow!=mainCWH && oldPrevTimeline != null)
+				if(oldPrevWindow!=mainCWH && oldPrevWindow != null)
 				{
 						oldPrevWindow.setBackgroundColorToInactive();
 				}				
-				if(oldPrevWindow!=mainCWH && oldPrevTimeline != null)
+				if(prevCodeWindow!=mainCWH && prevCodeWindow != null)
 				{
 					prevCodeWindow.setBackgroundColorToPrevious();
 				}

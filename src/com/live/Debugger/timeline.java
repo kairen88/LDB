@@ -26,6 +26,11 @@ public class timeline extends StackPane{
 	private SimpleIntegerProperty currentValue;
 	private ArrayList<MethodState> callStack;
 	
+	int timelineLength;
+	private SimpleIntegerProperty isReduced;//set to 0 to minimize timeline, else set 1 (used to calculate tick size)
+	
+	int childTimelineInt; //index of the child timeline in the display container
+	
 	private HBox tickBox;
 	private ArrayList<tick> tickList;
 	Label methodLabel;
@@ -37,6 +42,8 @@ public class timeline extends StackPane{
 		timestamps = _timestamps;
 		methodName = _methodName;
 		currentValue = new SimpleIntegerProperty(0);
+		isReduced = new SimpleIntegerProperty(1);
+		childTimelineInt = -1;
 		
 		getCallStack(codeWinCallStack);
 		
@@ -47,7 +54,7 @@ public class timeline extends StackPane{
 				
 		//space for 1 tick * number of ticks + size of 1 expanded tick
 		//refer to tick class for values
-		int timelineLength = (3 + 5 + 5) * timestamps.size() + (3 + 10 + 10) ;
+		timelineLength = (3 + 5 + 5) * timestamps.size() + (3 + 10 + 10) ;
 		
 		this.setMinHeight(15);
 		this.setMinWidth(timelineLength);
@@ -79,17 +86,37 @@ public class timeline extends StackPane{
 		currentValue.addListener(new ChangeListener<Object>(){
 
 			public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-				// TODO Auto-generated method stub
 				valueLabel.setText( ((Integer)newVal).toString() );
 			}
 	      });		
+		
+		final StackPane thisTimeLine = this;
+		isReduced.addListener(new ChangeListener<Object>(){
+
+			public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
+				if((int)(newVal) == 0)
+				{
+					thisTimeLine.setMinWidth(10);
+					thisTimeLine.setMaxWidth(10);
+					valueLabel.visibleProperty().setValue(false);
+					methodLabel.setText(methodName.substring(0, 4));
+				}
+				else
+				{
+					thisTimeLine.setMaxWidth(timelineLength);
+					thisTimeLine.setMinWidth(timelineLength);
+					valueLabel.visibleProperty().setValue(true);
+					methodLabel.setText(methodName);
+				}
+			}
+	      });
 	}
 	
 	private void createTicks()
 	{
 		for(Long timestamp : timestamps)
 		{
-			final tick tk = new tick(timestamp, tickList.size());
+			final tick tk = new tick(timestamp, tickList.size(), isReduced);
 			tickList.add(tk);
 			tk.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			   public void handle(MouseEvent arg0) {
@@ -140,6 +167,26 @@ public class timeline extends StackPane{
 	{
 		tick tk = tickList.get((int)val);
 		setTick(tk);
+	}
+	
+	public int getChildTimelineIdx()
+	{
+		return childTimelineInt;
+	}
+	
+	public void setChildTimelineIdx(int _childIdx)
+	{
+		childTimelineInt = _childIdx;
+	}
+	
+	public void reduceTimeline()
+	{
+		isReduced.set(0);
+	}
+	
+	public void expandTimeline()
+	{
+		isReduced.set(1);
 	}
 	
 	public void setTick(long _timestamp) {

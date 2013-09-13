@@ -1,4 +1,5 @@
 package com.live.Debugger;
+import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableIntegerValue;
@@ -12,31 +13,37 @@ import javafx.scene.shape.Rectangle;
 
 
 public class tick extends HBox{
-
-	private Rectangle tick;
-	private Rectangle spaceR;
-	private Rectangle spaceL;
-	
-	private Color tickColor = Color.WHITE;
-	private Color spaceColor = Color.TRANSPARENT;
-	private Color mouseOverColor = Color.LIGHTBLUE;
-	private Color selectedColor = Color.ORANGE;
-	
-	private int tickHeightInitial = 8;
-	private int tickWidthInitial = 3;
-	private int spaceHeightInitial = 20;
-	private int spaceWidthInitial = 5;
-	
-	private int tickHeightExpanded = 15;
-	private int tickWidthExpanded = 3;
-	private int spaceHeightExpanded = 20;
-	private int spaceWidthExpanded = 10;
 	
 	private long timestamp;
 	private boolean isSelected;
 	private int positionIdx;
 	
-	public tick(long _timestamp, int _positionIdx)
+	private Rectangle tick;
+	private Rectangle spaceR;
+	private Rectangle spaceL;
+	
+	private SimpleIntegerProperty tickWidth;
+	private SimpleIntegerProperty spaceWidth;
+	
+	//constants
+	private final Color tickColor = Color.WHITE;
+	private final Color spaceColor = Color.TRANSPARENT;
+	private final Color mouseOverColor = Color.LIGHTBLUE;
+	private final Color selectedColor = Color.ORANGE;
+	
+	private final int tickHeightInitial = 8;
+	private final int tickWidthInitial = 3;
+	private final int spaceHeightInitial = 20;
+	private final int spaceWidthInitial = 5;
+	
+	private final int tickHeightExpanded = 15;
+	private final int tickWidthExpanded = 3;
+	private final int spaceHeightExpanded = 20;
+	private final int spaceWidthExpanded = 10;
+	
+	
+	
+	public tick(long _timestamp, int _positionIdx, SimpleIntegerProperty _isReduced)
 	{
 		timestamp = _timestamp;
 		positionIdx = _positionIdx;
@@ -48,6 +55,16 @@ public class tick extends HBox{
 		spaceR.setFill(spaceColor);
 		spaceL = new Rectangle(10,10,spaceWidthInitial,spaceHeightInitial);
 		spaceL.setFill(spaceColor);
+		
+		tickWidth = new SimpleIntegerProperty(tickWidthInitial);
+		spaceWidth = new SimpleIntegerProperty(spaceWidthInitial);
+		
+		NumberBinding tickWidthBind = tickWidth.multiply(_isReduced);
+		NumberBinding spaceWidthBind = spaceWidth.multiply(_isReduced);
+		
+		tick.widthProperty().bind(tickWidthBind);
+		spaceL.widthProperty().bind(spaceWidthBind);
+		spaceR.widthProperty().bind(spaceWidthBind);
 		
 		this.getChildren().add(spaceR);
 		this.getChildren().add(tick);
@@ -88,10 +105,11 @@ public class tick extends HBox{
 		 //set height and width to initial values
 		  tick.setHeight(tickHeightInitial);
 	      spaceR.setHeight(spaceHeightInitial);
-	      spaceR.setWidth(spaceWidthInitial);
 	      spaceL.setHeight(spaceHeightInitial);
-	      spaceL.setWidth(spaceWidthInitial);
 	      
+  	      spaceWidth.setValue(spaceWidthInitial);
+  	      tickWidth.setValue(tickWidthInitial);
+
 	      tick.setFill(tickColor);
 	     
 	}
@@ -100,10 +118,11 @@ public class tick extends HBox{
 	{
 		 //increase height and width of rectangles
 	      tick.setHeight(tickHeightExpanded);
-	      spaceR.setHeight(spaceHeightExpanded);
-	      spaceR.setWidth(spaceWidthExpanded);
+	      spaceR.setHeight(spaceHeightExpanded);	      
 	      spaceL.setHeight(spaceHeightExpanded);
-	      spaceL.setWidth(spaceWidthExpanded);
+	      
+	      spaceWidth.setValue(spaceWidthExpanded);
+  	      tickWidth.setValue(tickWidthExpanded);
 	      
 	      tick.setFill(mouseOverColor);
 	      
@@ -135,9 +154,10 @@ public class tick extends HBox{
 		//set height and width to initial values
 		  tick.setHeight(tickHeightInitial);
 	      spaceR.setHeight(spaceHeightInitial);
-	      spaceR.setWidth(spaceWidthInitial);
 	      spaceL.setHeight(spaceHeightInitial);
-	      spaceL.setWidth(spaceWidthInitial);
+	      
+	      spaceWidth.setValue(spaceWidthInitial);
+	      tickWidth.setValue(tickWidthInitial);
 	}
 
 	public long getTimestamp() {
