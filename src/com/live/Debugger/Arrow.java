@@ -7,10 +7,12 @@ import javafx.beans.binding.IntegerBinding;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.scene.Group;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 
 
-public class Arrow extends Line{
+public class Arrow extends Group{
 
 	String startMethodName;
 	String endMethodName;
@@ -37,20 +39,26 @@ public class Arrow extends Line{
 		SimpleDoubleProperty xOffset = new SimpleDoubleProperty();
 		NumberBinding endX = xOffset.add(startWindow.getDraggableX()).add(startWindow.getEditor().widthProperty());
 		
+		Line mainLine = new Line();
 		//bind the start position of the arrow to the start method
-		this.startXProperty().bind(endX);
-		this.startYProperty().bind(startY);
+		mainLine.startXProperty().bind(endX);
+		mainLine.startYProperty().bind(startY);
 				
 		//bind the end position of the arrow to the end method
-		this.endXProperty().bind(endWindow.getDraggableX());
-		this.endYProperty().bind(endWindow.getDraggableY());
+		mainLine.endXProperty().bind(endWindow.getDraggableX());
+		mainLine.endYProperty().bind(endWindow.getDraggableY());
+		
+		Circle circle = new Circle();
+		circle.layoutXProperty().bind(endWindow.getDraggableX());
+		circle.layoutYProperty().bind(endWindow.getDraggableY());
+		circle.radiusProperty().set(5);
+		circle.setFill(javafx.scene.paint.Paint.valueOf("99CCFF"));
+		
+		this.getChildren().add(mainLine);
+		this.getChildren().add(circle);
 	}
 			
 			
 			
-//			prevCodeWindow.getMethodName(), codeWin.getMethodName(), 
-//			prevCodeWindow.getSelectedLineNumber(), prevCodeWindow.getEditor().getWidth(), 
-//			prevCodeWindow.getCodeWindowContainer().x, prevCodeWindow.getCodeWindowContainer().y, 
-//			codeWin.getCodeWindowContainer().x, codeWin.getCodeWindowContainer().y
 	
 }

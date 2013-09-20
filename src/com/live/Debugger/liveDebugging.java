@@ -253,7 +253,7 @@ public class liveDebugging extends Application {
 			lineNumberOffset = codeFragments.getLineNumberOffset(methodName);
 
 			currentCodeWindow = editor;
-		    s1.setPrefSize(1600, 600);
+		    s1.setPrefSize(1600, 700);
 			s1.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 			s1.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 			s1.setContent(codeWindowArea);
