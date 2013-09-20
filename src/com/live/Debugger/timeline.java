@@ -1,5 +1,6 @@
 package com.live.Debugger;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import tod.core.database.event.ILogEvent;
 
@@ -29,7 +30,7 @@ public class timeline extends StackPane{
 	int timelineLength;
 	private SimpleIntegerProperty isReduced;//set to 0 to minimize timeline, else set 1 (used to calculate tick size)
 	
-	int childTimelineInt; //index of the child timeline in the display container
+	Vector<Integer> childTimelineIdxList; //index of the child timeline in the display container
 	
 	private HBox tickBox;
 	private ArrayList<tick> tickList;
@@ -43,7 +44,7 @@ public class timeline extends StackPane{
 		methodName = _methodName;
 		currentValue = new SimpleIntegerProperty(0);
 		isReduced = new SimpleIntegerProperty(1);
-		childTimelineInt = -1;
+		childTimelineIdxList = new Vector<Integer>();
 		
 		getCallStack(codeWinCallStack);
 		
@@ -169,14 +170,14 @@ public class timeline extends StackPane{
 		setTick(tk);
 	}
 	
-	public int getChildTimelineIdx()
+	public Vector<Integer> getChildTimelineIdxList()
 	{
-		return childTimelineInt;
+		return childTimelineIdxList;
 	}
 	
 	public void setChildTimelineIdx(int _childIdx)
 	{
-		childTimelineInt = _childIdx;
+		childTimelineIdxList.add(_childIdx);
 	}
 	
 	public void reduceTimeline()
@@ -187,6 +188,16 @@ public class timeline extends StackPane{
 	public void expandTimeline()
 	{
 		isReduced.set(1);
+	}
+	
+	public void hideTimeline()
+	{
+		this.visibleProperty().set(false);
+	}
+	
+	public void showTimeline()
+	{
+		this.visibleProperty().set(true);
 	}
 	
 	public void setTick(long _timestamp) {
