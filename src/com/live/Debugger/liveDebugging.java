@@ -932,7 +932,13 @@ public class liveDebugging extends Application {
 			
 			timeline s=(timeline) timelineSection.getChildren().get(index);
 			
-			y = (int) (s.getLayoutY()) + 40;
+			y = (int) (s.getLayoutY()) + 34;
+			
+			//if prev timeline is main, y offset is reduced as main does not have a tail polygon
+			//temp solution until we have a better implementation
+//			timeline parent=(timeline) timelineSection.getChildren().get(index-1);
+			if(index == 0)
+				y = (int) (s.getLayoutY()) + 20;
 		}
 		else{//this is to handle the case for "main" method where there is no parent method
 

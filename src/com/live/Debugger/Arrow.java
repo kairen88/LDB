@@ -48,6 +48,7 @@ public class Arrow extends Group{
 		mainLine.endXProperty().bind(endWindow.getDraggableX());
 		mainLine.endYProperty().bind(endWindow.getDraggableY());
 		
+		//using a circle as the arrowhead
 		Circle circle = new Circle();
 		circle.layoutXProperty().bind(endWindow.getDraggableX());
 		circle.layoutYProperty().bind(endWindow.getDraggableY());

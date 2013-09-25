@@ -14,12 +14,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 
-public class timeline extends StackPane{
+public class timeline extends VBox{
 
 	private ArrayList<Long> timestamps;
 	private int prevSelectedTickIdx;
@@ -57,13 +59,15 @@ public class timeline extends StackPane{
 		//refer to tick class for values
 		timelineLength = (3 + 5 + 5) * timestamps.size() + (3 + 10 + 10) ;
 		
-		this.setMinHeight(15);
-		this.setMinWidth(timelineLength);
-		this.setStyle("-fx-background-color: #D8BFD8;");
+		StackPane timebar = new StackPane();
+		timebar.setMinHeight(15);
+		timebar.setMinWidth(timelineLength);
+		timebar.setStyle("-fx-background-color: #D8BFD8;");
 		
 		tickBox = new HBox();
 		createTicks();
 		
+		//adding labels
 		Pane labelBox = new Pane();		
 		Font fontSize = new Font(9);
 		
@@ -78,10 +82,25 @@ public class timeline extends StackPane{
 		
 		//relocate the labels in the timeline
 		methodLabel.relocate(0, 10);
-		valueLabel.relocate(timelineLength, 10);		
+		valueLabel.relocate(timelineLength, 10);
 		
-		this.getChildren().add(labelBox);
-		this.getChildren().add(tickBox);
+		//adding tail
+		//we add a tail only if it is not the main method
+		if(!_methodName.equals("main"))
+		{
+			Polygon tail = new Polygon();
+			tail.getPoints().addAll(new Double[]{
+			        0.0, 0.0,
+			        0.0, -15.0,
+			        5.0, 0.0 });
+			this.getChildren().add(tail);
+		}
+		
+		timebar.getChildren().add(labelBox);
+		timebar.getChildren().add(tickBox);
+		
+		
+		this.getChildren().add(timebar);
 				
 		//add listener to update valueLabel
 		currentValue.addListener(new ChangeListener<Object>(){
@@ -91,7 +110,8 @@ public class timeline extends StackPane{
 			}
 	      });		
 		
-		final StackPane thisTimeLine = this;
+		final StackPane thisTimeLine = timebar;
+		//change listener to reduce timeline when isReduced is set to 0
 		isReduced.addListener(new ChangeListener<Object>(){
 
 			public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
@@ -183,6 +203,9 @@ public class timeline extends StackPane{
 	public void reduceTimeline()
 	{
 		isReduced.set(0);
+		
+		//shift the timeline by 5 since the tick size is reduced when it loses focus
+		this.relocate(this.getLayoutX() - 5, this.getLayoutY());
 	}
 	
 	public void expandTimeline()
@@ -228,8 +251,22 @@ public class timeline extends StackPane{
 	}
 	
 	public void setColor(String _color)
-	{
-		this.setStyle("-fx-background-color: #" + _color + ";");
+	{		
+		//if the timeline has a tail, set color for tail and timebar
+		if(this.getChildren().size() > 1)
+		{
+			//set color of the tail
+			javafx.scene.paint.Paint tailColor = javafx.scene.paint.Paint.valueOf(_color);
+			Polygon tail = (Polygon)(this.getChildren().get(0));
+			tail.setFill(tailColor);
+			
+			//get color of the timebar
+			this.getChildren().get(1).setStyle("-fx-background-color: #" + _color + ";");
+		}else
+		{
+			//get color of the timebar
+			this.getChildren().get(0).setStyle("-fx-background-color: #" + _color + ";");
+		}
 	}
 	
 	//for debugging purposes
