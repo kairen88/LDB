@@ -26,6 +26,7 @@ public class timeline extends VBox{
 	private ArrayList<Long> timestamps;
 	private int prevSelectedTickIdx;
 	private String methodName;
+	private long createdTimestamp;
 	private SimpleIntegerProperty currentValue;
 	private ArrayList<MethodState> callStack;
 	
@@ -40,11 +41,12 @@ public class timeline extends VBox{
 	Label valueLabel;
 	
 	
-	timeline(ArrayList<Long> _timestamps, String _methodName, ArrayList<CodeWindow> codeWinCallStack)
+	timeline(ArrayList<Long> _timestamps, String _methodName, ArrayList<CodeWindow> codeWinCallStack, long _timeCreated)
 	{
 		timestamps = _timestamps;
 		methodName = _methodName;
 		currentValue = new SimpleIntegerProperty(0);
+		createdTimestamp = _timeCreated;
 		isReduced = new SimpleIntegerProperty(1);
 		childTimelineIdxList = new Vector<Integer>();
 		

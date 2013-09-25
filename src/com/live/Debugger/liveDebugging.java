@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import javax.swing.JComponent;
@@ -127,7 +128,7 @@ public class liveDebugging extends Application {
 	private HashMap displayedCodeWindowsList; //list of code windows currently displayed on screen
 	private ArrayList<CodeWindow> CodeWindowCallStack; //maintains a list that represents the call stack
 	
-	private HashMap<String, Integer> displayedTimelineList;//list of timelines displayed on screen, value = index of element in container (latest instance of a particular timeline)
+	private TreeMap<String, HashMap> displayedTimelineList;//list of timelines displayed on screen, value = index of element in container (latest instance of a particular timeline)
 	Pane timelineSection=new Pane ();
 
 	//timeline positions
@@ -168,7 +169,7 @@ public class liveDebugging extends Application {
 		codeWindowStack = new Stack<>();
 		timelineStack=new Stack<>();
 		displayedCodeWindowsList = new HashMap<String, Integer>();
-		displayedTimelineList = new HashMap<>();
+		displayedTimelineList = new TreeMap<String, HashMap>();
 		CodeWindowCallStack = new ArrayList<CodeWindow>();
 
 		codeWindowAreaNew = (Pane) getRootAnchorPane().lookup("#codeWindowSection");
@@ -199,7 +200,10 @@ public class liveDebugging extends Application {
 		timeline tLine = createTimeLine(null, mainEvent);
 		currentTimeline = tLine;
 		mainTH=currentTimeline;
-		displayedTimelineList.put("main", 0);
+		
+		HashMap<Long, Integer> mainTimelineIdx = new HashMap<Long, Integer>();
+		mainTimelineIdx.put(mainEvent.getTimestamp(), 0);
+		displayedTimelineList.put("main", mainTimelineIdx);
 
 		//setting the main code window and timeline color to red
 		String color="FF8C73"; //red
@@ -272,22 +276,13 @@ public class liveDebugging extends Application {
 		currentCodeWindow.highlightGutters(lineNumbers, codeFragments.getLineNumberOffset(currentCodeWindow.getMethodName()) );
 		
 	}
-	//This method is used to increment the slider value by 1
+	
+	//This method is used to set the selected tick
 	private void setTick(timeline currentTimeline, ILogEvent event){
-//		double tick=currentTimeline.getValue();
-		long timestamp = event.getTimestamp();
-//		try{
-//			tick++;
-//			if(tick<=currentTimeline.getMax()){
-				currentTimeline.setTick(timestamp);
-//			}
-//		}
-//		catch (Exception ex){
-//			int m=0;
-//		}
 
-//		Tooltip tip=new Tooltip(String.valueOf(t.getValue()));
-//		t.setTooltip(tip);
+		long timestamp = event.getTimestamp();
+
+		currentTimeline.setTick(timestamp);
 	}
 	
 	//This method is used to decrement the slider value by 1
@@ -382,9 +377,7 @@ public class liveDebugging extends Application {
 			//-----------------------------------------------------------Case: Method Call-----------------------------------------------		
 			
 			String methodName = eventUtils.getMethodName(prevEvent);
-			
-//			timeline tLine = createTimeLine(curEvent, prevEvent);
-			
+						
 			CodeWindow codeWin = null;				
 			boolean addedNewWindow = false;
 			
@@ -406,47 +399,11 @@ public class liveDebugging extends Application {
 			currentCodeWindow.setSelectedLineNumber(curLine);
 			currentCodeWindow.setExecutedLine(curLine);
 			
-//			//store the current grid pane in the current code window
-//			currentCodeWindow.setGridPane(gridPane);
 
 			//set the new window as current window
 			CodeWindow oldPrevWindow = prevCodeWindow;
 			prevCodeWindow = currentCodeWindow;
 			currentCodeWindow = codeWin;
-			
-			//get timeline of the child method
-			timeline tLine = (timeline) timelineSection.getChildren().get( displayedTimelineList.get(methodName) );
-			
-			timeline oldPrevTimeline = prevTimeline;
-			prevTimeline=currentTimeline;
-			currentTimeline= tLine;
-			
-//			//reduce all child timelines of prevTimeline
-//			Vector<Integer> childTimelineIdxList = prevTimeline.getChildTimelineIdxList();
-//			if(!childTimelineIdxList.isEmpty())
-//			{
-//				//iterate through all child timelines
-//				for(int i = 0; i < childTimelineIdxList.size(); i++)
-//				{
-//					int index = childTimelineIdxList.get(i);
-//					timeline tl = (timeline) timelineSection.getChildren().get(index);
-//					tl.reduceTimeline();
-//					
-//					//hide any grandchildren timelines
-//					hideChildTimelines(tl.getChildTimelineIdxList());
-//				}
-//			}
-			//add the idx to the new timeline to the list of children
-//			prevTimeline.setChildTimelineIdx(timelineSection.getChildren().size() - 1);
-			
-			timelineStack.push(prevTimeline);
-			
-			//set timeline colors
-			if(oldPrevTimeline != null && oldPrevTimeline != mainTH)
-				oldPrevTimeline.setColor("CCCCCC");
-			if(prevTimeline != null && prevTimeline != mainTH)
-				prevTimeline.setColor("FFFB78");
-			currentTimeline.setColor("A3FF7F");
 			
 			//set codeWindow background colors
 			if(oldPrevWindow!=mainCWH && oldPrevWindow != null)
@@ -471,6 +428,34 @@ public class liveDebugging extends Application {
 
 			gridPane=currentCodeWindow.getGridPane();
 			variablePane.getChildren().set(0,gridPane);
+			
+			//handling timeline -----------------------------------
+			
+			//get timeline of the child method
+			//** should use timestamp to get the correct timeline
+			long timestamp = prevEvent.getParent().getTimestamp();
+			HashMap<Long, Integer> hash = displayedTimelineList.get(methodName);
+			int index = hash.get(timestamp);
+			timeline tLine = (timeline) timelineSection.getChildren().get(index);
+			
+			timeline oldPrevTimeline = prevTimeline;
+			prevTimeline=currentTimeline;
+			currentTimeline= tLine;
+			
+			reduceChildTimelines(false);
+			
+			currentTimeline.expandTimeline();
+			currentTimeline.showTimeline();
+			
+			timelineStack.push(prevTimeline);
+			
+			//set timeline colors
+			if(oldPrevTimeline != null && oldPrevTimeline != mainTH)
+				oldPrevTimeline.setColor("CCCCCC");
+			if(prevTimeline != null && prevTimeline != mainTH)
+				prevTimeline.setColor("FFFB78");
+			currentTimeline.setColor("A3FF7F");
+			
 			
 			reposition();			
 		
@@ -726,7 +711,7 @@ public class liveDebugging extends Application {
 			//ELSE it is a method call and we need to add a new code window
 			else {
 				
-				timeline tLine = createTimeLine(curEvent, nextEvent);
+				
 				
 				CodeWindow codeWin = null;				
 				boolean addedNewWindow = false;
@@ -775,37 +760,6 @@ public class liveDebugging extends Application {
 				CodeWindow oldPrevWindow = prevCodeWindow;
 				prevCodeWindow = currentCodeWindow;
 				currentCodeWindow = codeWin;
-
-				timeline oldPrevTimeline = prevTimeline;
-				prevTimeline=currentTimeline;
-				currentTimeline= tLine;
-				
-				//reduce all child timelines of prevTimeline
-				Vector<Integer> childTimelineIdxList = prevTimeline.getChildTimelineIdxList();
-				if(!childTimelineIdxList.isEmpty())
-				{
-					//iterate through all child timelines
-					for(int i = 0; i < childTimelineIdxList.size(); i++)
-					{
-						int index = childTimelineIdxList.get(i);
-						timeline tl = (timeline) timelineSection.getChildren().get(index);
-						tl.reduceTimeline();
-						
-						//hide any grandchildren timelines
-						hideChildTimelines(tl.getChildTimelineIdxList());
-					}
-				}
-				//add the idx to the new timeline to the list of children
-				prevTimeline.setChildTimelineIdx(timelineSection.getChildren().size() - 1);
-				
-				timelineStack.push(prevTimeline);
-				
-				//set timeline colors
-				if(oldPrevTimeline != null && oldPrevTimeline != mainTH)
-					oldPrevTimeline.setColor("CCCCCC");
-				if(prevTimeline != null && prevTimeline != mainTH)
-					prevTimeline.setColor("FFFB78");
-				currentTimeline.setColor("A3FF7F");
 				
 				//set codeWindow background colors
 				if(oldPrevWindow!=mainCWH && oldPrevWindow != null)
@@ -819,7 +773,7 @@ public class liveDebugging extends Application {
 				currentCodeWindow.setBackgroundColorToCurrent();
 				
 				//minimize oldPrevWindow
-				if(oldPrevWindow!=null){
+				if(oldPrevWindow!=null && oldPrevWindow != mainCWH){
 					prevCodeWindow.reduceWindowSize();
 					prevCodeWindow.setPinBtn("plus");
 					//prevCodeWindow.getPinBtn().setVisible(true);
@@ -835,6 +789,46 @@ public class liveDebugging extends Application {
 					Arrow arrowNew = new Arrow(prevCodeWindow, currentCodeWindow);
 					codeWindowArea.getChildren().add(arrowNew);
 				}
+				
+				//handling the timeline---------------------
+				
+				timeline tLine = null;
+				boolean timelineExists = false;
+				
+				//check if the timeline already exists
+				if(displayedTimelineList.containsKey(methodName))
+				{
+					if(displayedTimelineList.get(methodName).containsKey(nextEvent.getTimestamp()))
+					{
+						tLine = (timeline) timelineSection.getChildren().get( (int) displayedTimelineList.get(methodName).get(nextEvent.getTimestamp()) );
+						timelineExists = true;
+					}
+				}
+				
+				if(!timelineExists) //else create new timeline
+				{
+					tLine = createTimeLine(curEvent, nextEvent);
+				}
+
+				timeline oldPrevTimeline = prevTimeline;
+				prevTimeline=currentTimeline;
+				currentTimeline= tLine;
+				
+				reduceChildTimelines(timelineExists);
+				
+				//add the idx to the new timeline to the list of children
+				prevTimeline.setChildTimelineIdx(timelineSection.getChildren().size() - 1);
+				
+				timelineStack.push(prevTimeline);
+				
+				//set timeline colors
+				if(oldPrevTimeline != null && oldPrevTimeline != mainTH)
+					oldPrevTimeline.setColor("CCCCCC");
+				if(prevTimeline != null && prevTimeline != mainTH)
+					prevTimeline.setColor("FFFB78");
+				currentTimeline.setColor("A3FF7F");
+				
+				
 				highlightGutters(nextEvent);
 				initializeGrid();
 				reposition();
@@ -939,6 +933,24 @@ public class liveDebugging extends Application {
 			}
 		};
 	}
+
+	private void reduceChildTimelines(boolean timelineExists) {
+		//reduce all child timelines of prevTimeline
+		Vector<Integer> childTimelineIdxList = prevTimeline.getChildTimelineIdxList();
+		if(!childTimelineIdxList.isEmpty() && timelineExists == false)
+		{
+			//iterate through all child timelines
+			for(int i = 0; i < childTimelineIdxList.size(); i++)
+			{
+				int index = childTimelineIdxList.get(i);
+				timeline tl = (timeline) timelineSection.getChildren().get(index);
+				tl.reduceTimeline();
+				
+				//hide any grandchildren timelines
+				hideChildTimelines(tl.getChildTimelineIdxList());
+			}
+		}
+	}
 	
 	//This method is used to create arrow head
 	//additional note, arrows need indexOnScreen as well to get them from the child array and reposition them
@@ -1031,12 +1043,12 @@ public class liveDebugging extends Application {
 	}
 	
 	//This method relocates the timeline position along x-axis 
-	private int timelineLocationX(String _methodName){
+	private int timelineLocationX(String _methodName, long _timestamp){
 		int x=0;
 		
 		if(_methodName != null){
 			
-			int index = displayedTimelineList.get(_methodName);
+			int index = (int) displayedTimelineList.get(_methodName).get(_timestamp);
 
 			timeline s=(timeline) timelineSection.getChildren().get(index);
 			
@@ -1050,12 +1062,12 @@ public class liveDebugging extends Application {
 	}
 	
 	//This method relocates the timeline position along y-axis 
-	private int timelineLocationY(String _methodName){
+	private int timelineLocationY(String _methodName, long _timestamp){
 		int y=0;
 		
 		if(_methodName != null){
 			
-			int index = displayedTimelineList.get(_methodName);
+			int index = (int) displayedTimelineList.get(_methodName).get(_timestamp);
 			
 			timeline s=(timeline) timelineSection.getChildren().get(index);
 			
@@ -1109,19 +1121,35 @@ public class liveDebugging extends Application {
 			if(parentMethodName == null)
 					parentMethodName = eventUtils.getMethodName(curEvent.getParent());
 		
-		timeline timeline = new timeline(childEventsTimestamps, newMethodName, CodeWindowCallStack);
+		timeline timeline = new timeline(childEventsTimestamps, newMethodName, CodeWindowCallStack, nextEvent.getTimestamp());
 
+		long parentTimestamp = 2671896418426L;
+		if(curEvent != null)
+			parentTimestamp = nextEvent.getParent().getTimestamp();
+		
 		//if the next method is "main", we pass in a null since there is no parent method to calculate the offset from
-		posX=timelineLocationX(parentMethodName);
-		posY=timelineLocationY(parentMethodName);
+		posX=timelineLocationX(parentMethodName, parentTimestamp);
+		posY=timelineLocationY(parentMethodName, parentTimestamp);
 		
 		timelineSection.getChildren().add(timeline);
 		timeline.relocate(posX,posY);
 		
 		//store the index of the timeline in container (timelineSection)
-		displayedTimelineList.put(newMethodName, timelineSection.getChildren().size() - 1);
-		//maintain the timeline callstack
-//		timelineStack.push(timeline);
+		int timelineIndex = timelineSection.getChildren().size() - 1;
+		HashMap<Long, Integer> methodTimelineIndexes;
+		
+		if(displayedTimelineList.containsKey(newMethodName))
+		{
+			methodTimelineIndexes = displayedTimelineList.get(newMethodName);
+			methodTimelineIndexes.put(nextEvent.getTimestamp(), timelineIndex);
+		}
+		else
+		{
+			methodTimelineIndexes = new HashMap<Long, Integer>();		
+			methodTimelineIndexes.put(nextEvent.getTimestamp(), timelineIndex);
+		}		
+				
+		displayedTimelineList.put(newMethodName, methodTimelineIndexes);
 
 		return timeline;
 	}
