@@ -432,18 +432,18 @@ public class liveDebugging extends Application {
 			//handling timeline -----------------------------------
 			
 			//get timeline of the child method
-			//** should use timestamp to get the correct timeline
+			//get the timestamp of the parent method call
 			long timestamp = prevEvent.getParent().getTimestamp();
-			HashMap<Long, Integer> hash = displayedTimelineList.get(methodName);
-			int index = hash.get(timestamp);
+			HashMap<Long, Integer> methodIdxhash = displayedTimelineList.get(methodName);//hashmap of the method with the idx of it's timelines in the display container (timelineSection)
+			int index = methodIdxhash.get(timestamp);
 			timeline tLine = (timeline) timelineSection.getChildren().get(index);
 			
 			timeline oldPrevTimeline = prevTimeline;
 			prevTimeline=currentTimeline;
 			currentTimeline= tLine;
 			
-			reduceChildTimelines(false);
-			
+			//reduce / hide child timelines and make sure our "new" timeline is expanded and visible
+			reduceChildTimelines(false);			
 			currentTimeline.expandTimeline();
 			currentTimeline.showTimeline();
 			
@@ -815,6 +815,8 @@ public class liveDebugging extends Application {
 				currentTimeline= tLine;
 				
 				reduceChildTimelines(timelineExists);
+				tLine.expandTimeline();
+				tLine.showTimeline();
 				
 				//add the idx to the new timeline to the list of children
 				prevTimeline.setChildTimelineIdx(timelineSection.getChildren().size() - 1);
