@@ -409,7 +409,7 @@ public void setCodeWindowContainer(DraggableNode e){
 	}
 	
 	//sets the class for the line number indicated to completedLine which styles it white
-	public void setLineColorToCompleted(int lineNum)
+	public void setLineColorToPrevious(int lineNum)
 	{
 		editor.webview.getEngine().executeScript("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'completedLine');");
 		//98FB98

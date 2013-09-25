@@ -273,18 +273,18 @@ public class liveDebugging extends Application {
 		
 	}
 	//This method is used to increment the slider value by 1
-	private void setTick(timeline currentTimeline2, ILogEvent event){
-		double tick=currentTimeline2.getValue();
+	private void setTick(timeline currentTimeline, ILogEvent event){
+//		double tick=currentTimeline.getValue();
 		long timestamp = event.getTimestamp();
-		try{
-			tick++;
-			if(tick<=currentTimeline2.getMax()){
-				currentTimeline2.setTick(timestamp);
-			}
-		}
-		catch (Exception ex){
-			int m=0;
-		}
+//		try{
+//			tick++;
+//			if(tick<=currentTimeline.getMax()){
+				currentTimeline.setTick(timestamp);
+//			}
+//		}
+//		catch (Exception ex){
+//			int m=0;
+//		}
 
 //		Tooltip tip=new Tooltip(String.valueOf(t.getValue()));
 //		t.setTooltip(tip);
@@ -308,101 +308,222 @@ public class liveDebugging extends Application {
 	}
 	
 	//This method is used to step backwards
-	private void processPrevious(int clineNum, int prevlineNum, ILogEvent prevEvent,ILogEvent curEvent) {
-		//step backwards towards previous line 
-		// TODO Auto-generated method stub
-		if (!eventUtils.isMethodCall(curEvent)) {
-			currentCodeWindow.setLineColorToCompleted(clineNum - lineNumberOffset
-				- 1);
-		}
+	private void processPrevious(ILogEvent curEvent, ILogEvent prevEvent) {		
+
+		int prevLine=eventUtils.getLineNum(prevEvent) - currentCodeWindow.getStartLine() - 1;
+		int curLine=eventUtils.getLineNum(curEvent) - currentCodeWindow.getStartLine() - 1;
 		
-		if (eventUtils.isParentOf(prevEvent, curEvent)) {
-			// previous event is parent, we stepped backwards out of
-			// a method
+//-----------------------------------------------------------Case: Method return-----------------------------------------------				
+		
+		if (eventUtils.isParentOf(prevEvent, curEvent)) {	// previous event is parent, we stepped backwards out of a method
 
-			// do something
-			if(prevCodeWindow!=mainCWH){
-			ColorAdjust c=new ColorAdjust(0,0,0,0);
-			String color="CCCCCC";//grey
-//			highlighter(prevCodeWindow,prevTimeline,c,color);
-			prevCodeWindow.reduceWindowSize();
-			}else{
-				if(prevCodeWindow!=null)
-					prevCodeWindow.reduceWindowSize();
-
-			}
-
-			//setTick(currentTimeline, curProgIndicator);
+			//since we are stepping out of the method, remove it from the call stack
+			//check if the current code window is the last method in the call stack, remove it
+			if(CodeWindowCallStack.get(CodeWindowCallStack.size() - 1).getMethodName().equalsIgnoreCase(currentCodeWindow.getMethodName()))
+				CodeWindowCallStack.remove(CodeWindowCallStack.size() - 1);
+			
+			//stash the previous window
 			CodeWindow oldPreviousWindow=prevCodeWindow;
 			prevCodeWindow = currentCodeWindow;
+			
+			timeline oldPreviousTimeline = prevTimeline;
 			prevTimeline=currentTimeline;
-
-			if (!codeWindowStack.empty()){
-				currentCodeWindow = codeWindowStack.pop();
+			
+			//current code window is now from the code window stack
+			if (!CodeWindowCallStack.isEmpty()){
+				currentCodeWindow= CodeWindowCallStack.get(CodeWindowCallStack.size() - 1);//return the last element in the call stack
 				currentTimeline=timelineStack.pop();
+				
+//				currentTimeline.printCallStack(); //for debugging
 			}
-			// highlight parent method
-			if(oldPreviousWindow==currentCodeWindow){
-				prevCodeWindow.normalWindowSize();
+			if(oldPreviousWindow!=currentCodeWindow){
+				oldPreviousWindow.setBackgroundColorToInactive();
+				oldPreviousWindow.reduceWindowSize();//prevCodeWindow.normalWindowSize();
+				oldPreviousWindow.setPinBtn("plus");
+				//oldPreviousWindow.getPinBtn().setVisible(true);
+//				currentCodeWindow.normalWindowSize();
 			}
-			lineNumberOffset = codeFragments
-					.getLineNumberOffset(currentCodeWindow.getMethodName());
-			int line=prevlineNum - lineNumberOffset- 1;
+			
+			//set the highlights for the main and prev windows
+			if(currentCodeWindow != mainCWH)
+				currentCodeWindow.setBackgroundColorToCurrent();
+			//ensure current window is maximixed
+			currentCodeWindow.normalWindowSize();
+			
+			prevCodeWindow.setBackgroundColorToPrevious();
+			prevCodeWindow.normalWindowSize();
+			
+			// highlight next line to be executed
+			int lineNum = eventUtils.getLineNum(prevEvent);
+			
+//			lineNumberOffset = codeFragments.getLineNumberOffset(currentCodeWindow.getMethodName());
+			int line=lineNum - currentCodeWindow.getStartLine()- 1;
+			
 			currentCodeWindow.setLineColorToCurrent(line);
-			currentCodeWindow.setSelectedLineNumber(line);
 			
-			decrementTick(currentTimeline);//kai
+			currentCodeWindow.setExecutedLine(line);//so we know the start point of the arrow
+			
+			if(oldPreviousTimeline != mainTH)
+				oldPreviousTimeline.setColor("CCCCCC");
+			
+			prevTimeline.setColor("FFFB78");
+			
+			if(currentTimeline != mainTH)
+				currentTimeline.setColor("A3FF7F");
+			
+			setTick(currentTimeline, prevEvent);
+			
+			gridPane=currentCodeWindow.getGridPane();
+			variablePane.getChildren().set(0,gridPane);
 			reposition();
-		} else if (eventUtils.isMethodCall(curEvent)){// (curEvent.getDepth() < prevEvent.getDepth()) {
-			// we have stepped backwards into a method
-			
-			String methodName = prevCodeWindow.getMethodName();
-			lineNumberOffset=codeFragments.getLineNumberOffset(methodName);
-			
-			if(prevCodeWindow!=mainCWH){
-				ColorAdjust c=new ColorAdjust(0,0,0,0);
-				String color="CCCCCC";//grey
-//				highlighter(prevCodeWindow,prevTimeline,c,color);
-				prevCodeWindow.reduceWindowSize();
-				}
-			else{
-				if(prevCodeWindow!=null)
-					prevCodeWindow.reduceWindowSize();
-			}
-			CodeWindow oldPreviousWindow=prevCodeWindow;
-			prevCodeWindow = currentCodeWindow;
-			prevTimeline=currentTimeline;
-			
-			if (!codeWindowStack.empty()){
-				currentCodeWindow = codeWindowStack.pop();
-				currentTimeline=timelineStack.pop();
-			}
-			// highlight parent method
-			
-			if(oldPreviousWindow==currentCodeWindow){
-				prevCodeWindow.normalWindowSize();
-			}
-			
-			currentCodeWindow.setLineColorToCompleted(clineNum - lineNumberOffset
-					- 1);// should be this but currently i haven't set main
-			int linenum=prevlineNum - lineNumberOffset
-					- 1;
-			currentCodeWindow.setLineColorToCurrent(linenum);// should be this but currently i haven't set main
-			currentCodeWindow.setSelectedLineNumber(linenum);
-				
-			decrementTick(currentTimeline);//kai
-			reposition();
-		} 
 		
-		else {
-			// did not step out of a method
+		} 
+		else if (prevEvent.getDepth() > curEvent.getDepth()){
+			//-----------------------------------------------------------Case: Method Call-----------------------------------------------		
+			
+			String methodName = eventUtils.getMethodName(prevEvent);
+			
+//			timeline tLine = createTimeLine(curEvent, prevEvent);
+			
+			CodeWindow codeWin = null;				
+			boolean addedNewWindow = false;
+			
+			//get the code window from the list of displayed windows
+			if(displayedCodeWindowsList.containsKey(methodName))
+			{ 
+				codeWin = (CodeWindow) codeWindowArea.getChildren().get((int) displayedCodeWindowsList.get(methodName));
+			}
+			
+			//update the selected line of the last method call
+			//add the new method to the call stack
+			CodeWindowCallStack.get(CodeWindowCallStack.size() - 1).setExecutedLine(curLine);				
+			CodeWindowCallStack.add(codeWin);
 				
-			// do something
-			int linenum=prevlineNum - lineNumberOffset - 1;
-			currentCodeWindow.setLineColorToCurrent(linenum);
-			currentCodeWindow.setSelectedLineNumber(linenum);
-			decrementTick(currentTimeline);//kai
-		}
+			//highlight the line of the method call in the current window
+			currentCodeWindow.setLineColorToMethodCall(curLine);
+			
+			//set the line number which initiated the method call so we know where to palce the arrow
+			currentCodeWindow.setSelectedLineNumber(curLine);
+			currentCodeWindow.setExecutedLine(curLine);
+			
+//			//store the current grid pane in the current code window
+//			currentCodeWindow.setGridPane(gridPane);
+
+			//set the new window as current window
+			CodeWindow oldPrevWindow = prevCodeWindow;
+			prevCodeWindow = currentCodeWindow;
+			currentCodeWindow = codeWin;
+			
+			//get timeline of the child method
+			timeline tLine = (timeline) timelineSection.getChildren().get( displayedTimelineList.get(methodName) );
+			
+			timeline oldPrevTimeline = prevTimeline;
+			prevTimeline=currentTimeline;
+			currentTimeline= tLine;
+			
+//			//reduce all child timelines of prevTimeline
+//			Vector<Integer> childTimelineIdxList = prevTimeline.getChildTimelineIdxList();
+//			if(!childTimelineIdxList.isEmpty())
+//			{
+//				//iterate through all child timelines
+//				for(int i = 0; i < childTimelineIdxList.size(); i++)
+//				{
+//					int index = childTimelineIdxList.get(i);
+//					timeline tl = (timeline) timelineSection.getChildren().get(index);
+//					tl.reduceTimeline();
+//					
+//					//hide any grandchildren timelines
+//					hideChildTimelines(tl.getChildTimelineIdxList());
+//				}
+//			}
+			//add the idx to the new timeline to the list of children
+//			prevTimeline.setChildTimelineIdx(timelineSection.getChildren().size() - 1);
+			
+			timelineStack.push(prevTimeline);
+			
+			//set timeline colors
+			if(oldPrevTimeline != null && oldPrevTimeline != mainTH)
+				oldPrevTimeline.setColor("CCCCCC");
+			if(prevTimeline != null && prevTimeline != mainTH)
+				prevTimeline.setColor("FFFB78");
+			currentTimeline.setColor("A3FF7F");
+			
+			//set codeWindow background colors
+			if(oldPrevWindow!=mainCWH && oldPrevWindow != null)
+			{
+					oldPrevWindow.setBackgroundColorToInactive();
+			}				
+			if(prevCodeWindow!=mainCWH && prevCodeWindow != null)
+			{
+				prevCodeWindow.setBackgroundColorToPrevious();
+			}
+			currentCodeWindow.setBackgroundColorToCurrent();
+			
+			//minimize oldPrevWindow
+			if(oldPrevWindow!=null){
+				prevCodeWindow.reduceWindowSize();
+				prevCodeWindow.setPinBtn("plus");
+				//prevCodeWindow.getPinBtn().setVisible(true);
+			}
+			
+			//maximise current window
+			currentCodeWindow.normalWindowSize();
+
+			gridPane=currentCodeWindow.getGridPane();
+			variablePane.getChildren().set(0,gridPane);
+			
+			reposition();			
+		
+		} 
+//-----------------------------------------------------------Case: Go To Previous Line-----------------------------------------------			
+		else {
+				
+//			int prevLine=eventUtils.getLineNum(prevEvent) - currentCodeWindow.getStartLine() - 1;
+//			int curLine=eventUtils.getLineNum(curEvent) - currentCodeWindow.getStartLine() - 1;
+			
+			//highlight the previous line, set current line to white
+			currentCodeWindow.setLineColorToPrevious(curLine);
+			currentCodeWindow.setLineColorToCurrent(prevLine);
+			currentCodeWindow.setExecutedLine(prevLine);
+			
+			setTick(currentTimeline, prevEvent);
+						
+			//event writes to a variable, we handle inputing/updates values on the variable pane (grid pane)
+			if(eventUtils.isWriteEvent(prevEvent)){
+				//List<LocalVariableInfo> locVariablesList=eventUtils.getLocalVariables(nextEvent);
+				String varName= eventUtils.getWriteEventVarName(prevEvent);		
+			
+				
+				LinkedHashMap<String,ArrayList> localVariableInfo=currentCodeWindow.getLocalVariables();
+					
+					//variable may not exist in our list in which index will be -1
+					int index=returnIndexofValue(varName,localVariableInfo);
+					//variable exists
+					if(index!=-1){
+				        index=2+2*index+2;
+				        
+				        removeGridStyles(gridPane);
+				        
+				        //highlight the variable name that is being written to
+				        Label nameLabel = (Label)gridPane.getChildren().get(index-1);	
+						nameLabel.setTextFill(Color.web("#ff9999"));
+						
+						//highlight and set the new value in the combo box
+				        ComboBox valueBox= (ComboBox)gridPane.getChildren().get(index);				        
+				        valueBox.setScaleX(1);
+				        valueBox.setScaleY(1);
+				        valueBox.setStyle("-fx-font-size: 10px; -fx-background-color: #ff9999");    
+				        //display the previous written value
+				        //**this is not correct, we need a new impl
+				        if(valueBox.getItems().size() > 1)
+				        	valueBox.setValue( valueBox.getItems().get(valueBox.getItems().size() - 1) );
+				        
+				        //update the elements being displayed
+				        gridPane.getChildren().set(index-1, nameLabel);
+				        gridPane.getChildren().set(index, valueBox);
+			        }
+				}		
+			}
 	}
 	
 	//calculate the position of arrow at x axis
@@ -518,7 +639,7 @@ public class liveDebugging extends Application {
 		}
 		
 		//sets current line to white - remove highlight
-		currentCodeWindow.setLineColorToCompleted(currentCodeWindow.getExecutedLine());
+		currentCodeWindow.setLineColorToPrevious(currentCodeWindow.getExecutedLine());
 		
 //-----------------------------------------------------------Case: Method return-----------------------------------------------		
 
@@ -578,6 +699,10 @@ public class liveDebugging extends Application {
 			
 			setTick(currentTimeline, nextEvent);
 			
+			//save previous window grid pane
+			prevCodeWindow.setGridPane(gridPane);
+
+			//restore current window grid pane
 			gridPane=currentCodeWindow.getGridPane();
 			variablePane.getChildren().set(0,gridPane);
 			reposition();
@@ -887,18 +1012,20 @@ public class liveDebugging extends Application {
 			
 			int clineNum = eventUtils.getLineNum(curEvent);
 			int prevLineNum = eventUtils.getLineNum(prevEvent);	
+			
+			processPrevious(curEvent, prevEvent);
 	
-			if(mainCWH!=currentCodeWindow ){
-				ColorAdjust c=new ColorAdjust(0.426,0.63,0.075,0.015);
-				String color="A3FF7F";//green
-
-//				highlighter(currentCodeWindow,currentTimeline,c,color);
-			}
-			if(mainCWH!=prevCodeWindow){
-				ColorAdjust c=new ColorAdjust(0.3,1,0.218,0.38);
-				String color="FFFB78";//yellow
-//				highlighter(prevCodeWindow,prevTimeline,c,color);
-			}
+//			if(mainCWH!=currentCodeWindow ){
+//				ColorAdjust c=new ColorAdjust(0.426,0.63,0.075,0.015);
+//				String color="A3FF7F";//green
+//
+////				highlighter(currentCodeWindow,currentTimeline,c,color);
+//			}
+//			if(mainCWH!=prevCodeWindow){
+//				ColorAdjust c=new ColorAdjust(0.3,1,0.218,0.38);
+//				String color="FFFB78";//yellow
+////				highlighter(prevCodeWindow,prevTimeline,c,color);
+//			}
 			
 		}
 	}
@@ -936,7 +1063,6 @@ public class liveDebugging extends Application {
 			
 			//if prev timeline is main, y offset is reduced as main does not have a tail polygon
 			//temp solution until we have a better implementation
-//			timeline parent=(timeline) timelineSection.getChildren().get(index-1);
 			if(index == 0)
 				y = (int) (s.getLayoutY()) + 20;
 		}

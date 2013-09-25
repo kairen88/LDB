@@ -129,17 +129,29 @@ public class EventUtils {
 			return null;
 	}
 	
+	//returns the method name of an event
+	//if event is a write event, get the parent and return the method name of the parent event
 	public String getMethodName(ILogEvent _event)
 	{
 		if(isMethodCall(_event))
 		{
-			MethodCallEvent methodCallEvent = (MethodCallEvent) _event;
-			if(methodCallEvent.getExecutedBehavior()!=null)
-				return methodCallEvent.getExecutedBehavior().getName();
-			else
-				return methodCallEvent.getCalledBehavior().getName();
-		}else
+			MethodCallEvent methodCallEvent = (MethodCallEvent) _event;			
+			return getNameFromMethodCallEvent(methodCallEvent);
+
+		}else if(isWriteEvent(_event))
+		{
+			MethodCallEvent methodCallEvent = (MethodCallEvent) _event.getParent();			
+			return getNameFromMethodCallEvent(methodCallEvent);
+		}
 			return null;
+	}
+	
+	private String getNameFromMethodCallEvent(MethodCallEvent methodCallEvent)
+	{
+		if(methodCallEvent.getExecutedBehavior()!=null)
+			return methodCallEvent.getExecutedBehavior().getName();
+		else
+			return methodCallEvent.getCalledBehavior().getName();
 	}
 	
 	//given an event, if it is a method call
