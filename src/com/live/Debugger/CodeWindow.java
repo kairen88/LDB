@@ -65,13 +65,16 @@ public class CodeWindow extends DraggableNode{
 	private TitledPane edit;//may not be used
 	private DraggableNode codeWindowContainer;
 	
-	private LinkedHashMap<String,ArrayList> localVariables= new LinkedHashMap<>();//store variables and value history
-	private ArrayList<LinkedHashMap<String,ArrayList>> localVariablesList= new ArrayList<>();//list of localVariables hashmaps to correspond the current iteration of the window
-	private LinkedHashMap<Long, Integer> iterationList; //stores the iteration of the code window mapped to the timestamp of the event where they were "created"
+	//stores the iteration of the code window mapped to the timestamp of the event where they were "created"
+	private LinkedHashMap<Long, Integer> iterationList; 
 	private String methodName;
-	SimpleIntegerProperty selectedLineNumber = new SimpleIntegerProperty(0);//linenumber of which spawns a new method call
+	
+	//linenumber of which spawns a new method call
+	SimpleIntegerProperty selectedLineNumber = new SimpleIntegerProperty(0);
 	private int currentExecutionLine = 0;//currently executed line
-	SimpleIntegerProperty lineoffset = new SimpleIntegerProperty(9); //amount to offset the position of the arrow for each line according to selectedLineNumber
+	
+	//amount to offset the position of the arrow for each line according to selectedLineNumber
+	SimpleIntegerProperty lineoffset = new SimpleIntegerProperty(9); 
 	
 	private int windowWidth;
 	private int windowHeight;
@@ -86,17 +89,13 @@ public class CodeWindow extends DraggableNode{
 	private int prevStartCol = -1;
 	private int prevEndCol = -1;
 	
-	private GridPane gridPane=new GridPane();
-	private ArrayList<GridPane> gridPaneList=new ArrayList<GridPane>();
+	private VariablePane gridPane;
+	private ArrayList<VariablePane> gridPaneList=new ArrayList<VariablePane>();
 	private liveDebugging ld;//to use reposition logic, etc.
 	
-//	private final ObservableList strings = FXCollections.observableArrayList(
-//			"1");//may not be used
 	
 	private int indexOnScreen;
 			
-//	double mousex=0;//may not be used
-//	 double mousey=0;//may not be used
 	 
 	 double x =0;
 	 double y=0;
@@ -147,8 +146,8 @@ public class CodeWindow extends DraggableNode{
 		return this.editor;
 	}
 	
-	//increment the current iteration in the iteration combo box, return TRUE
-	//if we are re-entering the same iteration of the codewindow, no new iteration is added, return FALSE
+	//increment the current iteration in the iteration combo box
+	//if we are re-entering the same iteration of the codewindow, no new iteration is added
 	public void setIteration(long _timestamp)
 	{
 		//initialize the 1st instance with the corresponding timestamp
@@ -194,31 +193,7 @@ public void setCodeWindowContainer(DraggableNode e){
 		
 		return this.codeWindowContainer;
 	}
-	public void initializeGrid(){
-		gridPane.setPadding(new Insets(18, 18, 18, 18));
-        gridPane.setGridLinesVisible(true);
-        RowConstraints rowinfo = new RowConstraints();
-        rowinfo.setPercentHeight(50);
-        
-        ColumnConstraints colInfo1 = new ColumnConstraints();
-        colInfo1.setPercentWidth(40);
- 
-        ColumnConstraints colInfo2 = new ColumnConstraints();
-        colInfo2.setPercentWidth(60);
- 
-        gridPane.getRowConstraints().add(rowinfo);//2*50 percent
-        gridPane.getColumnConstraints().add(colInfo1); //25 percent
-        gridPane.getColumnConstraints().add(colInfo2); //30 percent
-        
- 
-        Label nameLabel = new Label("Name");
-        GridPane.setMargin(nameLabel, new Insets(0, 5, 0, 10));
-        GridPane.setConstraints(nameLabel, 0, 0);
-        Label variableValue = new Label("Variable");
-        GridPane.setMargin(variableValue, new Insets(0, 0, 0, 10));
-        GridPane.setConstraints(variableValue, 1, 0);
-        gridPane.getChildren().addAll(nameLabel, variableValue);
-	}
+
 	public CodeWindow(String editingCode, int _windowWidth, int _windowHeight,String methodName, liveDebugging ldInstance) {
 		//initialize window dimensions
 		//set code window size, min 300 by 300
@@ -237,35 +212,10 @@ public void setCodeWindowContainer(DraggableNode e){
 					
 		//construct the code window
 		constructCodeWindow(editingCode,methodName);	
-		initializeGrid();
 		
 		//add change listener to run scripts when webform is loaded		
 //		addWebviewLoadedChangeListener();
 	}
-	/*
-	//overloaded constructor that takes path and loads code from file
-	public CodeWindow(Path _editingCodePath, int _windowWidth, int _windowHeight) {
-		//initialize window dimensions
-		//set code window size, min 300 by 300
-		if(_windowWidth < 600)
-			this.windowWidth = 600;
-		else
-			this.windowWidth = _windowWidth;
-
-			this.windowHeight= _windowHeight;
-		
-		//load the code from file
-		String editingCode = getCodeFromFile(_editingCodePath);
-		
-		//construct the code window
-		constructCodeWindow(editingCode, "old");	
-		
-		initializeGrid();
-		//add change listener to run scripts when webform is loaded		
-//		addWebviewLoadedChangeListener();
-	}
-	*/
-	//public methods-----------------------------------------------------------
 	
 	//returns the root/container node for the code window which is a draggable node
 	public DraggableNode getRootNode()
@@ -387,7 +337,7 @@ public void setCodeWindowContainer(DraggableNode e){
 			//98FB98
 		}
 		
-//Methods for section by section highlighting, currently NOT WORKING
+//Methods for section by section highlighting, currently NOT WORKING--------------------------------------------------------
 		
 //	//highlights a section of the current line
 //		//**currently this method works, but info from tod is returning 1, 1 for start and end, so no highlight appears
@@ -417,7 +367,7 @@ public void setCodeWindowContainer(DraggableNode e){
 //				"if(match != null) " +
 //				"$(this).addClass(\"CodeMirror-LineSection-highlight\"); });");	
 //	}
-	
+//---------------------------------------------------------------------------------------------------------------------------	
 	public void highlightSection(int _lineNum, String _varName)
 	{
 
@@ -448,7 +398,7 @@ public void setCodeWindowContainer(DraggableNode e){
 		setBackgroundColor("FFFB78");
 	}
 	
-	//set CodeWindow background color to Grey - oldPreviousWindow
+	//set CodeWindow background color to Grey 
 	public void setBackgroundColorToInactive()
 	{		
 		setBackgroundColor("CCCCCC");
@@ -738,32 +688,7 @@ public void setCodeWindowContainer(DraggableNode e){
 	public void setEdit(TitledPane edit) {
 		this.edit = edit;
 	}
-	public LinkedHashMap getLocalVariables() {
-		int value=Integer.parseInt(iterationBox.getValue().toString());
-		
-		if(localVariablesList.size()>0 && value<=localVariablesList.size()){
-				localVariables=localVariablesList.get(value-1);
-		}
-		else{
-			localVariables= new LinkedHashMap<>();
-		}
-		return localVariables;
-	}
-	public void setLocalVariables(LinkedHashMap localVariables) {
-		int value=Integer.parseInt(iterationBox.getValue().toString());
-		if(localVariablesList.size()>0){
-			if(localVariablesList.size()>=value){
-				localVariablesList.set(value-1,localVariables);
-			}
-			else{
-				localVariablesList.add(value-1,localVariables);
-			}
-		}
-		else{
-			localVariablesList.add(value-1,localVariables);
-		}
-		this.localVariables = localVariables;
-	}
+
 	public int getExecutedLine()
 	{
 		return currentExecutionLine;
@@ -777,16 +702,14 @@ public void setCodeWindowContainer(DraggableNode e){
 	}
 	public void setSelectedLineNumber(int selectedLineNumber) {
 		this.selectedLineNumber.setValue(selectedLineNumber);
-	}/*
-	public GridPane getGridPane() {
-		return gridPane;
-	}*/
-	public void setGridPane(GridPane gridPane) {
+	}
+
+	public void setGridPane(VariablePane gridPane) {
 		gridPaneList.set((int)iterationBox.getValue()-1,gridPane);
 		this.gridPane = gridPane;
 	}
 
-	public GridPane getGridPane() {
+	public VariablePane getGridPane() {
 		
 		int value=Integer.parseInt(iterationBox.getValue().toString());
 		
@@ -796,42 +719,12 @@ public void setCodeWindowContainer(DraggableNode e){
 				gridPane=gridPaneList.get(value-1);
 		}else
 		{
-			gridPane = initGridPane();
+			gridPane = new VariablePane(methodName, value);
 			gridPaneList.add(gridPane);
 		}
 		return gridPane;
 	}
 	
-	public GridPane initGridPane(){
-		GridPane gridPane=new GridPane();
-	    gridPane.setMaxSize(230, 800);
-		gridPane.setPadding(new Insets(18, 18, 18, 18));
-        gridPane.setGridLinesVisible(true);
-        RowConstraints rowinfo = new RowConstraints();
-        gridPane.setMinWidth(230);
-        
-        ColumnConstraints colInfo1 = new ColumnConstraints();
-        colInfo1.setPercentWidth(40);
- 
-        ColumnConstraints colInfo2 = new ColumnConstraints();
-        colInfo2.setPercentWidth(60);
- 
-        gridPane.getColumnConstraints().add(colInfo1); //25 percent
-        gridPane.getColumnConstraints().add(colInfo2); //30 percent
-        
- 
-        Label nameLabel = new Label("Name");
-        GridPane.setMargin(nameLabel, new Insets(0, 5, 0, 10));
-        
-        GridPane.setConstraints(nameLabel, 0, 0);
-        Label variableValue = new Label("Variable");
-        GridPane.setMargin(variableValue, new Insets(0, 0, 0, 10));
-        GridPane.setConstraints(variableValue, 1, 0);
- 
-		
-        gridPane.getChildren().addAll(nameLabel, variableValue);
-        return gridPane;
-	}
 
 	public int getIndexOnScreen() {
 		return indexOnScreen;
@@ -843,13 +736,13 @@ public void setCodeWindowContainer(DraggableNode e){
 
 
 
-	public ArrayList<GridPane> getGridPaneList() {
+	public ArrayList<VariablePane> getGridPaneList() {
 		return gridPaneList;
 	}
 
 
 
-	public void setGridPaneList(ArrayList<GridPane> gridPaneList) {
+	public void setGridPaneList(ArrayList<VariablePane> gridPaneList) {
 		this.gridPaneList = gridPaneList;
 	}
 

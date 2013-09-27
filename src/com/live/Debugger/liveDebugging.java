@@ -141,7 +141,7 @@ public class liveDebugging extends Application {
 	timeline mainTH;
 
 	ScrollPane s1 = new ScrollPane();
-	GridPane gridPane=new GridPane(); 
+	VariablePane gridPane; 
 	RowConstraints rowinfo = new RowConstraints();	
 
 
@@ -476,37 +476,9 @@ public class liveDebugging extends Application {
 				//List<LocalVariableInfo> locVariablesList=eventUtils.getLocalVariables(nextEvent);
 				String varName= eventUtils.getWriteEventVarName(prevEvent);		
 			
-				
-				LinkedHashMap<String,ArrayList> localVariableInfo=currentCodeWindow.getLocalVariables();
+				gridPane = currentCodeWindow.getGridPane().highlightVariableValue(varName);
 					
-					//variable may not exist in our list in which index will be -1
-					int index=returnIndexofValue(varName,localVariableInfo);
-					//variable exists
-					if(index!=-1){
-				        index=2+2*index+2;
-				        
-				        removeGridStyles(gridPane);
-				        
-				        //highlight the variable name that is being written to
-				        Label nameLabel = (Label)gridPane.getChildren().get(index-1);	
-						nameLabel.setTextFill(Color.web("#ff9999"));
-						
-						//highlight and set the new value in the combo box
-				        ComboBox valueBox= (ComboBox)gridPane.getChildren().get(index);				        
-				        valueBox.setScaleX(1);
-				        valueBox.setScaleY(1);
-				        valueBox.setStyle("-fx-font-size: 10px; -fx-background-color: #ff9999");    
-				        //display the previous written value
-				        //**this is not correct, we need a new impl
-				        if(valueBox.getItems().size() > 1)
-				        	valueBox.setValue( valueBox.getItems().get(valueBox.getItems().size() - 1) );
-				        
-				        //update the elements being displayed
-				        gridPane.getChildren().set(index-1, nameLabel);
-				        gridPane.getChildren().set(index, valueBox);
-			        }
-					
-					currentCodeWindow.highlightSection(prevLine, varName);
+				currentCodeWindow.highlightSection(prevLine, varName);
 					
 			}else 
 			{	//may be a SYSTEM method call
@@ -591,38 +563,7 @@ public class liveDebugging extends Application {
 
 	}
 	
-	//helping function which returns index value of some variable name
-	private int returnIndexofValue(String name,LinkedHashMap<String,ArrayList> localVariableInfo){
-			int i=0;
-			Iterator keys=localVariableInfo.keySet().iterator();
-			while(keys.hasNext()){
-				String variableValue=(String)keys.next();
-				if(variableValue.equals(name)){
-					return i; 
-				}
-				i++;
-			}
-		
-	return -1;	
-	}
-	
-	//This method is used to initialize grid on moving towards another program fragment window, because we are showing grid pane of local variables for every program fragment window. 
-	private void initializeGrid(){
-		 gridPane=currentCodeWindow.getGridPane();
-		 variablePane.getChildren().set(0,gridPane);
-	}
-	
-	//This method is used to change the style of grid pane
-	private void removeGridStyles(GridPane gp){
-		for(int i=3;i<gp.getChildren().size();i=i+2){
-			Label label=(Label)gp.getChildren().get(i);
-			ComboBox cb=(ComboBox)gp.getChildren().get(i+1);
-			label.setTextFill(Color.web("#000000"));
-			cb.setStyle("-fx-font-size: 10px");
-			gp.getChildren().set(i,label);
-			gp.getChildren().set(i+1,cb);
-		}
-	}
+
 	//This method is used to proceed towards a next line
 	private void processNextLine(ILogEvent curEvent, ILogEvent nextEvent) {
 		
@@ -727,8 +668,7 @@ public class liveDebugging extends Application {
 				boolean addedNewWindow = false;
 //				boolean newIteration = false;
 				
-				//if code window does not exist in display container
-				//add new code window
+				//if code window does not exist in display container add new code window
 				if(!displayedCodeWindowsList.containsKey(methodName))
 				{
 					// get the code window 
@@ -842,9 +782,12 @@ public class liveDebugging extends Application {
 					prevTimeline.setColor("FFFB78");
 				currentTimeline.setColor("A3FF7F");
 				
+
+				//initialize grid
+				gridPane=currentCodeWindow.getGridPane();
+				variablePane.getChildren().set(0,gridPane);
 				
 				highlightGutters(nextEvent);
-				initializeGrid();
 				reposition();
 				
 			} 
@@ -870,82 +813,9 @@ public class liveDebugging extends Application {
 				if(varValue.contains("UID:"))
 					varValue = varValue.substring(4);
 				
-				LinkedHashMap<String,ArrayList> localVariableInfo=currentCodeWindow.getLocalVariables();
+				gridPane = currentCodeWindow.getGridPane().setVariableValue(varName, varValue);
 				
-				//if the variable to be written to exist in our local var hashmap, append the value to it
-				if(!localVariableInfo.isEmpty()&&localVariableInfo.containsKey(varName)){
-					ArrayList values=(ArrayList)localVariableInfo.get(varName);
-					if(varValue!=null){
-						values.add(varValue);
-					}
-					else{
-						values.add("null");
-					}
-					//update the entry in local variable hashmap
-					localVariableInfo.put(varName, values);
-					
-					//variable may not exist in our list in which index will be -1
-					int index=returnIndexofValue(varName,localVariableInfo);
-					//variable exists
-					if(index!=-1){
-				        currentCodeWindow.setLocalVariables(localVariableInfo);//set the updated variable hashmap
-				        index=2+2*index+2;
-				        
-				        removeGridStyles(gridPane);
-				        
-				        //highlight the variable name that is being written to
-				        Label nameLabel = (Label)gridPane.getChildren().get(index-1);	
-						nameLabel.setTextFill(Color.web("#ff9999"));
-						
-						//highlight and set the new value in the combo box
-				        ComboBox valueBox= (ComboBox)gridPane.getChildren().get(index);				        
-				        valueBox.setScaleX(1);
-				        valueBox.setScaleY(1);
-				        valueBox.setStyle("-fx-font-size: 10px; -fx-background-color: #ff9999");    
-				        valueBox.getItems().add(varValue);
-				        valueBox.setValue(varValue);
-				        
-				        //update the elements being displayed
-				        gridPane.getChildren().set(index-1, nameLabel);
-				        gridPane.getChildren().set(index, valueBox);
-			        }
-				}
-				else{ //if it does not exist in our hashmap, create the elements and add it to the variable pane
-					
-					//each time we add a variable we add 2 child elements
-					//number of rows = no. of child elements / 2
-					int rows=((gridPane.getChildren().size())/2);
-					
-					Label nameLabel = new Label(varName);
-					
-					//remove previous highlights and highlight the new var
-					removeGridStyles(gridPane);
-					nameLabel.setTextFill(Color.web("#ff9999"));
-					
-			        			        
-			        ComboBox valueBox= new ComboBox();
-			        valueBox.setScaleX(1);
-			        valueBox.setScaleY(1);
-			        valueBox.setStyle("-fx-font-size: 10px; -fx-background-color: #ff9999");
-			        valueBox.getItems().add(varValue);
-			        valueBox.setValue(varValue);
-			        
-			        gridPane.setMargin(nameLabel, new Insets(10, 10, 10, 10));
-			        gridPane.setMargin(valueBox, new Insets(10, 10, 10, 10));
-			        
-			        gridPane.add(nameLabel, 0, rows);
-			        gridPane.add(valueBox, 1, rows);
-			       
-			       
-			       //add the new var and value in local var hashmap and update the hashmap in the current code window
-			       ArrayList values=new ArrayList();
-			       values.add(varValue);
-			       localVariableInfo.put(varName, values);
-			       currentCodeWindow.setLocalVariables(localVariableInfo);
-			       
-			       currentCodeWindow.highlightSection(line, varName);
-				}
-
+				currentCodeWindow.highlightSection(line, varName);
 			}
 		};
 	}
@@ -1043,17 +913,6 @@ public class liveDebugging extends Application {
 			
 			processPrevious(curEvent, prevEvent);
 	
-//			if(mainCWH!=currentCodeWindow ){
-//				ColorAdjust c=new ColorAdjust(0.426,0.63,0.075,0.015);
-//				String color="A3FF7F";//green
-//
-////				highlighter(currentCodeWindow,currentTimeline,c,color);
-//			}
-//			if(mainCWH!=prevCodeWindow){
-//				ColorAdjust c=new ColorAdjust(0.3,1,0.218,0.38);
-//				String color="FFFB78";//yellow
-////				highlighter(prevCodeWindow,prevTimeline,c,color);
-//			}
 			
 		}
 	}
