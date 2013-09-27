@@ -181,7 +181,7 @@ public class liveDebugging extends Application {
 
 		//initialize variable pane window
 		variablePane = (Pane) getRootAnchorPane().lookup("#VariablePane");
-		gridPane = currentCodeWindow.initGridPane();
+		gridPane = currentCodeWindow.getGridPane();
         variablePane.getChildren().add(gridPane);
 
         //initializing timeline section
@@ -384,7 +384,8 @@ public class liveDebugging extends Application {
 			//get the code window from the list of displayed windows
 			if(displayedCodeWindowsList.containsKey(methodName))
 			{ 
-				codeWin = (CodeWindow) codeWindowArea.getChildren().get((int) displayedCodeWindowsList.get(methodName));
+				codeWin = (CodeWindow) codeWindowArea.getChildren().get((int) displayedCodeWindowsList.get(methodName));				
+				codeWin.setIteration(prevEvent.getParent().getTimestamp());//get the timestamp of the original method call event
 			}
 			
 			//update the selected line of the last method call
@@ -710,11 +711,10 @@ public class liveDebugging extends Application {
 			}
 			//ELSE it is a method call and we need to add a new code window
 			else {
-				
-				
-				
+
 				CodeWindow codeWin = null;				
 				boolean addedNewWindow = false;
+//				boolean newIteration = false;
 				
 				//if code window does not exist in display container
 				//add new code window
@@ -729,6 +729,7 @@ public class liveDebugging extends Application {
 					//add code window to list of displayed windows and store it's position in the container
 					displayedCodeWindowsList.put(methodName, codeWindowArea.getChildren().size() - 1);
 					
+					codeWin.setIteration(nextEvent.getTimestamp());
 					addedNewWindow = true;
 				}
 				else //code window already exists in display container
@@ -736,7 +737,7 @@ public class liveDebugging extends Application {
 				{ 
 					codeWin = (CodeWindow) codeWindowArea.getChildren().get((int) displayedCodeWindowsList.get(methodName));
 					
-					codeWin.incrementIteration();
+					codeWin.setIteration(nextEvent.getTimestamp());
 				}
 				
 				//update the selected line of the last method call

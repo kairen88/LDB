@@ -67,8 +67,10 @@ public class CodeWindow extends DraggableNode{
 	
 	private LinkedHashMap<String,ArrayList> localVariables= new LinkedHashMap<>();//store variables and value history
 	private ArrayList<LinkedHashMap<String,ArrayList>> localVariablesList= new ArrayList<>();//list of localVariables hashmaps to correspond the current iteration of the window
+	private LinkedHashMap<Long, Integer> iterationList; //stores the iteration of the code window mapped to the timestamp of the event where they were "created"
 	private String methodName;
-	SimpleIntegerProperty selectedLineNumber = new SimpleIntegerProperty(0);//linenumber of the method call
+	SimpleIntegerProperty selectedLineNumber = new SimpleIntegerProperty(0);//linenumber of which spawns a new method call
+	private int currentExecutionLine = 0;//currently executed line
 	SimpleIntegerProperty lineoffset = new SimpleIntegerProperty(9); //amount to offset the position of the arrow for each line according to selectedLineNumber
 	
 	private int windowWidth;
@@ -76,9 +78,7 @@ public class CodeWindow extends DraggableNode{
 	private int padding = 10;
 	private int paddingTop = 15;
 	
-	private int currentExecutionLine = 0;
-	private int instance=0;//This will determine how many instances of same method name are opened
-	
+		
 	private int startLine=0;//line offset, to match actual line number to code editor line number
 	private int endLine=0;
 	
@@ -90,13 +90,13 @@ public class CodeWindow extends DraggableNode{
 	private ArrayList<GridPane> gridPaneList=new ArrayList<GridPane>();
 	private liveDebugging ld;//to use reposition logic, etc.
 	
-	private final ObservableList strings = FXCollections.observableArrayList(
-			"1");//may not be used
+//	private final ObservableList strings = FXCollections.observableArrayList(
+//			"1");//may not be used
 	
 	private int indexOnScreen;
 			
-	double mousex=0;//may not be used
-	 double mousey=0;//may not be used
+//	double mousex=0;//may not be used
+//	 double mousey=0;//may not be used
 	 
 	 double x =0;
 	 double y=0;
@@ -128,15 +128,15 @@ public class CodeWindow extends DraggableNode{
        return super.y;
    }	
 	 
-		public int getWindowWidth(){
-			
-			return this.windowWidth;
-		}
+	public int getWindowWidth(){
 		
-		public int getWindowHeight(){
-			
-			return this.windowHeight;
-		}
+		return this.windowWidth;
+	}
+	
+	public int getWindowHeight(){
+		
+		return this.windowHeight;
+	}
 		
 	public void setEditor(CodeEditor e){
 		
@@ -147,14 +147,35 @@ public class CodeWindow extends DraggableNode{
 		return this.editor;
 	}
 	
-	//increment the current iteration in the iteration combo box
-	public void incrementIteration()
+	//increment the current iteration in the iteration combo box, return TRUE
+	//if we are re-entering the same iteration of the codewindow, no new iteration is added, return FALSE
+	public void setIteration(long _timestamp)
 	{
-		int currentIteration = iterationBox.getItems().size() + 1;
-		iterationBox.getItems().add(currentIteration);
-		
-		//set the last item in the iteration Box as it's displayed value
-		iterationBox.setValue( iterationBox.getItems().get(iterationBox.getItems().size() - 1) );
+		//initialize the 1st instance with the corresponding timestamp
+		if(iterationList.isEmpty())
+		{			
+			iterationList.put(_timestamp, 1);
+			return;
+		}
+		//check if the timestamp exists, if it does, we do not need to add a new iteration
+		else if(iterationList.containsKey(_timestamp))
+		{
+			int iteration = iterationList.get(_timestamp);
+			iterationBox.setValue(iteration);
+			return;
+		}
+		else
+		{
+			int currentIteration = iterationBox.getItems().size() + 1;
+			iterationBox.getItems().add(currentIteration);
+			
+			//set the last item in the iteration Box as it's displayed value
+			iterationBox.setValue( iterationBox.getItems().get(iterationBox.getItems().size() - 1) );
+			
+			iterationList.put(_timestamp, currentIteration);
+			
+			return;
+		}
 	}
 	
 public void setIterationBox(ComboBox e){
@@ -202,6 +223,8 @@ public void setCodeWindowContainer(DraggableNode e){
 		//initialize window dimensions
 		//set code window size, min 300 by 300
 		ld=ldInstance;
+		iterationList = new LinkedHashMap<Long, Integer>();
+		
 		if(_windowWidth < 600)
 			this.windowWidth = 600;
 		else
@@ -736,7 +759,7 @@ public void setCodeWindowContainer(DraggableNode e){
 		return gridPane;
 	}*/
 	public void setGridPane(GridPane gridPane) {
-		gridPaneList.add((int)iterationBox.getValue()-1,gridPane);
+		gridPaneList.set((int)iterationBox.getValue()-1,gridPane);
 		this.gridPane = gridPane;
 	}
 
@@ -751,6 +774,7 @@ public void setCodeWindowContainer(DraggableNode e){
 		}else
 		{
 			gridPane = initGridPane();
+			gridPaneList.add(gridPane);
 		}
 		return gridPane;
 	}
