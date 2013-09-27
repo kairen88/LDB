@@ -463,9 +463,6 @@ public class liveDebugging extends Application {
 		} 
 //-----------------------------------------------------------Case: Go To Previous Line-----------------------------------------------			
 		else {
-				
-//			int prevLine=eventUtils.getLineNum(prevEvent) - currentCodeWindow.getStartLine() - 1;
-//			int curLine=eventUtils.getLineNum(curEvent) - currentCodeWindow.getStartLine() - 1;
 			
 			//highlight the previous line, set current line to white
 			currentCodeWindow.setLineColorToPrevious(curLine);
@@ -508,8 +505,21 @@ public class liveDebugging extends Application {
 				        gridPane.getChildren().set(index-1, nameLabel);
 				        gridPane.getChildren().set(index, valueBox);
 			        }
-				}		
+					
+					currentCodeWindow.highlightSection(prevLine, varName);
+					
+			}else 
+			{	//may be a SYSTEM method call
+				if(eventUtils.isMethodCall(prevEvent))
+				{
+					String methodName = eventUtils.getMethodName(prevEvent);
+					
+					if(methodName != null)
+						currentCodeWindow.highlightSection(prevLine, methodName);
+				}
+					
 			}
+		}
 	}
 	
 	//calculate the position of arrow at x axis
@@ -706,6 +716,7 @@ public class liveDebugging extends Application {
 				//get the next line number and highlight it
 				int nextLine = eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
 				currentCodeWindow.setLineColorToCurrent(nextLine);
+				currentCodeWindow.highlightSection(nextLine, methodName);
 				
 				currentCodeWindow.setExecutedLine(nextLine);
 			}
@@ -847,7 +858,7 @@ public class liveDebugging extends Application {
 			
 			setTick(currentTimeline, nextEvent);
 			
-			currentTimeline.printCallStack(); //for debugging
+//			currentTimeline.printCallStack(); //for debugging
 			
 			//event writes to a variable, we handle inputing/updates values on the variable pane (grid pane)
 			if(eventUtils.isWriteEvent(nextEvent)){
@@ -931,6 +942,8 @@ public class liveDebugging extends Application {
 			       values.add(varValue);
 			       localVariableInfo.put(varName, values);
 			       currentCodeWindow.setLocalVariables(localVariableInfo);
+			       
+			       currentCodeWindow.highlightSection(line, varName);
 				}
 
 			}

@@ -387,24 +387,47 @@ public void setCodeWindowContainer(DraggableNode e){
 			//98FB98
 		}
 		
-	//highlights a section of the current line
-		//**currently this method works, but info from tod is returning 1, 1 for start and end, so no highlight appears
-	public void highlightSection(int lineNum, int startChar, int endChar)
+//Methods for section by section highlighting, currently NOT WORKING
+		
+//	//highlights a section of the current line
+//		//**currently this method works, but info from tod is returning 1, 1 for start and end, so no highlight appears
+//	public void highlightSection(int lineNum, int startChar, int endChar)
+//	{
+//		//if there was another section highlighted, remove the highlight
+//		if(prevStartCol != -1 && prevEndCol != -1)
+//		{
+//			editor.webview.getEngine().executeScript("var start = {line:" + String.valueOf(lineNum) + ",ch:" + String.valueOf(prevStartCol) + "};" +
+//					"var end = {line:" + String.valueOf(lineNum) + ", ch:" + String.valueOf(prevEndCol) + "};" +
+//					"editor.markText(start,end,\"CodeMirror-original-background\");");
+//			//set current section as previous
+//			prevStartCol = startChar;
+//			prevEndCol = endChar;
+//		}
+//		//highlihgt section on line
+//		editor.webview.getEngine().executeScript("var start = {line:" + String.valueOf(lineNum) + ",ch:" + String.valueOf(startChar) + "};" +
+//												"var end = {line:" + String.valueOf(lineNum) + ", ch:" + String.valueOf(endChar) + "};" +
+//												"editor.markText(start,end,\"CodeMirror-LineSection-highlight\");");		
+//	}
+//	
+//	public void highlightSection(int _lineNum, String _varName)
+//	{
+//		editor.webview.getEngine().executeScript("$(\"div.CodeMirror-lines div:eq(3) pre:eq(0)\").each(function () {" +
+//				"var regex = /public/; " +
+//				"var match = regex.exec($(this).text()); " +
+//				"if(match != null) " +
+//				"$(this).addClass(\"CodeMirror-LineSection-highlight\"); });");	
+//	}
+	
+	public void highlightSection(int _lineNum, String _varName)
 	{
-		//if there was another section highlighted, remove the highlight
-		if(prevStartCol != -1 && prevEndCol != -1)
-		{
-			editor.webview.getEngine().executeScript("var start = {line:" + String.valueOf(lineNum) + ",ch:" + String.valueOf(prevStartCol) + "};" +
-					"var end = {line:" + String.valueOf(lineNum) + ", ch:" + String.valueOf(prevEndCol) + "};" +
-					"editor.markText(start,end,\"CodeMirror-original-background\");");
-			//set current section as previous
-			prevStartCol = startChar;
-			prevEndCol = endChar;
-		}
+
 		//highlihgt section on line
-		editor.webview.getEngine().executeScript("var start = {line:" + String.valueOf(lineNum) + ",ch:" + String.valueOf(startChar) + "};" +
-												"var end = {line:" + String.valueOf(lineNum) + ", ch:" + String.valueOf(endChar) + "};" +
-												"editor.markText(start,end,\"CodeMirror-LineSection-highlight\");");		
+		editor.webview.getEngine().executeScript("var lineNum = " + (_lineNum) + ";" +
+				"var lineStr = editor.lineInfo(lineNum).text;" +
+				"var varName = \"" + _varName + "\";" +
+				"var start = lineStr.indexOf(varName);" +
+				"var end = start + varName.length;" +
+				"editor.markText({line:lineNum, ch:start}, {line:lineNum, ch:end}, 'CodeMirror-LineSection-highlight');");		
 	}
 	
 	//set CodeWindow background color to Red
