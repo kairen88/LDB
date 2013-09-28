@@ -334,12 +334,17 @@ public void setCodeWindowContainer(DraggableNode e){
 		//98FB98
 	}
 	//sets the class for the line number indicated to completedLine which styles it green
-		public void highlightGutters(ArrayList<Integer> lineNumList, int offset)
-		{
-			for(int lineNum : lineNumList)
-				editor.webview.getEngine().executeScript("editor.setMarker(" + String.valueOf(lineNum - offset - 1) + ",'<div height=10 width=10 style=\"background-color:#A3FF7F;\"> %N%');");
-			//98FB98
-		}
+	public void highlightGutters(ArrayList<Integer> lineNumList, int offset)
+	{
+		for(int lineNum : lineNumList)
+			editor.webview.getEngine().executeScript("editor.setMarker(" + String.valueOf(lineNum - offset - 1) + ",'<div height=10 width=10 style=\"background-color:#A3FF7F;\"> %N%');");
+		//98FB98
+	}
+	
+	public void setGutterToComplete(int _lineNum)
+	{
+		runScriptOnWebForm("editor.setMarker(" + String.valueOf(_lineNum) + ",'<div height=10 width=10 style=\"background-color:#FF8C73;\"> %N%');");
+	}
 		
 //Methods for section by section highlighting, currently NOT WORKING--------------------------------------------------------
 		

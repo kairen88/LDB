@@ -568,6 +568,13 @@ public class liveDebugging extends Application {
 	//This method is used to proceed towards a next line
 	private void processNextLine(ILogEvent curEvent, ILogEvent nextEvent) {
 		
+		//highlighting the gutter
+		int prevLine = eventUtils.getLineNum(curEvent) - currentCodeWindow.getStartLine() - 1;
+		int curLine = eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
+		
+		if(curLine != prevLine)
+			currentCodeWindow.setGutterToComplete(prevLine);
+		
 		int clineNum = eventUtils.getLineNum(curEvent);
 		
 		//handle special case - check if this is still valid
