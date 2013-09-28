@@ -137,9 +137,12 @@ public class timeline extends VBox{
 	
 	private void createTicks()
 	{
-		for(Long timestamp : timestamps)
+		// - 1 since we want to exclude the method exit event
+		for(int i = 0; i < (timestamps.size() - 1); i++)
+//		for(Long timestamp : timestamps)
 		{
-			final tick tk = new tick(timestamp, tickList.size(), isReduced);
+//			final tick tk = new tick(timestamp, tickList.size(), isReduced);
+			final tick tk = new tick(timestamps.get(i), tickList.size(), isReduced);
 			tickList.add(tk);
 			tk.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			   public void handle(MouseEvent arg0) {

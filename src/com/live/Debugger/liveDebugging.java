@@ -181,7 +181,8 @@ public class liveDebugging extends Application {
 
 		//initialize variable pane window
 		variablePane = (Pane) getRootAnchorPane().lookup("#VariablePane");
-		gridPane = currentCodeWindow.getGridPane();
+		ArrayList<Object[]> childEventsInfo = eventUtils.getChildEventsInfo(mainEvent);
+		gridPane = currentCodeWindow.getGridPane(mainEvent, childEventsInfo);
         variablePane.getChildren().add(gridPane);
 
         //initializing timeline section
@@ -197,7 +198,7 @@ public class liveDebugging extends Application {
 		
 		
 		//creating timeline for "main" method
-		timeline tLine = createTimeLine(null, mainEvent);
+		timeline tLine = createTimeLine(null, mainEvent, childEventsInfo);
 		currentTimeline = tLine;
 		mainTH=currentTimeline;
 		
@@ -476,7 +477,7 @@ public class liveDebugging extends Application {
 				//List<LocalVariableInfo> locVariablesList=eventUtils.getLocalVariables(nextEvent);
 				String varName= eventUtils.getWriteEventVarName(prevEvent);		
 			
-				gridPane = currentCodeWindow.getGridPane().highlightVariableValue(varName);
+				gridPane = currentCodeWindow.getGridPane().highlightVariableValue(varName, prevEvent.getTimestamp());
 					
 				currentCodeWindow.highlightSection(prevLine, varName);
 					
@@ -757,9 +758,11 @@ public class liveDebugging extends Application {
 					}
 				}
 				
+				ArrayList<Object[]> childEventsInfo = null;
 				if(!timelineExists) //else create new timeline
 				{
-					tLine = createTimeLine(curEvent, nextEvent);
+					childEventsInfo = eventUtils.getChildEventsInfo(nextEvent);
+					tLine = createTimeLine(curEvent, nextEvent, childEventsInfo);
 				}
 
 				timeline oldPrevTimeline = prevTimeline;
@@ -784,12 +787,14 @@ public class liveDebugging extends Application {
 				
 
 				//initialize grid
-				gridPane=currentCodeWindow.getGridPane();
+				if(childEventsInfo != null)
+					gridPane=currentCodeWindow.getGridPane(nextEvent, childEventsInfo);
+				else
+					gridPane=currentCodeWindow.getGridPane();
 				variablePane.getChildren().set(0,gridPane);
 				
 				highlightGutters(nextEvent);
-				reposition();
-				
+				reposition();				
 			} 
 		}
 //-----------------------------------------------------------Case: Go To Next Line-----------------------------------------------		
@@ -813,7 +818,7 @@ public class liveDebugging extends Application {
 				if(varValue.contains("UID:"))
 					varValue = varValue.substring(4);
 				
-				gridPane = currentCodeWindow.getGridPane().setVariableValue(varName, varValue);
+				gridPane = currentCodeWindow.getGridPane().highlightVariableValue(varName, nextEvent.getTimestamp());
 				
 				currentCodeWindow.highlightSection(line, varName);
 			}
@@ -983,9 +988,14 @@ public class liveDebugging extends Application {
 
 	// get a list of child events timestamps
 	//creates a tick for each event and returns a timeline object
-	private timeline createTimeLine(ILogEvent curEvent,ILogEvent nextEvent) {
+	private timeline createTimeLine(ILogEvent curEvent,ILogEvent nextEvent, ArrayList<Object[]> childEventsInfo) {
 
-		ArrayList<Long> childEventsTimestamps = eventUtils.getChildEventTimestamps(nextEvent);
+//		ArrayList<Long> childEventsTimestamps = eventUtils.getChildEventTimestamps(nextEvent);
+//		ArrayList<Object[]> childEventsInfo = eventUtils.getChildEventsInfo(nextEvent);
+		
+		ArrayList<Long> childEventsTimestamps = new ArrayList<Long>();
+		for(Object[] info : childEventsInfo)
+			childEventsTimestamps.add((Long) info[0]);
 		
 		String parentMethodName = eventUtils.getMethodName(curEvent);
 		String newMethodName = eventUtils.getMethodName(nextEvent);

@@ -199,11 +199,9 @@ public class EventUtils {
 			//get child event browser
 			MethodCallEvent callEvent = (MethodCallEvent)_event;
 			IEventBrowser childBrowser = callEvent.getChildrenBrowser();
-//			IEventBrowser browser = childBrowser.createIntersection(
-//										logBrowser.createDepthFilter(callEvent.getDepth() + 1));
+
 			ArrayList<Long> timeStamps = new ArrayList<Long>();
 			
-//			childBrowser.setPreviousEvent(_event);
 			childBrowser.setNextTimestamp(_event.getTimestamp());
 			while(childBrowser.hasNext())
 			{
@@ -214,6 +212,42 @@ public class EventUtils {
 			}
 			return timeStamps;
 			
+		}		
+		//else return null
+			return null;
+	}
+	
+	public ArrayList<Object[]> getChildEventsInfo(ILogEvent _event)
+	{
+		//check if event is a method call
+		if(isMethodCall(_event))
+		{
+			//get child event browser
+			MethodCallEvent callEvent = (MethodCallEvent)_event;
+			IEventBrowser childBrowser = callEvent.getChildrenBrowser();
+
+			ArrayList<Object[]> eventInfo = new ArrayList<Object[]>();
+			
+			childBrowser.setNextTimestamp(_event.getTimestamp());
+			while(childBrowser.hasNext())
+			{
+				//get child event
+				ILogEvent childEvent = childBrowser.next();
+				
+				Object[] info = new Object[3];
+				
+				info[0] = childEvent.getTimestamp();
+				
+				if(isMethodCall(childEvent))
+					info[1] = getMethodName(childEvent);
+				else
+					info[1] = getWriteEventVarName(childEvent);
+				
+				info[2] = getWriteEventValue(childEvent);
+				
+				eventInfo.add(info);
+			}
+			return eventInfo;			
 		}		
 		//else return null
 			return null;

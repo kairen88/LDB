@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import tod.core.database.event.ILogEvent;
+
+import com.sun.org.apache.xpath.internal.operations.Variable;
+
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
@@ -717,9 +721,27 @@ public void setCodeWindowContainer(DraggableNode e){
 		//if it exists return it
 		if(gridPaneList.size()>0 && value<=gridPaneList.size()){
 				gridPane=gridPaneList.get(value-1);
-		}else
+				return gridPane;
+		}/*else
 		{
 			gridPane = new VariablePane(methodName, value);
+			gridPaneList.add(gridPane);
+		}*/
+		return null;
+	}
+	
+	public VariablePane getGridPane(ILogEvent _event, ArrayList<Object[]> _childEventsInfo) {
+		
+		int value=Integer.parseInt(iterationBox.getValue().toString());
+		
+		//check if the current iteration of the code window already has a grid pane
+		//if it exists return it
+		if(gridPaneList.size()>0 && value<=gridPaneList.size()){
+				gridPane=gridPaneList.get(value-1);
+				return gridPane;
+		}else
+		{
+			gridPane = new VariablePane(methodName, value, _event, _childEventsInfo);
 			gridPaneList.add(gridPane);
 		}
 		return gridPane;
