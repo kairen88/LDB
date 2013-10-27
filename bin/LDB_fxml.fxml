@@ -21,8 +21,10 @@
       </children>
     </Pane>
     <Pane fx:id="codeWindowSection" layoutX="15.0" layoutY="253.0" prefHeight="800.0" prefWidth="1600.0" style="-fx-background-color:#CCCCCC;" />
-    <Button fx:id="PrevBtn" layoutX="18.0" layoutY="219.0" mnemonicParsing="false" text="Prev" />
-    <Button fx:id="NextBtn" layoutX="76.0" layoutY="219.0" mnemonicParsing="false" text="Next" />
+    <Button fx:id="StepOverPrevBtn" layoutX="18.0" layoutY="219.0" mnemonicParsing="false" text="step over backwards" />
+    <Button fx:id="PrevBtn" layoutX="200.0" layoutY="219.0" mnemonicParsing="false" text="Prev" />
+    <Button fx:id="NextBtn" layoutX="280.0" layoutY="219.0" mnemonicParsing="false" text="Next" />
+    <Button fx:id="StepOverNextBtn" layoutX="350.0" layoutY="219.0" mnemonicParsing="false" text="step over forward" />
     <Pane fx:id="VariablePane" layoutX="1615.0" layoutY="253.0" prefHeight="800.0" prefWidth="230.0" style="-fx-background-color:#F7F7F7;" />
   </children>
 </AnchorPane>

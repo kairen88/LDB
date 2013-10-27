@@ -241,6 +241,7 @@ public void setCodeWindowContainer(DraggableNode e){
 		this.editor.webview.setPrefSize(this.windowWidth, this.windowHeight);
 		this.editor.webview.setMinSize(this.windowWidth, this.windowHeight);
 		
+		//this sets the spacing between lines to adjust arrow position
 		this.lineoffset.setValue(0);
 
 		//resizing grid pane - grip pane contains method name label, iternation box and pin
@@ -269,9 +270,15 @@ public void setCodeWindowContainer(DraggableNode e){
 		this.editor.setReduced(true);
 		codeWindowContainer.setDSize(this.windowWidth, this.windowHeight);
 		}
-		
-		
+	
 	}
+	
+	private void setEditorFont()
+	{
+		//assume this works for now (it dosent)
+		runScriptOnWebForm("$('.CodeMirror')");
+	}
+	
 	public void normalWindowSize()
 	{
 		if(this.editor.isReduced()){
@@ -343,7 +350,7 @@ public void setCodeWindowContainer(DraggableNode e){
 	
 	public void setGutterToComplete(int _lineNum)
 	{
-		runScriptOnWebForm("editor.setMarker(" + String.valueOf(_lineNum) + ",'<div height=10 width=10 style=\"background-color:#FF8C73;\"> %N%');");
+		runScriptOnWebForm("editor.setMarker(" + String.valueOf(_lineNum) + ",'<div height=10 width=10 style=\"background-color:#FF9900;\"> %N%');");
 	}
 		
 //Methods for section by section highlighting, currently NOT WORKING--------------------------------------------------------
@@ -379,14 +386,24 @@ public void setCodeWindowContainer(DraggableNode e){
 //---------------------------------------------------------------------------------------------------------------------------	
 	public void highlightSection(int _lineNum, String _varName)
 	{
-
+		if(_varName != null &&_lineNum > 0)
+		{
 		//highlihgt section on line
 		editor.webview.getEngine().executeScript("var lineNum = " + (_lineNum) + ";" +
 				"var lineStr = editor.lineInfo(lineNum).text;" +
 				"var varName = \"" + _varName + "\";" +
 				"var start = lineStr.indexOf(varName);" +
 				"var end = start + varName.length;" +
-				"editor.markText({line:lineNum, ch:start}, {line:lineNum, ch:end}, 'CodeMirror-LineSection-highlight');");		
+				"markSegment = editor.markText({line:lineNum, ch:start}, {line:lineNum, ch:end}, 'CodeMirror-LineSection-highlight');");	
+		}
+	}
+	
+	public void removeHighlightedSection()
+	{
+
+		//highlihgt section on line
+		editor.webview.getEngine().executeScript("if(markSegment != null)" +
+													"markSegment.clear();" );		
 	}
 	
 	//set CodeWindow background color to Red

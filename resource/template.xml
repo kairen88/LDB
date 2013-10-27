@@ -8,7 +8,7 @@
     <script>${mode}</script>
     <style type="text/css"> 
     	.CodeMirror-scroll { height: 100%; } 
-    	.CodeMirror { width: 120% ;  font-size: 9px}
+    	.CodeMirror {   font-size: 9px}
     	.CodeMirror-reduce { height: dynamic; width: dynamic;  font-size: 3px}
     	
     	.CodeMirror-original-background {background-color:transparent !important;}
@@ -19,7 +19,7 @@
 		.CodeMirror-gutter-highlight{
 		  position: absolute; left: 0; top: 0;
 		  z-index: 10;
-		  background-color: #CCFF66;
+		  background-color: #99FFFF;
 		  border-right: 1px solid #eee;
 		  min-width: 2em;
 		  height: 100%;
@@ -31,7 +31,7 @@
 		  padding: .4em .2em .4em .4em;
 		  white-space: pre !important;
 		  cursor: default;
-		  background-color: #CCFF66;
+		  background-color: #99FFFF;
 		}
 		.CodeMirror-LineSection-highlight{
           background-color:rgba(0,255,0,0.5);
@@ -44,6 +44,8 @@
         matchBrackets: true,
         readOnly: true 
       });
+      
+      var markSegment = null;
     </script>
     
   </head>

@@ -158,8 +158,14 @@ public class liveDebugging extends Application {
 				"LDB_fxml.fxml"));
 
 		//load the test code
-		Path classPath = FileSystems.getDefault().getPath("resource", "sampleJs.txt");
-		codeFragments = new CodeFragments(classPath, this);
+//		Path classPath = FileSystems.getDefault().getPath("resource", "Program1.txt");
+//		codeFragments = new CodeFragments(classPath, this, "p1");
+		
+		Path classPath = FileSystems.getDefault().getPath("resource", "Program2.txt");
+		codeFragments = new CodeFragments(classPath, this, "p2");
+		
+//		Path classPath = FileSystems.getDefault().getPath("resource", "SampleProgram.txt");
+//		codeFragments = new CodeFragments(classPath, this, "sp");
 		
 		//initialize the variables
 		eventUtils = new EventUtils();
@@ -177,8 +183,14 @@ public class liveDebugging extends Application {
 		//Initialize code window for "main" method
 		ILogEvent mainEvent = getMainMethodEvent();
 		createMainWindow("main");
-//		mainCWH=currentCodeWindow;
 
+		//setting the 1st and last event of "main"		
+		MethodCallEvent mEvent = (MethodCallEvent)(mainEvent);
+		IEventBrowser browser = mEvent.getChildrenBrowser();
+		eventUtils.setFirstTimestamp(browser.getFirstTimestamp());
+		eventUtils.setLastTimestamp(browser.getLastTimestamp());
+		
+		
 		//initialize variable pane window
 		variablePane = (Pane) getRootAnchorPane().lookup("#VariablePane");
 		ArrayList<Object[]> childEventsInfo = eventUtils.getChildEventsInfo(mainEvent);
@@ -332,7 +344,7 @@ public class liveDebugging extends Application {
 				
 //				currentTimeline.printCallStack(); //for debugging
 			}
-			if(oldPreviousWindow!=currentCodeWindow){
+			if(oldPreviousWindow!=currentCodeWindow && oldPreviousWindow != null){
 				oldPreviousWindow.setBackgroundColorToInactive();
 				oldPreviousWindow.reduceWindowSize();//prevCodeWindow.normalWindowSize();
 				oldPreviousWindow.setPinBtn("plus");
@@ -346,7 +358,8 @@ public class liveDebugging extends Application {
 			//ensure current window is maximixed
 			currentCodeWindow.normalWindowSize();
 			
-			prevCodeWindow.setBackgroundColorToPrevious();
+			if(prevCodeWindow != mainCWH)
+				prevCodeWindow.setBackgroundColorToPrevious();
 			prevCodeWindow.normalWindowSize();
 			
 			// highlight next line to be executed
@@ -359,10 +372,11 @@ public class liveDebugging extends Application {
 			
 			currentCodeWindow.setExecutedLine(line);//so we know the start point of the arrow
 			
-			if(oldPreviousTimeline != mainTH)
+			if(oldPreviousTimeline != mainTH && oldPreviousWindow != null)
 				oldPreviousTimeline.setColor("CCCCCC");
 			
-			prevTimeline.setColor("FFFB78");
+			if(prevTimeline != mainTH && oldPreviousWindow != null)
+				prevTimeline.setColor("FFFB78");
 			
 			if(currentTimeline != mainTH)
 				currentTimeline.setColor("A3FF7F");
@@ -479,6 +493,7 @@ public class liveDebugging extends Application {
 			
 				gridPane = currentCodeWindow.getGridPane().highlightVariableValue(varName, prevEvent.getTimestamp());
 					
+				currentCodeWindow.removeHighlightedSection();
 				currentCodeWindow.highlightSection(prevLine, varName);
 					
 			}else 
@@ -488,7 +503,11 @@ public class liveDebugging extends Application {
 					String methodName = eventUtils.getMethodName(prevEvent);
 					
 					if(methodName != null)
+					{
+						currentCodeWindow.removeHighlightedSection();
 						currentCodeWindow.highlightSection(prevLine, methodName);
+					}
+						
 				}
 					
 			}
@@ -572,16 +591,28 @@ public class liveDebugging extends Application {
 		int prevLine = eventUtils.getLineNum(curEvent) - currentCodeWindow.getStartLine() - 1;
 		int curLine = eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
 		
-		if(curLine != prevLine)
+		//handle the case the event is an object instantiation
+		if(nextEvent instanceof IBehaviorCallEvent)
+		{
+			IBehaviorCallEvent callEvent = (IBehaviorCallEvent) nextEvent;
+		
+			if(callEvent.getCalledBehavior() != null)
+				if(callEvent.getCalledBehavior().getName().compareToIgnoreCase("<init>") == 0)
+					curLine = prevLine;
+		}
+		
+		//handle special case - check if this is still valid
+		if (curLine < 0) {
+
+			curLine = currentCodeWindow.getExecutedLine();
+		}
+		
+		if(curLine != prevLine && prevLine > 0)
 			currentCodeWindow.setGutterToComplete(prevLine);
 		
 		int clineNum = eventUtils.getLineNum(curEvent);
 		
-		//handle special case - check if this is still valid
-		if (clineNum - lineNumberOffset < 0) {
-
-			clineNum = lineNumberOffset + 1;
-		}
+		
 		
 		//sets current line to white - remove highlight
 		currentCodeWindow.setLineColorToPrevious(currentCodeWindow.getExecutedLine());
@@ -589,28 +620,38 @@ public class liveDebugging extends Application {
 //-----------------------------------------------------------Case: Method return-----------------------------------------------		
 
 		//if depth of next event > current, we have returned to parent method
-		if (curEvent.getDepth() > nextEvent.getDepth()) {
+		if (curEvent.getDepth() > nextEvent.getDepth() &&
+				eventUtils.getParentMethodName(nextEvent) != null &&
+				eventUtils.getParentMethodName(nextEvent).compareToIgnoreCase(currentCodeWindow.getMethodName()) != 0) {
 			
-			//since we are stepping out of the method, remove it from the call stack
-			//check if the current code window is the last method in the call stack, remove it
-			if(CodeWindowCallStack.get(CodeWindowCallStack.size() - 1).getMethodName().equalsIgnoreCase(currentCodeWindow.getMethodName()))
-				CodeWindowCallStack.remove(CodeWindowCallStack.size() - 1);
+			CodeWindow oldPreviousWindow=null;
+			timeline oldPreviousTimeline = null;
 			
-			//stash the previous window
-			CodeWindow oldPreviousWindow=prevCodeWindow;
-			prevCodeWindow = currentCodeWindow;
-			
-			timeline oldPreviousTimeline = prevTimeline;
-			prevTimeline=currentTimeline;
-			
-			//current code window is now from the code window stack
-			if (!CodeWindowCallStack.isEmpty()){
-				currentCodeWindow= CodeWindowCallStack.get(CodeWindowCallStack.size() - 1);//return the last element in the call stack
-				currentTimeline=timelineStack.pop();
+			//iterate through the codewindows / timeline until we reach the correct one
+			while(eventUtils.getParentMethodName(nextEvent).compareToIgnoreCase(currentCodeWindow.getMethodName()) != 0)
+			{
+				//since we are stepping out of the method, remove it from the call stack
+				//check if the current code window is the last method in the call stack, remove it
+				if(CodeWindowCallStack.get(CodeWindowCallStack.size() - 1).getMethodName().equalsIgnoreCase(currentCodeWindow.getMethodName()))
+					CodeWindowCallStack.remove(CodeWindowCallStack.size() - 1);
 				
-//				currentTimeline.printCallStack(); //for debugging
+				//stash the previous window
+				oldPreviousWindow=prevCodeWindow;
+				prevCodeWindow = currentCodeWindow;
+				
+				oldPreviousTimeline = prevTimeline;
+				prevTimeline=currentTimeline;
+				
+				//current code window is now from the code window stack
+				if (!CodeWindowCallStack.isEmpty()){
+					currentCodeWindow= CodeWindowCallStack.get(CodeWindowCallStack.size() - 1);//return the last element in the call stack
+					currentTimeline=timelineStack.pop();
+					
+	//				currentTimeline.printCallStack(); //for debugging
+				}
 			}
-			if(oldPreviousWindow!=currentCodeWindow){
+			
+			if(oldPreviousWindow!=currentCodeWindow && oldPreviousWindow != null){
 				oldPreviousWindow.setBackgroundColorToInactive();
 				oldPreviousWindow.reduceWindowSize();//prevCodeWindow.normalWindowSize();
 				oldPreviousWindow.setPinBtn("plus");
@@ -637,7 +678,8 @@ public class liveDebugging extends Application {
 			
 			currentCodeWindow.setExecutedLine(line);//so we know the start point of the arrow
 			
-			oldPreviousTimeline.setColor("CCCCCC");
+			if(oldPreviousTimeline != null)
+				oldPreviousTimeline.setColor("CCCCCC");
 			prevTimeline.setColor("FFFB78");
 			if(currentTimeline != mainTH)
 				currentTimeline.setColor("A3FF7F");
@@ -665,6 +707,8 @@ public class liveDebugging extends Application {
 				//get the next line number and highlight it
 				int nextLine = eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
 				currentCodeWindow.setLineColorToCurrent(nextLine);
+				
+				currentCodeWindow.removeHighlightedSection();
 				currentCodeWindow.highlightSection(nextLine, methodName);
 				
 				currentCodeWindow.setExecutedLine(nextLine);
@@ -806,10 +850,10 @@ public class liveDebugging extends Application {
 		}
 //-----------------------------------------------------------Case: Go To Next Line-----------------------------------------------		
 		else {
-			int line=eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
+//			int line=eventUtils.getLineNum(nextEvent) - currentCodeWindow.getStartLine() - 1;
 			
-			currentCodeWindow.setLineColorToCurrent(line);
-			currentCodeWindow.setExecutedLine(line);
+			currentCodeWindow.setLineColorToCurrent(curLine);
+			currentCodeWindow.setExecutedLine(curLine);
 			
 			setTick(currentTimeline, nextEvent);
 			
@@ -827,7 +871,8 @@ public class liveDebugging extends Application {
 				
 				gridPane = currentCodeWindow.getGridPane().highlightVariableValue(varName, nextEvent.getTimestamp());
 				
-				currentCodeWindow.highlightSection(line, varName);
+				currentCodeWindow.removeHighlightedSection();
+				currentCodeWindow.highlightSection(curLine, varName);
 			}
 		};
 	}
@@ -850,84 +895,100 @@ public class liveDebugging extends Application {
 		}
 	}
 	
-	//This method is used to create arrow head
-	//additional note, arrows need indexOnScreen as well to get them from the child array and reposition them
-//	public static Polygon createUMLArrow() {
-//		Polygon polygon = new Polygon(new double[]{
-//				7.5, 0,
-//				15, 15,
-//				7.51, 15,
-//				7.51, 40,
-//				7.49, 40,
-//				7.49, 15,
-//				0, 15
-//		});
-//		polygon.setFill(Color.WHITE);
-//		polygon.setStroke(Color.BLACK);
-//		polygon.setRotate(90);
-//		return polygon;
-//	}
 	
 	private void initializeElementControl() {
 		Button nextBtn = (Button) getRootAnchorPane().lookup("#NextBtn");
 		Button previousBtn = (Button) getRootAnchorPane().lookup("#PrevBtn");
-		Button tagBtn = (Button) getRootAnchorPane().lookup("#varTagSwitch");
+		Button stepOverNextBtn = (Button) getRootAnchorPane().lookup("#StepOverNextBtn");
+		Button stepOverPreviousBtn = (Button) getRootAnchorPane().lookup("#StepOverPrevBtn");
+//		Button tagBtn = (Button) getRootAnchorPane().lookup("#varTagSwitch");
 
 		nextBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
 				ILogEvent curEvent = eventUtils.getCurrentEvent();
-				stepForward(curEvent);
-			}
+				
+				if(curEvent.getTimestamp() >= eventUtils.getLastTimestamp() - 1)//just tweaking this condition to make it work, not sure why timestamp is wrong
+				{
+					new Dialogue("Reached last event", "OK").show();
+					return;
+				}
 
-			
+				// step forward and get next event
+				ILogEvent nextEvent = eventUtils.forwardStepInto();
+				
+				if (nextEvent != null) 					
+					processNextLine(curEvent, nextEvent);
+				else
+					new Dialogue("Reached last event", "OK").show();
+			}
+		});
+		
+		stepOverNextBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				ILogEvent curEvent = eventUtils.getCurrentEvent();
+				
+				if(curEvent.getTimestamp() >= eventUtils.getLastTimestamp() - 1)//just tweaking this condition to make it work, not sure why timestamp is wrong
+				{
+					new Dialogue("Reached last event", "OK").show();
+					return;
+				}
+
+				// step forward and get next event
+				ILogEvent nextEvent = eventUtils.forwardStepOver();
+				
+				if (nextEvent != null) 					
+					processNextLine(curEvent, nextEvent);
+				else
+					new Dialogue("Reached last event", "OK").show();
+			}
 		});
 
 		previousBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
 				ILogEvent curEvent = eventUtils.getCurrentEvent();
-				stepBackward(curEvent);
 				
+				if(curEvent.getTimestamp() <= eventUtils.getFirstTimestamp())
+				{
+					new Dialogue("Reached last event", "OK").show();
+					return;
+				}
+
+				// step backward and the the previous event
+				ILogEvent prevEvent = eventUtils.backwardStepInto();
 				
+				if (prevEvent != null)
+					processPrevious(curEvent, prevEvent);
+				else
+					new Dialogue("Reached last event", "OK").show();
 			}
+		});
+		
+		stepOverPreviousBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				ILogEvent curEvent = eventUtils.getCurrentEvent();
+				
+				if(curEvent.getTimestamp() <= eventUtils.getFirstTimestamp())
+				{
+					new Dialogue("Reached last event", "OK").show();
+					return;
+				}
 
-			
-
+				// step backward and the the previous event
+				ILogEvent prevEvent = eventUtils.backwardStepOver();
+				
+				if (prevEvent != null)
+					processPrevious(curEvent, prevEvent);
+				else
+					new Dialogue("Reached last event", "OK").show();
+			}
 		});
 
 	}
 	
-	void stepForward(ILogEvent curEvent) {
-		// step forward and get next event
-		ILogEvent nextEvent = eventUtils.forwardStepInto();
-		
-		if (nextEvent != null) {
-
-				int clineNum = eventUtils.getLineNum(curEvent);
-				int nextlineNum = eventUtils.getLineNum(nextEvent);
-				
-					processNextLine(curEvent, nextEvent);
-
-//			}
-
-		}
-	}
-	
-	void stepBackward(ILogEvent curEvent) {
-		// step backward and the the previous event
-		ILogEvent prevEvent = eventUtils.backwardStepInto();
-		
-		if (prevEvent != null) {
-			
-			int clineNum = eventUtils.getLineNum(curEvent);
-			int prevLineNum = eventUtils.getLineNum(prevEvent);	
-			
-			processPrevious(curEvent, prevEvent);
-	
-			
-		}
-	}
 	
 	//This method relocates the timeline position along x-axis 
 	private int timelineLocationX(String _methodName, long _timestamp){

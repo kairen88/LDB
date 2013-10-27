@@ -22,7 +22,7 @@ public class CodeFragments {
 	public CodeFragments(){
 		
 	}
-	public CodeFragments(Path _editingCodePath, liveDebugging _ld)
+	public CodeFragments(Path _editingCodePath, liveDebugging _ld, String _program)
 	{
 		ld = _ld;
 		
@@ -30,7 +30,32 @@ public class CodeFragments {
 		lineNumToMethodMap = new HashMap<String, Integer>();
 		
 		originalClass = loadClassIntoStringArray(_editingCodePath);
-		//for Big factorial
+		
+		switch (_program) {
+		case "p1":
+			setProg1();
+			break;
+		case "p2":
+			setProg2();
+			break;
+		case "sp":
+			setSampleProg();
+			break;
+
+		default:
+			break;
+		}
+		
+		
+		//we convert line number to array index here to avoid confusion
+		convertLineNumToAryIdx();
+		
+		createCodeFragments(fragmentList,_ld);
+	}
+	
+	public void setProg1()
+	{
+		//for Program 1
 		int[] fragment = {162, 175};//_fact
 		int[] fragment2 = {185, 193};//_makeString
 		int[] fragment3 = {21, 70}; //main
@@ -39,15 +64,6 @@ public class CodeFragments {
 		int[] fragment6 = {122, 126};////_intLen
 		int[] fragment7 = {135, 149};//_trimLeadZero
 		
-		
-/*
-		int[] fragment = {6, 7};//BubbleSort
-		int[] fragment2 = {6, 11};//initialization
-		int[] fragment3 = {12, 17}; //bubbleSort
-		int[] fragment4 = {18, 26};//bubbleSwitch
-		int[] fragment5 = {27, 32};//output
-		int[] fragment6 = {33, 39};////main
-	*/	
 		fragmentList = new ArrayList<int[]>();
 		fragmentList.add(fragment);
 		fragmentList.add(fragment2);
@@ -56,13 +72,46 @@ public class CodeFragments {
 		fragmentList.add(fragment5);
 		fragmentList.add(fragment6);
 		fragmentList.add(fragment7);
+	}
+	
+	public void setProg2()
+	{
+		//for Program 2
+		int[] fragment = {5, 16};//_fact
+		int[] fragment2 = {18, 46};//_makeString
+		int[] fragment3 = {48, 85}; //main
+		int[] fragment4 = {78, 81};//multiply
+		int[] fragment5 = {83, 87};//_int2Array
+		int[] fragment6 = {89, 93};//_int2Array
+		int[] fragment7 = {97, 111};//_int2Array
+		int[] fragment8 = {113, 127};//_int2Array
+		int[] fragment9 = {129, 143};//_int2Array
 		
+		fragmentList = new ArrayList<int[]>();
+		fragmentList.add(fragment);
+		fragmentList.add(fragment2);
+		fragmentList.add(fragment3);
+		fragmentList.add(fragment4);
+		fragmentList.add(fragment5);
+		fragmentList.add(fragment6);
+		fragmentList.add(fragment7);
+		fragmentList.add(fragment8);
+		fragmentList.add(fragment9);
+	}
+	
+	public void setSampleProg()
+	{
+		//for Sample Program
+		int[] fragment = {4, 10};//_fact
+		int[] fragment2 = {12, 17};//_makeString
+		int[] fragment3 = {19, 37}; //main
+		int[] fragment4 = {39, 54};//multiply
 		
-		
-		//we convert line number to array index here to avoid confusion
-		convertLineNumToAryIdx();
-		
-		createCodeFragments(fragmentList,_ld);
+		fragmentList = new ArrayList<int[]>();
+		fragmentList.add(fragment);
+		fragmentList.add(fragment2);
+		fragmentList.add(fragment3);
+		fragmentList.add(fragment4);
 	}
 	
 	public CodeWindow getCodeFragment(String _methodName)
@@ -125,6 +174,7 @@ public class CodeFragments {
 			codeWin.setMethodName(methodName);
 			codeWin.setStartLine(fragmentIdx[0]);
 			codeWin.setEndLine(fragmentIdx[1]);
+			codeWin.setExecutedLine(1);
 			codeFragmentArray.put(methodName, codeWin);
 			
 			//map method name to line number so we can convert line num 

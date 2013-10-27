@@ -24,15 +24,17 @@ public class Arrow extends Group{
 		startMethodName = startWindow.getMethodName();
 		endMethodName = endWindow.getMethodName();
 		
-		IntegerBinding lineNumber = startWindow.selectedLineNumber.add(1);
+//		IntegerBinding lineNumber = startWindow.selectedLineNumber.add(1);
+		int lineNumber = startWindow.selectedLineNumber.getValue() + 1;
 		
 //		lineNumber.add(startWindow.getEditor().selectedLineNumber.add(1));
 		
 	
 		//calculate the offset for the y position at the start of the arrow
 		//using the current line selected
-		NumberBinding yLineOffset = lineNumber.multiply(startWindow.lineoffset);
-		NumberBinding startY = yLineOffset.add(startWindow.getDraggableY()).add(30);
+//		NumberBinding yLineOffset = lineNumber.multiply(startWindow.lineoffset);
+//		NumberBinding startY = yLineOffset.add(startWindow.getDraggableY()).add(30);
+		NumberBinding startY = startWindow.lineoffset.multiply(lineNumber).add(startWindow.getDraggableY()).add(30);
 		
 		//calculate the offset for the x position at the start of the arrow
 		//using the width of the editor

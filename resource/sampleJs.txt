@@ -1,194 +1,157 @@
-/**
- * Import statements.
- */
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
+package t;
 
-/**
- * This is the main class for big factorial. All methods needed are implemented here.
- * @see BigFactorialException
- * @author Chanchal Kumar Ghosh
- * @version 1.00
- */
-public class BigFactorialdemo {
+class NumRec {
 
-	/**
-	 * The main method.
-	 * @param args Arguments passed from command line.
-	 * @throws InterruptedException 
-	 */
-	public static void main(String args[]) throws InterruptedException {
-    	if(args.length!=0) {
-			System.out.println();//Thread.sleep(10);
-			for(String t : args) {
-				int n;//Thread.sleep(10);
-				try {
-					try {
-						n=Integer.parseInt(t);//Thread.sleep(10);
-					}
-					catch(NumberFormatException e) {
-						throw new BigFactorialException("Please enter a valid integer number.");
-					}
-					System.out.println("Factorial of "+n+" is: "+_makeString(_fact(n)));//Thread.sleep(10);
-				}
-				catch(BigFactorialException e) {
-					System.out.println(e);//Thread.sleep(10);
-				}
-			}
-		}
-		else {
-			System.out.println();//Thread.sleep(10);
-			while(true) {
-				System.out.print("Please enter an integer number(-1 to exit): ");//Thread.sleep(10);
-				BufferedReader ds=new BufferedReader(new InputStreamReader(System.in));//Thread.sleep(10);
-				int n;//Thread.sleep(10);
-				try {
-					try {
-						n=Integer.parseInt(ds.readLine());//Thread.sleep(10);
-					}
-					catch(IOException e) {
-						throw new BigFactorialException("Input Output Error.");
-					}
-					catch(NumberFormatException e) {
-						throw new BigFactorialException("Please enter a valid integer number.");
-					}
-					if(n==-1) {
-						System.out.println("\nYou also can make factorial directly from command line." +
-								"\nUsage: java Factorial [number1 [number2 [number3 [...]]]]\n");//Thread.sleep(10);
-						break;
-					}
-					int[]fact=_fact(n);
-					String result=_makeString(fact);
-					System.out.println("Factorial of "+n+" is: " +result);//Thread.sleep(10);
-				}
-				catch(BigFactorialException e) {
-					System.out.println(e);//Thread.sleep(10);
-				}
-			}
+public static void main(String[] Bas) {
+	char quit = 'a';
+	do {
+		NumRec.important();
+		try {	quit = (char)System.in.read();	}
+		catch(Exception e) {
+			System.out.println("Fatal Error, exiting...");
+			System.exit(0);
 		}
 	}
-	
-	/**
-	 * This method multiplies an array of integers with an integer.
-	 * @param a array of integer numbers.
-	 * @param b integer number.
-	 * @param index length of given integer.
-	 * @return Returns trimmed integer array.
-	 * @throws InterruptedException 
-	 * @see #_intLen(int)
-	 * @since 1.0
-	 */
-	protected static int[] _multiply(int[] a, int b, int index) throws InterruptedException {
-    	int carry=0;//Thread.sleep(10);
-    	int retLen=index+_intLen(b);//Thread.sleep(10);
-    	int ret[]=new int[retLen];//Thread.sleep(10);
-		for(int i=index-1; i>=0; i--) {
-			int temp=a[i]*b;//Thread.sleep(10);
-			temp+=carry;//Thread.sleep(10);
-			ret[retLen-- -1]=temp%10;//Thread.sleep(10);
-			carry=temp/10;//Thread.sleep(10);
-		}
-		ret[retLen-1]=carry;//Thread.sleep(10);
-		return ret;
-	}
-	
-	/**
-	 * This method converts an integer to an array of integers.
-	 * @param a given integer number.
-	 * @return Returns equivalent integer array of the given string.
-	 * @throws InterruptedException 
-	 * @since 1.0
-	 */
-	protected static int[] _int2Array(int a) throws InterruptedException {
-		String tempInt=a+"";//Thread.sleep(10);
-		int len=tempInt.length();//Thread.sleep(10);
-		int ret[]=new int[len];//Thread.sleep(10);
-		for(int i=len-1; i>=0; i--) {
-			ret[i]=a%10;//Thread.sleep(10);
-			a/=10;//Thread.sleep(10);
-		}
-		int res[]=ret;
-		return res;
-	}
-	
-	/**
-	 * This method calculates the length of the an integer.
-	 * @param a given integer number.
-	 * @return Returns lengh of the given number.
-	 * @throws InterruptedException 
-	 * @since 1.0
-	 */
-	protected static int _intLen(int a) throws InterruptedException {
-		 int len=(_int2Array(a)).length;
-		 int m=len;
-		 return m;
-	}
+	while(quit != 27);
+ }
 
-	/**
-	 * This method trims all leading zeros from the given integer array.
-	 * @param a given integer number.
-	 * @return Returns trimmed integer array.
-	 * @throws InterruptedException 
-	 * @since 1.0
-	 */
-	protected static int[] _trimLeadZero(int[] a) throws InterruptedException {
-		int trimCount=0;//Thread.sleep(10);
-		for(int i=0; i<a.length; i++) { //BUG should be for(int i=0;Thread.sleep(10); i<a.length;Thread.sleep(10); i++)
-			if(a[i]==0) {
-				trimCount++;//Thread.sleep(10);
-			}
-			else
-				break;//Thread.sleep(10);
+public static void important() {
+	char arr[] = new char[15];
+	int a=0;
+	a=Enter(arr);
+	while((a==-1)==true){a=0;a=Enter(arr);}
+	System.out.print("\n=> \" ");
+	int req=a;
+	for(int b=a;b>=0;b--) {
+		switch(req) {
+			case 0: req = unit(arr[0], req);
+				break;
+
+			case 1: req = ten(arr[0], arr[1], req);
+				break;
+
+			case 2: req = hundred(arr[0], req);              
+				for(int x=0;x<2;x++)arr[x]=arr[x+1];
+				break;
+
+			default:System.out.println("Exception("+req+")"+
+				"NumberTooLarge.\" <=\n\nExiting...");
+				System.exit(0);
 		}
-		int ret[]=new int[a.length-trimCount];//Thread.sleep(10);
-		for(int i=trimCount; i<a.length; i++) {
-			ret[i-trimCount]=a[i];//Thread.sleep(10);
-		}
-		return ret;
+		//System.out.print(req);
+		if(req<=-1)	break;//{System.out.println("Done..."+req+" "+b);break;}
 	}
+	System.out.println("\" <=\n\nPress [ESC]+[ENTER] to exit.");
+ }//////////////////////////////////////END OF MAIN/////////////////////////////////////////////
 
-	/**
-	 * This method calculates the factorial value using a simple
-	 * <code>for</code> loop.
-	 * @param number Number to factorial. (<b>Note:</b> <u>Range <code>0</code> to <code>238609294</code></u>)
-	 * @return Returns factorial of given number.
-	 * @exception BigFactorialException if number is less than 0 or greater than 238609294.
-	 * @throws InterruptedException 
-	 * @see BigFactorialException
-	 * @see #_multiply(int[], int, int)
-	 * @since 1.0
-	 */
-	protected static int[] _fact(int number) throws BigFactorialException, InterruptedException {
-    	if(number<0 || number>238609294)
-    		throw new BigFactorialException("Please enter a number between 0 and 238609294.");
-    	else {
-    		int ret[]={1};//Thread.sleep(10);
-//    		for(int i=1;Thread.sleep(10); i<number;Thread.sleep(10); i++) { //BUG should be: for(int i=1;Thread.sleep(10); i<=number;Thread.sleep(10); i++) (off by 1)
-//			for(int i=0;Thread.sleep(10); i<=number;Thread.sleep(10); i++) { //BUG should be: for(int i=1;Thread.sleep(10); i<=number;Thread.sleep(10); i++) (off by 1)
-    		for(int i=1; i<=number; i++) { //Original
-    			ret=_multiply(ret, i, ret.length);//Thread.sleep(10);
-    		}
-    		int result[]=ret;
-    		return ret;
-    	}
-    }
+public static int Enter(char arr[]) {
+	int a=0;
+	System.out.print("\nPlease input an integer: ");
+	for(a=0;a<15;a++) {
+		if(a>=14) {//	a=0;
+			System.out.println("Error: NumberTooLarge.");
+			System.exit(0);
+			//return -1;
+			//break;
+		}
+		try {	
+			arr[a]=(char)System.in.read();	
+		    }
+		catch(Exception e){
+			System.out.println("Fatal Error, exiting...");
+			System.exit(0);
+		}	
+		if(arr[a]==13&&a>0){      arr[a]=0;a--;break;	}
+	}
+//	if(a==0)a=-1;
+	if(arr[a]==27) {
+		System.out.println("\nProgrammed by Asim.");
+		System.exit(0);
+	}
+	for(int b=0;b<=a;b++) {
+		if(Character.isDigit(arr[b])==false) {
+			System.out.println("\nPlease enter integers only...");
+			System.exit(0);
+			//a=-1;
+			//break outer;
+		}
+	}
+	return a;
+ }
 
-    /**
-	 * This method converts an integer array to a string to use in
-	 * <code>System.out.println()</code> method.
-	 * @param a Input integer array
-	 * @return Returns String value of given integer number
-     * @throws InterruptedException 
-	 * @since 1.0
-	 */
-	protected static String _makeString(int[] a) throws InterruptedException {
-    	int x=0;
-    	a=_trimLeadZero(a);//Thread.sleep(10);
-    	int i=0;//Thread.sleep(10);
-    	String ret="";//Thread.sleep(10);
-		for(int t:a)
-    		ret+=t;//Thread.sleep(10);
-    	return ret;
-    }
+
+public static int unit(char ch, int req) {
+//	System.out.println("-unit");
+	unit2(ch);
+	return req--;
+  }
+
+public static int ten(char ch, char ch2, int req) {
+//	System.out.println("-ten");
+	magic(ch, ch2);
+	if(ch >= '2' && ch <= '9')	unit2(ch2);
+	return req -= 2;
+  }		
+
+public static int hundred(char ch, int req) {
+//	System.out.println("-hundred");
+	unit2(ch);
+	if(ch!='0')	System.out.print("Hundred ");
+	return req--;
+  }		
+
+ 	
+
+public static void unit2(char ch) {
+//	System.out.println("-unit2");
+	switch(ch) {
+		case '0':System.out.print("");break;
+		case '1':System.out.print("One ");break;
+		case '2':System.out.print("Two ");break;
+		case '3':System.out.print("Three ");break;
+		case '4':System.out.print("Four ");break;
+		case '5':System.out.print("Five ");break;
+		case '6':System.out.print("Six ");break;
+		case '7':System.out.print("Seven ");break;
+		case '8':System.out.print("Eight ");break;
+		case '9':System.out.print("Nine ");break;
+		default :System.out.print("Invalid Input ");break;
+	}
+  }
+
+public static void ten2(char ch) {
+//	System.out.println("-ten2");
+	switch(ch) {
+		case '0':System.out.print("Ten ");break;
+		case '1':System.out.print("Eleven ");break;
+		case '2':System.out.print("Twelve ");break;
+		case '3':System.out.print("Thirteen ");break;
+		case '4':System.out.print("Fourteen ");break;
+		case '5':System.out.print("Fifteen ");break;
+		case '6':System.out.print("Sixteen ");break;
+		case '7':System.out.print("Seventeen ");break;
+		case '8':System.out.print("Eighteen ");break;
+		case '9':System.out.print("Nineteen ");break;
+		default :System.out.print("Invalid Input ");break;
+	}
+  }
+  
+public static void magic(char ch, char ch2) {
+//	System.out.println("-magic");
+	switch(ch) {
+		case '0':unit2(ch2);break;
+		case '1':ten2(ch2);break;
+		case '2':System.out.print("Twenty ");break;
+		case '3':System.out.print("Thirty ");break;
+		case '4':System.out.print("Fourty ");break;
+		case '5':System.out.print("Fifty ");break;
+		case '6':System.out.print("Sixty ");break;
+		case '7':System.out.print("Seventy ");break;
+		case '8':System.out.print("Eighty ");break;
+		case '9':System.out.print("Ninety ");break;
+		default :System.out.print("Invalid Input ");break;
+	}
+  }
+
 }
+////////////////////////////class NumRec's closing///////////////////////////////////////////////

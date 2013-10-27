@@ -10,9 +10,11 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
 import tod.core.config.TODConfig;
+import tod.core.database.browser.ICompoundInspector.EntryValue;
 import tod.core.database.browser.IEventBrowser;
 import tod.core.database.browser.ILogBrowser;
 import tod.core.database.browser.IObjectInspector;
+import tod.core.database.browser.IObjectInspector.IEntryInfo;
 import tod.core.database.browser.LocationUtils;
 import tod.core.database.browser.Stepper;
 import tod.core.database.event.IArrayWriteEvent;
@@ -40,11 +42,14 @@ import tod.gui.components.eventlist.ArrayWriteNode;
 import tod.gui.components.eventlist.FieldWriteNode;
 import tod.impl.common.event.BehaviorExitEvent;
 import tod.impl.dbgrid.event.MethodCallEvent;
+import tod.tools.interpreter.ToStringComputer;
 
 public class EventUtils {
 
 	private ILogBrowser logBrowser;
 	private Stepper stepper;
+	private long firstEventTimestamp;
+	private long lastEventTimestamp;
 	
 	public EventUtils()
 		{
@@ -61,14 +66,17 @@ public class EventUtils {
 			logBrowser = itsSession.getLogBrowser();
 		
 			//create event browser
-			IEventBrowser eventBrwoser = logBrowser.createBrowser();
+			IEventBrowser eventBrowser = logBrowser.createBrowser();
 			
 			//create stepper
 			stepper = new Stepper(logBrowser);
 			
 			//set the current event in the stepper to point to the first event
-			if(eventBrwoser.hasNext())
-			stepper.setCurrentEvent(eventBrwoser.next());
+			if(eventBrowser.hasNext())
+			stepper.setCurrentEvent(eventBrowser.next());
+			
+//			firstEventTimestamp = eventBrowser.getFirstTimestamp();
+//			lastEventTimestamp = eventBrowser.getLastTimestamp(); 
 		}
 	
 	public ILogBrowser getLogBrowser()
@@ -81,6 +89,26 @@ public class EventUtils {
 		IEventBrowser eventBrowser = logBrowser.createBrowser();
 		
 		return eventBrowser;
+	}
+	
+	public void setFirstTimestamp(long _timestamp)
+	{
+		firstEventTimestamp = _timestamp;
+	}
+	
+	public long getFirstTimestamp()
+	{
+		return firstEventTimestamp;
+	}
+	
+	public void setLastTimestamp(long _timestamp)
+	{
+		lastEventTimestamp = _timestamp;
+	}
+	
+	public long getLastTimestamp()
+	{
+		return lastEventTimestamp;
 	}
 	
 	//Returns if an event is a method call
@@ -327,14 +355,42 @@ public class EventUtils {
 	
 	public ILogEvent forwardStepInto()
 	{
-		stepper.forwardStepInto();
-		return stepper.getCurrentEvent();
+		if(hasNextEvent(stepper.getCurrentEvent()))
+		{
+			stepper.forwardStepInto();
+			return stepper.getCurrentEvent();
+		}
+		return null;
+	}
+	
+	public ILogEvent forwardStepOver()
+	{
+		if(hasNextEvent(stepper.getCurrentEvent()))
+		{
+			stepper.forwardStepOver();
+			return stepper.getCurrentEvent();
+		}
+		return null;
 	}
 	
 	public ILogEvent backwardStepInto()
 	{
-		stepper.backwardStepInto();
-		return stepper.getCurrentEvent();
+		if(hasPrevEvent(stepper.getCurrentEvent()))
+		{
+			stepper.backwardStepInto();
+			return stepper.getCurrentEvent();
+		}
+		return null;
+	}
+	
+	public ILogEvent backwardStepOver()
+	{
+		if(hasPrevEvent(stepper.getCurrentEvent()))
+		{
+			stepper.backwardStepOver();
+			return stepper.getCurrentEvent();
+		}
+		return null;
 	}
 	
 	public ILogEvent getCurrentEvent()
@@ -439,25 +495,80 @@ public class EventUtils {
 		{
 			Object obj = null;
 			
+			String value = null;
+			String name = null;
+			
 			if(_event instanceof IFieldWriteEvent)
 			{
 				IFieldWriteEvent fieldWriteEvent = (IFieldWriteEvent) _event;
-				return fieldWriteEvent.getValue().toString();
+				obj = fieldWriteEvent.getValue();
+				value = fieldWriteEvent.getValue().toString();
+				name = fieldWriteEvent.getField().getName();
 			}
 			else if(_event instanceof IArrayWriteEvent)
 			{
 				IArrayWriteEvent aryWriteEvent = (IArrayWriteEvent)_event;
-				return aryWriteEvent.getValue().toString();
-							}
+				obj = aryWriteEvent.getValue();
+				value = aryWriteEvent.getValue().toString();
+				name = aryWriteEvent.getTarget().toString();
+			}
 			else if(_event instanceof ILocalVariableWriteEvent)
 			{
 				ILocalVariableWriteEvent localVarWriteEvent = (ILocalVariableWriteEvent)_event;
-				return localVarWriteEvent.getValue().toString();
+				obj =  localVarWriteEvent.getValue();
+				value = localVarWriteEvent.getValue().toString();
+				name = localVarWriteEvent.getVariable().getVariableName();
 			}
 			
-			return null;
-		}
 
+			if(value.startsWith("UID"))
+			{
+//				if(name.compareTo("result") == 0)
+				if (obj instanceof ObjectId)
+				{
+					ObjectId theObjectId = (ObjectId) obj;
+					
+//					Object theRegistered = logBrowser.getRegistered(theObjectId);
+//					if (theRegistered != null) value = theRegistered.toString();
+//					
+//					System.out.println(value);
+
+					
+//					IObjectInspector oi = logBrowser.createObjectInspector(theObjectId);
+//					oi.setReferenceEvent(_event); // Sets the point in time at which to reconstitute the object's state; could be your write event
+//					List<IEntryInfo> entries = oi.getEntries(0, oi.getEntryCount()); // Entries are object fields or array slots
+//					for(IEntryInfo entry : entries) {
+////						System.out.println(entry.toString());
+//					    EntryValue[] possibleValues = oi.getEntryValue(entry);
+//					    System.out.println(possibleValues[0].getValue()); // Could have more than one possible value, or maybe no one, so you must check first
+//					    if(possibleValues[0].getValue() != null)
+//					    	value = possibleValues[0].getValue().toString();
+//					}
+					
+					
+					IObjectInspector oi = logBrowser.createObjectInspector(theObjectId);
+					value = oi.getType().getName();
+					
+				}
+			}
+			
+			return value;
+//			if(name.compareTo("result") == 0)
+//			if (obj instanceof ObjectId)
+//			{
+//				ObjectId theObjectId = (ObjectId) obj;
+//				
+//				TODConfig config = logBrowser.getSession().getConfig();
+//				IObjectInspector oi = logBrowser.createObjectInspector(theObjectId);
+//				oi.setReferenceEvent(_event);
+//				ToStringComputer c = new ToStringComputer(config, oi);
+//				System.out.println(c.compute());
+//				System.out.println();
+//			}
+		}
+		
+		
+				
 		return null;
 	}
 	
@@ -513,6 +624,22 @@ public class EventUtils {
 			
 		return display;
 
+	}
+	
+	private boolean hasNextEvent(ILogEvent _event)
+	{
+		IEventBrowser browser = logBrowser.createBrowser();
+		browser.setNextEvent(_event);
+		
+		return browser.hasNext();
+	}
+	
+	private boolean hasPrevEvent(ILogEvent _event)
+	{
+		IEventBrowser browser = logBrowser.createBrowser();
+		browser.setPreviousEvent(_event);
+		
+		return browser.hasPrevious();
 	}
 	
 	private class MyTraceView extends MinerUI
