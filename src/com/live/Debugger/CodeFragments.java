@@ -10,24 +10,30 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
+
+import javafx.util.Pair;
 
 public class CodeFragments {
 	
 	private HashMap codeFragmentArray;
 	private HashMap lineNumToMethodMap;
+	
+	private TreeMap<String, Pair<int[], String>> codeFragments; //key: method name, Value: Pair (Pair(startline, endline), fragment string)
+	
 	private ArrayList<String> originalClass;
 	ArrayList<int[]> fragmentList;
-	liveDebugging ld;
 	
 	public CodeFragments(){
 		
 	}
 	public CodeFragments(Path _editingCodePath, liveDebugging _ld, String _program)
 	{
-		ld = _ld;
-		
+
 		codeFragmentArray = new HashMap<String, CodeWindow>();
 		lineNumToMethodMap = new HashMap<String, Integer>();
+		
+		codeFragments = new TreeMap<String, Pair<int[], String>>();
 		
 		originalClass = loadClassIntoStringArray(_editingCodePath);
 		
@@ -50,7 +56,8 @@ public class CodeFragments {
 		//we convert line number to array index here to avoid confusion
 		convertLineNumToAryIdx();
 		
-		createCodeFragments(fragmentList,_ld);
+		codeFragmentsInit(fragmentList);
+		createCodeFragments(fragmentList);
 	}
 	
 	public void setProg1()
@@ -114,6 +121,24 @@ public class CodeFragments {
 		fragmentList.add(fragment4);
 	}
 	
+	/**
+	 * initialize a treemap with key: method name, value: method (string array)
+	 * @param _fragmentList arrayList of int[]. int[0] startline, int[1] endline
+	 */	
+	private void codeFragmentsInit(ArrayList<int[]> _fragmentList)
+	{
+		for(int[] fragmentIdx : _fragmentList)
+		{
+			Object []obj=(Object[])getCodeFragmentString(fragmentIdx[0], fragmentIdx[1]);
+			String fragment = (String)obj[0];
+			String methodName = getMethodName(fragmentIdx[0]);
+			int[] startEnd = {fragmentIdx[0], fragmentIdx[1]};
+			
+			codeFragments.put(methodName, 
+								new Pair<int[], String>(startEnd, fragment));
+		}
+	}
+	
 	public CodeWindow getCodeFragment(String _methodName)
 	{
 		CodeWindow cdw=(CodeWindow)codeFragmentArray.get(_methodName);
@@ -161,7 +186,27 @@ public class CodeFragments {
 	{
 		return (length)*7;
 	}
-	private void createCodeFragments(ArrayList<int[]> _fragmentList, liveDebugging ld)
+	
+	public CodeWindow createCodeWindow(String _methodName)
+	{
+		Pair<int[], String> fragment = codeFragments.get(_methodName);
+		String fragmentString = fragment.getValue();
+		int startLine = fragment.getKey()[0];
+		int endLine = fragment.getKey()[1];
+		int width = 600;
+		int height= calculateHeight(startLine, endLine);
+		
+		CodeWindow codeWin = new CodeWindow(fragmentString, width, height,_methodName);
+		
+		codeWin.setMethodName(_methodName);
+		codeWin.setStartLine(startLine);
+		codeWin.setEndLine(endLine);
+		codeWin.setExecutedLine(1);
+		
+		return codeWin;
+	}
+	
+	private void createCodeFragments(ArrayList<int[]> _fragmentList)
 	{
 		for(int[] fragmentIdx : _fragmentList)
 		{
@@ -170,7 +215,7 @@ public class CodeFragments {
 			int width = 600;//(int)obj[1];
 			String methodName = getMethodName(fragmentIdx[0]);
 			int height= calculateHeight(fragmentIdx[0], fragmentIdx[1]);
-			CodeWindow codeWin = new CodeWindow(fragment, width, height,methodName, ld);
+			CodeWindow codeWin = new CodeWindow(fragment, width, height,methodName);
 			codeWin.setMethodName(methodName);
 			codeWin.setStartLine(fragmentIdx[0]);
 			codeWin.setEndLine(fragmentIdx[1]);
@@ -192,7 +237,7 @@ public class CodeFragments {
 			int width = 600;//(int)obj[1];
 //			String methodName = getMethodName(obj[2]);
 			int height= calculateHeight((int)obj[2], (int)obj[3]);
-			CodeWindow codeWin = new CodeWindow(fragment, width, height,_methodName, ld);
+			CodeWindow codeWin = new CodeWindow(fragment, width, height,_methodName);
 			codeWin.setMethodName(_methodName);
 			codeWin.setStartLine((int)obj[2]);
 			codeWin.setEndLine((int)obj[3]);

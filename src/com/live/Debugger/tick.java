@@ -17,6 +17,7 @@ public class tick extends HBox{
 	private long timestamp;
 	private boolean isSelected;
 	private int positionIdx;
+	private int lineNumber; //raw line number NOT corrected to relative line number in codeWindow
 	
 	private Rectangle tick;
 	private Rectangle spaceR;
@@ -43,10 +44,11 @@ public class tick extends HBox{
 	
 	
 	
-	public tick(long _timestamp, int _positionIdx, SimpleIntegerProperty _isReduced)
+	public tick(long _timestamp, int _lineNum, int _positionIdx, SimpleIntegerProperty _isReduced)
 	{
 		timestamp = _timestamp;
 		positionIdx = _positionIdx;
+		lineNumber = _lineNum;
 
 		//create the rectagles for the tick, the left and right spaces
 		tick = new Rectangle(10,10,tickWidthInitial,tickHeightInitial);
@@ -143,6 +145,11 @@ public class tick extends HBox{
 		return timestamp;
 	}
 	
+	public int getLineNumber()
+	{
+		return lineNumber;
+	}
+	
 	public void setTickColorSelected()
 	{
 		tick.setFill(selectedColor);
@@ -162,6 +169,6 @@ public class tick extends HBox{
 
 	public long getTimestamp() {
 		// TODO Auto-generated method stub
-		return 0;
+		return timestamp;
 	}
 }

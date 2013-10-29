@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import tod.core.database.event.ILogEvent;
 
 import com.sun.org.apache.xpath.internal.operations.Variable;
 
@@ -85,6 +84,8 @@ public class CodeWindow extends DraggableNode{
 	private int padding = 10;
 	private int paddingTop = 15;
 	
+	private long firstTimestamp;	
+	private long lastTimestamp;	
 		
 	private int startLine=0;//line offset, to match actual line number to code editor line number
 	private int endLine=0;
@@ -99,6 +100,8 @@ public class CodeWindow extends DraggableNode{
 	
 	
 	private int indexOnScreen;
+	
+	private String scriptToRunOnLoad;
 			
 	 
 	 double x =0;
@@ -150,6 +153,26 @@ public class CodeWindow extends DraggableNode{
 		return this.editor;
 	}
 	
+	public long firstTimestamp()
+	{
+		return firstTimestamp;
+	}
+	
+	public void setFirstTimestamp(long _timestamp)
+	{
+		firstTimestamp = _timestamp;
+	}
+	
+	public long lastTimestamp()
+	{
+		return lastTimestamp;
+	}
+	
+	public void setLastTimestamp(long _timestamp)
+	{
+		lastTimestamp = _timestamp;
+	}
+	
 	//increment the current iteration in the iteration combo box
 	//if we are re-entering the same iteration of the codewindow, no new iteration is added
 	public void setIteration(long _timestamp)
@@ -198,10 +221,9 @@ public void setCodeWindowContainer(DraggableNode e){
 		return this.codeWindowContainer;
 	}
 
-	public CodeWindow(String editingCode, int _windowWidth, int _windowHeight,String methodName, liveDebugging ldInstance) {
+	public CodeWindow(String editingCode, int _windowWidth, int _windowHeight,String methodName) {
 		//initialize window dimensions
 		//set code window size, min 300 by 300
-		ld=ldInstance;
 		iterationList = new LinkedHashMap<Long, Integer>();
 		
 		if(_windowWidth < 600)
@@ -217,7 +239,20 @@ public void setCodeWindowContainer(DraggableNode e){
 		//construct the code window
 		constructCodeWindow(editingCode,methodName);	
 		
-		//add change listener to run scripts when webform is loaded		
+		scriptToRunOnLoad = "";
+		final CodeWindow cw = this;
+		//add change listener to run scripts when webform is loaded	
+		this.editor.webview.getEngine().getLoadWorker().stateProperty().addListener(
+	            new ChangeListener<State>() {
+	                @Override
+	                public void changed(ObservableValue<? extends State> ov,
+	                    State oldState, State newState) {
+	                        if (newState == State.SUCCEEDED) {
+	                        	cw.editor.webview.getEngine().executeScript(scriptToRunOnLoad);
+	                        }
+	                    }
+	                }
+	        );
 //		addWebviewLoadedChangeListener();
 	}
 	
@@ -262,7 +297,7 @@ public void setCodeWindowContainer(DraggableNode e){
 			
 			this.hbox.getChildren().set(0,gp);
 	        
-		editor.webview.getEngine().executeScript("editor.reduceWindowSize();");
+		runScriptOnWebForm("editor.reduceWindowSize();");
 		
 		editor.webview.setPrefWidth(this.windowWidth);
 		editor.webview.setPrefHeight(this.windowHeight);
@@ -298,7 +333,7 @@ public void setCodeWindowContainer(DraggableNode e){
 		//this.hbox.relocate(codeWindowContainer.getLayoutX()+5, codeWindowContainer.getLayoutY()+5);
 	
 		//((HBox)(this.hbox.getChildren().get(1))).relocate(codeWindowContainer.getDWidth()-25, codeWindowContainer.getLayoutY()+5);
-		editor.webview.getEngine().executeScript("editor.normalWindowSize();");
+		runScriptOnWebForm("editor.normalWindowSize();");
 		this.editor.setReduced(false);
 
 		editor.webview.setPrefWidth(this.windowWidth);
@@ -344,7 +379,7 @@ public void setCodeWindowContainer(DraggableNode e){
 	public void highlightGutters(ArrayList<Integer> lineNumList, int offset)
 	{
 		for(int lineNum : lineNumList)
-			editor.webview.getEngine().executeScript("editor.setMarker(" + String.valueOf(lineNum - offset - 1) + ",'<div height=10 width=10 style=\"background-color:#A3FF7F;\"> %N%');");
+			runScriptOnWebForm("editor.setMarker(" + String.valueOf(lineNum - offset - 1) + ",'<div height=10 width=10 style=\"background-color:#A3FF7F;\"> %N%');");
 		//98FB98
 	}
 	
@@ -362,7 +397,7 @@ public void setCodeWindowContainer(DraggableNode e){
 //		//if there was another section highlighted, remove the highlight
 //		if(prevStartCol != -1 && prevEndCol != -1)
 //		{
-//			editor.webview.getEngine().executeScript("var start = {line:" + String.valueOf(lineNum) + ",ch:" + String.valueOf(prevStartCol) + "};" +
+//			runScriptOnWebForm("var start = {line:" + String.valueOf(lineNum) + ",ch:" + String.valueOf(prevStartCol) + "};" +
 //					"var end = {line:" + String.valueOf(lineNum) + ", ch:" + String.valueOf(prevEndCol) + "};" +
 //					"editor.markText(start,end,\"CodeMirror-original-background\");");
 //			//set current section as previous
@@ -370,14 +405,14 @@ public void setCodeWindowContainer(DraggableNode e){
 //			prevEndCol = endChar;
 //		}
 //		//highlihgt section on line
-//		editor.webview.getEngine().executeScript("var start = {line:" + String.valueOf(lineNum) + ",ch:" + String.valueOf(startChar) + "};" +
+//		runScriptOnWebForm("var start = {line:" + String.valueOf(lineNum) + ",ch:" + String.valueOf(startChar) + "};" +
 //												"var end = {line:" + String.valueOf(lineNum) + ", ch:" + String.valueOf(endChar) + "};" +
 //												"editor.markText(start,end,\"CodeMirror-LineSection-highlight\");");		
 //	}
 //	
 //	public void highlightSection(int _lineNum, String _varName)
 //	{
-//		editor.webview.getEngine().executeScript("$(\"div.CodeMirror-lines div:eq(3) pre:eq(0)\").each(function () {" +
+//		runScriptOnWebForm("$(\"div.CodeMirror-lines div:eq(3) pre:eq(0)\").each(function () {" +
 //				"var regex = /public/; " +
 //				"var match = regex.exec($(this).text()); " +
 //				"if(match != null) " +
@@ -389,7 +424,21 @@ public void setCodeWindowContainer(DraggableNode e){
 		if(_varName != null &&_lineNum > 0)
 		{
 		//highlihgt section on line
-		editor.webview.getEngine().executeScript("var lineNum = " + (_lineNum) + ";" +
+		runScriptOnWebForm("var lineNum = " + (_lineNum) + ";" +
+				"var lineStr = editor.lineInfo(lineNum).text;" +
+				"var varName = \"" + _varName + "\";" +
+				"var start = lineStr.indexOf(varName);" +
+				"var end = start + varName.length;" +
+				"markSegment = editor.markText({line:lineNum, ch:start}, {line:lineNum, ch:end}, 'CodeMirror-LineSection-highlight');");	
+		}
+	}
+	
+	public void highlightSection2(int _lineNum, String _varName)
+	{
+		if(_varName != null &&_lineNum > 0)
+		{
+		//highlihgt section on line
+		runScriptOnWebForm("var lineNum = " + (_lineNum - startLine - 1) + ";" +
 				"var lineStr = editor.lineInfo(lineNum).text;" +
 				"var varName = \"" + _varName + "\";" +
 				"var start = lineStr.indexOf(varName);" +
@@ -402,7 +451,7 @@ public void setCodeWindowContainer(DraggableNode e){
 	{
 
 		//highlihgt section on line
-		editor.webview.getEngine().executeScript("if(markSegment != null)" +
+		runScriptOnWebForm("if(markSegment != null)" +
 													"markSegment.clear();" );		
 	}
 	
@@ -430,10 +479,19 @@ public void setCodeWindowContainer(DraggableNode e){
 		setBackgroundColor("CCCCCC");
 	}
 	
+	public void clearAllLineHighlights()
+	{
+		int numOfLines = endLine - startLine + 1;
+//		for(int i = 0; i < numOfLines; i++)
+//			setLineColorToPrevious(i);
+		runScriptOnWebForm("for(var i = 0; i < "+numOfLines+"; i++) {editor.setLineClass(i, null, 'completedLine');}");
+
+	}
+	
 	//sets the class for the line number indicated to completedLine which styles it white
 	public void setLineColorToPrevious(int lineNum)
 	{
-		editor.webview.getEngine().executeScript("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'completedLine');");
+		runScriptOnWebForm("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'completedLine');");
 		//98FB98
 	}
 	
@@ -441,19 +499,33 @@ public void setCodeWindowContainer(DraggableNode e){
 	//sets the class for the line number indicated to currentLine which styles it yellow
 	public void setLineColorToCurrent(int lineNum)
 	{
-		editor.webview.getEngine().executeScript("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'currentLine');");
+		runScriptOnWebForm("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'currentLine');");
+	}
+	
+	public void setLineColorToCurrent2(int lineNum)
+	{
+		runScriptOnWebForm("editor.setLineClass(" + String.valueOf(lineNum - startLine - 1) + ", null, 'currentLine');");
 	}
 	
 	//sets the class for the line number indicated to newLine which styles it red - for method calls
 	public void setLineColorToMethodCall(int lineNum)
 	{
-		editor.webview.getEngine().executeScript("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'newLine');");
+		runScriptOnWebForm("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'newLine');");
 	}
 	
 	//execute script on editor webview
 	public void runScriptOnWebForm(String _script)
 	{
-		editor.webview.getEngine().executeScript(_script);
+		//if the webview is loaded, run the script
+		if(editor.webview.getEngine().getLoadWorker().stateProperty().getValue().toString().compareTo(State.SUCCEEDED.name()) == 0)
+			editor.webview.getEngine().executeScript(_script);
+		else
+			//we append the script to a string  to be executed when the webview loads
+			scriptToRunOnLoad += " " + _script;
+			
+		//there are 2 ways to handle this, either add change listeners to the state property for each script to be run
+		//when the webview loads each of these change listers will try to run the script
+		//or we can concat all the scripts as a single string and run as one script when the webview is loaded
 	}
 	
 	//return current execution line
@@ -480,11 +552,11 @@ public void setCodeWindowContainer(DraggableNode e){
 		this.currentExecutionLine -= 1;
 	}
 	
-	public int getLineCount()
-	{
-		Object codeLineCount = editor.webview.getEngine().executeScript("editor.lineCount();");
-		return (int) codeLineCount;
-	}
+//	public int getLineCount()
+//	{
+//		Object codeLineCount = runScriptOnWebForm("editor.lineCount();");
+//		return (int) codeLineCount;
+//	}
 	
 	public void setMethodName(String _methodName)
 	{
@@ -613,7 +685,7 @@ public void setCodeWindowContainer(DraggableNode e){
                 		//status="cannotReduce";
                 		reduceWindowSize();
                 			
-                    	ld.reposition();
+                    	liveDebugging.reposition();
                 	}
                 	else{
                 	//status="canReduce";
@@ -621,7 +693,7 @@ public void setCodeWindowContainer(DraggableNode e){
                 	imageView=img;
                 	//pinBtn.setGraphic(img);
                 	normalWindowSize();
-                	ld.reposition();
+                	liveDebugging.reposition();
                 	}
                 }
             });
@@ -752,7 +824,7 @@ public void setCodeWindowContainer(DraggableNode e){
 		return null;
 	}
 	
-	public VariablePane getGridPane(ILogEvent _event, ArrayList<Object[]> _childEventsInfo) {
+	public VariablePane getGridPane(ArrayList<EventInfo> _childEventsInfo) {
 		
 		int value=Integer.parseInt(iterationBox.getValue().toString());
 		
@@ -763,7 +835,7 @@ public void setCodeWindowContainer(DraggableNode e){
 				return gridPane;
 		}else
 		{
-			gridPane = new VariablePane(methodName, value, _event, _childEventsInfo);
+			gridPane = new VariablePane(methodName, value, _childEventsInfo);
 			gridPaneList.add(gridPane);
 		}
 		return gridPane;

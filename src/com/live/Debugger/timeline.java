@@ -21,9 +21,17 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 
+/**
+ * @author penguin
+ *
+ */
+/**
+ * @author penguin
+ *
+ */
 public class timeline extends VBox{
 
-	private ArrayList<Long> timestamps;
+	private ArrayList<EventInfo> eventList;
 	private int prevSelectedTickIdx;
 	private String methodName;
 	private long createdTimestamp;
@@ -41,16 +49,16 @@ public class timeline extends VBox{
 	Label valueLabel;
 	
 	
-	timeline(ArrayList<Long> _timestamps, String _methodName, ArrayList<CodeWindow> codeWinCallStack, long _timeCreated)
+	timeline(ArrayList<EventInfo> _timestamps, String _methodName)
 	{
-		timestamps = _timestamps;
+		eventList = _timestamps;
 		methodName = _methodName;
 		currentValue = new SimpleIntegerProperty(0);
-		createdTimestamp = _timeCreated;
+//		createdTimestamp = _timeCreated;
 		isReduced = new SimpleIntegerProperty(1);
 		childTimelineIdxList = new Vector<Integer>();
 		
-		getCallStack(codeWinCallStack);
+//		getCallStack(codeWinCallStack);
 		
 		//stores the idx of the last tick that was selected
 		//prev tick idx has not been set, initialized to -1
@@ -59,7 +67,7 @@ public class timeline extends VBox{
 				
 		//space for 1 tick * number of ticks + size of 1 expanded tick
 		//refer to tick class for values
-		timelineLength = (3 + 5 + 5) * timestamps.size() + (3 + 10 + 10) ;
+		timelineLength = (3 + 5 + 5) * eventList.size() + (3 + 10 + 10) ;
 		
 		StackPane timebar = new StackPane();
 		timebar.setMinHeight(15);
@@ -138,16 +146,17 @@ public class timeline extends VBox{
 	private void createTicks()
 	{
 		// - 1 since we want to exclude the method exit event
-		for(int i = 0; i < (timestamps.size() - 1); i++)
+		for(int i = 0; i < (eventList.size() - 1); i++)
 //		for(Long timestamp : timestamps)
 		{
 //			final tick tk = new tick(timestamp, tickList.size(), isReduced);
-			final tick tk = new tick(timestamps.get(i), tickList.size(), isReduced);
+			final tick tk = new tick(eventList.get(i).getTimestamp(), eventList.get(i).getLineNumber(), tickList.size(), isReduced);
 			tickList.add(tk);
 			tk.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			   public void handle(MouseEvent arg0) {
 				   
 				   setTick(tk);
+				   liveDebugging.naviTo(tk.getTimestamp());
 			   }
 			});
 			
@@ -155,13 +164,16 @@ public class timeline extends VBox{
 		}
 	}
 	
+	/**
+	 * 
+	 * @param tk
+	 */
 	private void setTick(tick tk)
 	{
-		 //set the previously selected tick to false, enable mousout resizing
+		 //if a tick was previously set, clear it
 		  if(prevSelectedTickIdx != -1)
 		  {
-			  tickList.get(prevSelectedTickIdx).setIsSelected(false);
-			  tickList.get(prevSelectedTickIdx).setTickSizeToInitial();
+			  clearTick();
 		  }
 		  tk.setIsSelected(true);		  
 		  tk.setTickSizeToExpanded();
@@ -170,12 +182,22 @@ public class timeline extends VBox{
 		  prevSelectedTickIdx = tk.getPositionIdx();
 	}
 	
+	public void clearTick()
+	{
+		if(prevSelectedTickIdx != -1)
+		{
+			//set the previously selected tick to false, enable mousout resizing
+			tickList.get(prevSelectedTickIdx).setIsSelected(false);
+			tickList.get(prevSelectedTickIdx).setTickSizeToInitial();
+		}
+	}
+	
 	private int getIndexFromTimestamp(long _timestamp)
 	{
 		int index = -1;
-		for(int i = 0; i < timestamps.size(); i++)
+		for(int i = 0; i < eventList.size(); i++)
 		{
-			if(_timestamp == timestamps.get(i))
+			if(_timestamp == eventList.get(i).getTimestamp())
 			{
 				index = i;
 				break;
@@ -228,14 +250,22 @@ public class timeline extends VBox{
 		this.visibleProperty().set(true);
 	}
 	
-	public void setTick(long _timestamp) {
+	/**
+	 * sets the correct tick given a timestamp
+	 * @param _timestamp
+	 * @return raw line number of the represented event (needs to be corrected to relative line number for the codeWindow)
+	 */
+	public int setTick(long _timestamp) {
 		int index = getIndexFromTimestamp(_timestamp);
+		int lineNum = -1;
 		
 		if(index != -1)
 		{
 			tick tk = tickList.get(index);
 			setTick(tk);
-		}			
+			lineNum = tk.getLineNumber();
+		}		
+		return lineNum;
 	}
 	
 	public int getValue()

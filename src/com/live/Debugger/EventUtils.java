@@ -96,6 +96,11 @@ public class EventUtils {
 		firstEventTimestamp = _timestamp;
 	}
 	
+	public void setCurrentEvent(ILogEvent _event)
+	{
+		stepper.setCurrentEvent(_event);
+	}
+	
 	public long getFirstTimestamp()
 	{
 		return firstEventTimestamp;
@@ -109,6 +114,14 @@ public class EventUtils {
 	public long getLastTimestamp()
 	{
 		return lastEventTimestamp;
+	}
+	
+	public boolean validTimestamp(long _timestamp)
+	{
+		if(firstEventTimestamp <= _timestamp && lastEventTimestamp >= _timestamp)
+			return true;
+		else
+			return false;
 	}
 	
 	//Returns if an event is a method call
@@ -135,7 +148,8 @@ public class EventUtils {
 	{
 		if(_event instanceof IFieldWriteEvent ||
 			_event instanceof IArrayWriteEvent ||
-			_event instanceof ILocalVariableWriteEvent)
+			_event instanceof ILocalVariableWriteEvent ||
+			_event instanceof IInstantiationEvent)
 			return true;
 		else 
 			return false;		
@@ -199,7 +213,12 @@ public class EventUtils {
 				ILogEvent childEvent = browser.next();
 				*/
 				//get array of line numbers
-				LineNumberInfo[] lineNumAry = /*getExecutionPath(_event);*/callEvent.getCalledBehavior().getLineNumbers();
+				LineNumberInfo[] lineNumAry;
+				if(callEvent.getExecutedBehavior() != null)
+					lineNumAry = callEvent.getExecutedBehavior().getLineNumbers();
+				else
+					lineNumAry = callEvent.getCalledBehavior().getLineNumbers();
+			
 				ArrayList<Integer> lineNumbers = new ArrayList<Integer>();
 				
 				//convert into an ary of integers
@@ -245,7 +264,7 @@ public class EventUtils {
 			return null;
 	}
 	
-	public ArrayList<Object[]> getChildEventsInfo(ILogEvent _event)
+	public ArrayList<EventInfo> getChildEventsInfo(ILogEvent _event)
 	{
 		//check if event is a method call
 		if(isMethodCall(_event))
@@ -254,7 +273,7 @@ public class EventUtils {
 			MethodCallEvent callEvent = (MethodCallEvent)_event;
 			IEventBrowser childBrowser = callEvent.getChildrenBrowser();
 
-			ArrayList<Object[]> eventInfo = new ArrayList<Object[]>();
+			ArrayList<EventInfo> eventInfo = new ArrayList<EventInfo>();
 			
 			childBrowser.setNextTimestamp(_event.getTimestamp());
 			while(childBrowser.hasNext())
@@ -262,16 +281,26 @@ public class EventUtils {
 				//get child event
 				ILogEvent childEvent = childBrowser.next();
 				
-				Object[] info = new Object[3];
+//				Object[] info = new Object[3];
+//				
+//				info[0] = childEvent.getTimestamp();
+//				
+//				if(isMethodCall(childEvent))
+//					info[1] = getMethodName(childEvent);
+//				else
+//					info[1] = getWriteEventVarName(childEvent);
+//				
+//				info[2] = getWriteEventValue(childEvent);
 				
-				info[0] = childEvent.getTimestamp();
+				EventInfo info = new EventInfo(childEvent.getTimestamp(), getLineNum(childEvent));
 				
 				if(isMethodCall(childEvent))
-					info[1] = getMethodName(childEvent);
+					info.setMethodName(getMethodName(childEvent));
 				else
-					info[1] = getWriteEventVarName(childEvent);
-				
-				info[2] = getWriteEventValue(childEvent);
+				{
+					info.setVarName(getWriteEventVarName(childEvent));
+					info.setWriteValue(getWriteEventValue(childEvent));
+				}
 				
 				eventInfo.add(info);
 			}

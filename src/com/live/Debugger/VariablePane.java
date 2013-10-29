@@ -8,7 +8,6 @@ import java.util.TreeMap;
 
 import com.sun.org.apache.bcel.internal.classfile.LocalVariable;
 
-import tod.core.database.event.ILogEvent;
 import tod.core.database.structure.IStructureDatabase.LocalVariableInfo;
 
 import javafx.geometry.Insets;
@@ -33,7 +32,7 @@ public class VariablePane extends VBox{
 	private TreeMap<String, Integer> variableMap;
 	
 
-	public VariablePane(String _methodName, int _iteration, ILogEvent _event, ArrayList<Object[]> _childEventsInfo){
+	public VariablePane(String _methodName, int _iteration, ArrayList<EventInfo> _childEventsInfo){
 		
 		methodName = _methodName;
 		iteration = _iteration;
@@ -52,24 +51,24 @@ public class VariablePane extends VBox{
 
 
 
-	private void populateGrid(ArrayList<Object[]> _childEventsInfo) {
-		for(Object[] eventInfo : _childEventsInfo)
+	private void populateGrid(ArrayList<EventInfo> _childEventsInfo) {
+		for(EventInfo eventInfo : _childEventsInfo)
 		{
 			//is a write event with variable value
 			//object[1] contains the variable / method name of the child events
-			if(eventInfo[2] != null)
+			if(eventInfo.getWriteValue() != null)
 			{
 				//if we have not created the corresponding element for grid variable
-				if(variableMap.get(eventInfo[1]) == null)
+				if(variableMap.get(eventInfo.getVarName()) == null)
 				{
 					//create it and add it to the variable Pane
 					
 					//create value pair, timestamp : var value
-					valuePair<Long, String> varValue = new valuePair<Long, String>((long)eventInfo[0], (String) eventInfo[2]);
+					valuePair<Long, String> varValue = new valuePair<Long, String>((long)eventInfo.getTimestamp(), (String) eventInfo.getWriteValue());
 					ComboBox<valuePair<Long, String>> valueBox = new ComboBox<valuePair<Long, String>>();
 					valueBox.getItems().add(varValue);
 					
-					Label varNameLabel = new Label(eventInfo[1].toString());
+					Label varNameLabel = new Label(eventInfo.getVarName().toString());
 					
 					valueBox.setScaleX(1);
 			        valueBox.setScaleY(1);
@@ -82,15 +81,15 @@ public class VariablePane extends VBox{
 					grid.add(valueBox, 1, row);
 					
 					//store the index of the variable label element, combobox element index will be idx + 1
-					variableMap.put(eventInfo[1].toString(), grid.getChildren().size() - 2);
+					variableMap.put(eventInfo.getVarName(), grid.getChildren().size() - 2);
 					
 				}else //get the corresponding combo box and add the value
 				{
 					//get the index of the label element
-					int index = variableMap.get(eventInfo[1]);
+					int index = variableMap.get(eventInfo.getVarName());
 					ComboBox<valuePair<Long, String>> valueBox = (ComboBox<valuePair<Long, String>>) grid.getChildren().get(index + 1);
 					
-					valuePair<Long, String> varValue = new valuePair<Long, String>((long)eventInfo[0], (String) eventInfo[2]);
+					valuePair<Long, String> varValue = new valuePair<Long, String>((long)eventInfo.getTimestamp(), (String) eventInfo.getWriteValue());
 					valueBox.getItems().add(varValue);
 				}
 			}
@@ -142,7 +141,7 @@ public class VariablePane extends VBox{
 	
 	public VariablePane highlightVariableValue(String _varName, long _timestamp) {
 
-		removeGridStyles(grid);
+		removeGridStyles();
 		
 		if(_varName != null && variableMap.containsKey(_varName))
 		{
@@ -166,14 +165,14 @@ public class VariablePane extends VBox{
 	}
 	
 	//grid method is used to change the style of grid pane
-	private void removeGridStyles(GridPane gp){
-		for(int i=3;i<gp.getChildren().size();i=i+2){
-			Label label=(Label)gp.getChildren().get(i);
-			ComboBox cb=(ComboBox)gp.getChildren().get(i+1);
+	public void removeGridStyles(){
+		for(int i=3;i<grid.getChildren().size();i=i+2){
+			Label label=(Label)grid.getChildren().get(i);
+			ComboBox cb=(ComboBox)grid.getChildren().get(i+1);
 			label.setTextFill(Color.web("#000000"));
 			cb.setStyle("-fx-font-size: 10px");
-			gp.getChildren().set(i,label);
-			gp.getChildren().set(i+1,cb);
+			grid.getChildren().set(i,label);
+			grid.getChildren().set(i+1,cb);
 		}
 	}
 	

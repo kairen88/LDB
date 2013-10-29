@@ -37,6 +37,7 @@ import tod.core.database.event.ICallerSideEvent;
 import tod.core.database.event.ILogEvent;
 import tod.core.database.structure.IBehaviorInfo;
 import tod.core.database.structure.ILocationInfo;
+import tod.core.database.structure.ObjectId;
 import tod.core.database.structure.IBehaviorInfo.BytecodeRole;
 import tod.core.database.structure.IStructureDatabase.LineNumberInfo;
 import tod.core.database.structure.IStructureDatabase.LocalVariableInfo;
@@ -99,11 +100,24 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+/**
+ * @author penguin
+ *
+ */
+/**
+ * @author penguin
+ *
+ */
+/**
+ * @author penguin
+ *
+ */
 public class liveDebugging extends Application {
 
-	private Parent root = null;
+	private static Parent root = null;
 	private static String[] _args;
 
 	int currentWindowIdx = 0;
@@ -111,37 +125,41 @@ public class liveDebugging extends Application {
 	Stack<CodeWindow> codeWindowStack;
 	Stack<timeline> timelineStack;
 	
-	CodeWindow currentCodeWindow;
-	CodeWindow prevCodeWindow;
+	static CodeWindow currentCodeWindow;
+	static CodeWindow prevCodeWindow;
 	
-	timeline currentTimeline;
-	timeline prevTimeline;	
+	static timeline currentTimeline;
+	static timeline prevTimeline;	
+	
+	VariablePane currentVar;
+	
+	static ArrayList<MethodInfo> methodList; // list of methods currently loaded, may have multiple instances of a method
 
 	
 	Pane codeWindowAreaNew;
-	Pane codeWindowArea=new Pane ();
+	static Pane codeWindowArea=new Pane ();
 
-	EventUtils eventUtils;
-	CodeFragments codeFragments;
+	static EventUtils eventUtils;
+	static CodeFragments codeFragments;
 
 	int lineNumberOffset;
 	private HashMap displayedCodeWindowsList; //list of code windows currently displayed on screen
 	private ArrayList<CodeWindow> CodeWindowCallStack; //maintains a list that represents the call stack
 	
 	private TreeMap<String, HashMap> displayedTimelineList;//list of timelines displayed on screen, value = index of element in container (latest instance of a particular timeline)
-	Pane timelineSection=new Pane ();
+	static Pane timelineSection=new Pane ();
 
 	//timeline positions
 	double posX=37;
 	int posY=0;
-	Pane variablePane =new Pane();
+	static Pane variablePane =new Pane();
 
-	//for Highlighting
+	static //for Highlighting
 	CodeWindow mainCWH;
 	timeline mainTH;
 
 	ScrollPane s1 = new ScrollPane();
-	VariablePane gridPane; 
+	static VariablePane gridPane; 
 	RowConstraints rowinfo = new RowConstraints();	
 
 
@@ -168,6 +186,7 @@ public class liveDebugging extends Application {
 //		codeFragments = new CodeFragments(classPath, this, "sp");
 		
 		//initialize the variables
+		methodList = new ArrayList<MethodInfo>();
 		eventUtils = new EventUtils();
 		currentCodeWindow = null;
 		prevCodeWindow = null;
@@ -183,18 +202,29 @@ public class liveDebugging extends Application {
 		//Initialize code window for "main" method
 		ILogEvent mainEvent = getMainMethodEvent();
 		createMainWindow("main");
+		
+		//highlight gutters
+		highlightGutters(mainEvent);
 
 		//setting the 1st and last event of "main"		
 		MethodCallEvent mEvent = (MethodCallEvent)(mainEvent);
 		IEventBrowser browser = mEvent.getChildrenBrowser();
-		eventUtils.setFirstTimestamp(browser.getFirstTimestamp());
-		eventUtils.setLastTimestamp(browser.getLastTimestamp());
+		long firstTimestamp = browser.getFirstTimestamp();
+		long lastTimestamp = browser.getLastTimestamp();
+		
+		eventUtils.setFirstTimestamp(firstTimestamp);
+		eventUtils.setLastTimestamp(lastTimestamp);
+		
+		currentCodeWindow.setFirstTimestamp(firstTimestamp);
+		currentCodeWindow.setLastTimestamp(lastTimestamp);
+		
+		methodList.add(new MethodInfo(firstTimestamp, lastTimestamp, -1, -1, "main", "", 0, 0));
 		
 		
 		//initialize variable pane window
 		variablePane = (Pane) getRootAnchorPane().lookup("#VariablePane");
-		ArrayList<Object[]> childEventsInfo = eventUtils.getChildEventsInfo(mainEvent);
-		gridPane = currentCodeWindow.getGridPane(mainEvent, childEventsInfo);
+		ArrayList<EventInfo> childEventsInfo = eventUtils.getChildEventsInfo(mainEvent);
+		gridPane = currentCodeWindow.getGridPane(childEventsInfo);
         variablePane.getChildren().add(gridPane);
 
         //initializing timeline section
@@ -235,7 +265,7 @@ public class liveDebugging extends Application {
 		primaryStage.show();
 	}
 
-	private AnchorPane getRootAnchorPane() {
+	private static AnchorPane getRootAnchorPane() {
 		AnchorPane pane = (AnchorPane) root.lookup("#AnchorPane");
 		return pane;
 	}
@@ -284,7 +314,7 @@ public class liveDebugging extends Application {
 	}
 	
 	//This method is used to highlight gutters in the editor
-	private void highlightGutters(ILogEvent event){
+	private static void highlightGutters(ILogEvent event){
 		ArrayList<Integer> lineNumbers =eventUtils.getExecutedLineNumers(event);
 		currentCodeWindow.highlightGutters(lineNumbers, codeFragments.getLineNumberOffset(currentCodeWindow.getMethodName()) );
 		
@@ -536,7 +566,7 @@ public class liveDebugging extends Application {
 	}
 	
 	//calculate the position of code fragment window at x axis
-	private int calculateWindowX(CodeWindow cd) {
+	private static int calculateWindowX(CodeWindow cd) {
 		CodeEditor ed= cd.getEditor();
 		if(!ed.isReduced()){
 			return	(int)cd.getLayoutX()+630;
@@ -545,7 +575,7 @@ public class liveDebugging extends Application {
 	}
 	
 	//calculate the position of code fragment window at y axis
-	private int calculateWindowY(CodeWindow cd,int linenum) {
+	private static int calculateWindowY(CodeWindow cd,int linenum) {
 		// TODO Auto-generated method stub
 		CodeEditor ed = cd.getEditor();
 //		if(!ed.isReduced()){
@@ -556,7 +586,7 @@ public class liveDebugging extends Application {
 
 	}
 	//elocate all the existing added arrows and code fragment windows over the screen
-	public void reposition(){
+	static public void reposition(){
 		
 		//set main to the top left corner of the area
 		CodeWindow cd=(CodeWindow)codeWindowArea.getChildren().get(0);
@@ -809,7 +839,7 @@ public class liveDebugging extends Application {
 					}
 				}
 				
-				ArrayList<Object[]> childEventsInfo = null;
+				ArrayList<EventInfo> childEventsInfo = null;
 				if(!timelineExists) //else create new timeline
 				{
 					childEventsInfo = eventUtils.getChildEventsInfo(nextEvent);
@@ -839,13 +869,33 @@ public class liveDebugging extends Application {
 
 				//initialize grid
 				if(childEventsInfo != null)
-					gridPane=currentCodeWindow.getGridPane(nextEvent, childEventsInfo);
+					gridPane=currentCodeWindow.getGridPane(childEventsInfo);
 				else
 					gridPane=currentCodeWindow.getGridPane();
 				variablePane.getChildren().set(0,gridPane);
 				
 				highlightGutters(nextEvent);
-				reposition();				
+				reposition();	
+				
+				//-------------------------------------------------------------------just doing this to get method info for now
+				MethodCallEvent methodCall = (MethodCallEvent) nextEvent;
+				IEventBrowser browser = methodCall.getChildrenBrowser();
+				
+				MethodCallEvent parent = (MethodCallEvent) nextEvent.getParent();
+				IEventBrowser parentBrowser = parent.getChildrenBrowser();
+				
+				MethodInfo methodInfo = new MethodInfo(browser.getFirstTimestamp(), browser.getLastTimestamp(), 
+						parent.getFirstTimestamp(), parentBrowser.getLastTimestamp(), 
+						methodName, eventUtils.getMethodName(parent), 
+						timelineSection.getChildren().size() - 1, (int)(displayedCodeWindowsList.get(methodName)) );
+				
+				MethodInfo parentInfo = findMethod(curEvent, prevCodeWindow.getMethodName(), curEvent.getTimestamp());
+				parentInfo.addChild(methodInfo);
+				
+				methodList.add(methodInfo);
+				
+				//------------------------------------------------------setting timstamp for codewindow
+				currentCodeWindow.setFirstTimestamp(browser.getFirstTimestamp());
 			} 
 		}
 //-----------------------------------------------------------Case: Go To Next Line-----------------------------------------------		
@@ -906,21 +956,26 @@ public class liveDebugging extends Application {
 		nextBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				ILogEvent curEvent = eventUtils.getCurrentEvent();
+//				ILogEvent curEvent = eventUtils.getCurrentEvent();
+//				
+//				if(curEvent.getTimestamp() >= eventUtils.getLastTimestamp() - 1)//just tweaking this condition to make it work, not sure why timestamp is wrong
+//				{
+//					new Dialogue("Reached last event", "OK").show();
+//					return;
+//				}
+//
+//				// step forward and get next event
+//				ILogEvent nextEvent = eventUtils.forwardStepInto();
+//				
+//				if (nextEvent != null) 					
+//					processNextLine(curEvent, nextEvent);
+//				else
+//					new Dialogue("Reached last event", "OK").show();
 				
-				if(curEvent.getTimestamp() >= eventUtils.getLastTimestamp() - 1)//just tweaking this condition to make it work, not sure why timestamp is wrong
-				{
-					new Dialogue("Reached last event", "OK").show();
-					return;
-				}
-
-				// step forward and get next event
+				
+				
 				ILogEvent nextEvent = eventUtils.forwardStepInto();
-				
-				if (nextEvent != null) 					
-					processNextLine(curEvent, nextEvent);
-				else
-					new Dialogue("Reached last event", "OK").show();
+				naviTo(nextEvent.getTimestamp());
 			}
 		});
 		
@@ -1056,14 +1111,14 @@ public class liveDebugging extends Application {
 
 	// get a list of child events timestamps
 	//creates a tick for each event and returns a timeline object
-	private timeline createTimeLine(ILogEvent curEvent,ILogEvent nextEvent, ArrayList<Object[]> childEventsInfo) {
+	private timeline createTimeLine(ILogEvent curEvent,ILogEvent nextEvent, ArrayList<EventInfo> childEventsInfo) {
 
 //		ArrayList<Long> childEventsTimestamps = eventUtils.getChildEventTimestamps(nextEvent);
 //		ArrayList<Object[]> childEventsInfo = eventUtils.getChildEventsInfo(nextEvent);
 		
-		ArrayList<Long> childEventsTimestamps = new ArrayList<Long>();
-		for(Object[] info : childEventsInfo)
-			childEventsTimestamps.add((Long) info[0]);
+//		ArrayList<Long> childEventsTimestamps = new ArrayList<Long>();
+//		for(EventInfo info : childEventsInfo)
+//			childEventsTimestamps.add((Long) info.getTimestamp());
 		
 		String parentMethodName = eventUtils.getMethodName(curEvent);
 		String newMethodName = eventUtils.getMethodName(nextEvent);
@@ -1074,7 +1129,7 @@ public class liveDebugging extends Application {
 			if(parentMethodName == null)
 					parentMethodName = eventUtils.getMethodName(curEvent.getParent());
 		
-		timeline timeline = new timeline(childEventsTimestamps, newMethodName, CodeWindowCallStack, nextEvent.getTimestamp());
+		timeline timeline = new timeline(childEventsInfo, newMethodName);
 
 		long parentTimestamp = 2671896418426L;
 		if(curEvent != null)
@@ -1129,6 +1184,343 @@ public class liveDebugging extends Application {
 	{
 		for(CodeWindow codeWin : CodeWindowCallStack)
 			System.out.println(codeWin.getMethodName() + "\n");
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * navigate to the execution of an event give event and timestamp
+	 * sets timeline, codewindow area and variable pane
+	 * @param event
+	 * @param _timestamp
+	 */
+	static public void naviTo(long _timestamp)
+	{
+		ILogEvent event = eventUtils.getEventFromTimestamp(_timestamp);
+		String parentMethodName = eventUtils.getMethodName(event.getParent());
+		//if method name is null, we get the name of the parent method
+		if(parentMethodName == null)
+			parentMethodName = eventUtils.getMethodName(event.getParent());
+		MethodInfo method = findMethod(event, parentMethodName, _timestamp);
+		
+		// we found the method, 
+		if(method != null)
+		{
+			//is it the same as the current method
+			if(currentCodeWindow.getMethodName().compareToIgnoreCase(method.methodName()) == 0 &&
+					currentCodeWindow.firstTimestamp() <= method.FirstEventTimestamp())
+			{
+				//set timeline, returns line to be executed (raw, not corrected for codeWindow)
+				int rawLineNum = currentTimeline.setTick(_timestamp);
+				
+				//set current window
+				updateCurrentWindow(rawLineNum);
+				
+				//reset all highlight in variable pane
+				gridPane.removeGridStyles();
+				
+				//check if it is a write event
+				if(eventUtils.isWriteEvent(event))
+					writeEvent(event, _timestamp, rawLineNum);
+				else if(!codeFragments.codeFragmentExist(eventUtils.getMethodName(event)))//else is it a system method call
+					systemMethodCall(event);
+			
+			}else //is a different method that exists
+			{
+				setOldPreviousInactive();
+				
+				//set current codeWindow to inactive (Grey)
+				setCurrentMethodInactive();
+				
+				//set next codeWindow to active (green)
+				setNextMethodActive(method);
+				
+				setPrevMethodPrev(method, event);
+				
+				//nav to the event
+				naviTo(_timestamp);
+			}
+		}
+		else //method (or method instance) does not exist, create new method
+		{
+			createNewMethod(parentMethodName, event, _timestamp);
+			//highlight gutters
+			highlightGutters(event.getParent());
+		}
+		
+		//update Event Stepper
+		eventUtils.setCurrentEvent(event);
+	}
+	
+	/**
+	 * iterate through the list of method instances
+		compare the start and end timestamp of each method to find the one this event belongs to
+	 * @param _timestamp
+	 * @return MethodInfo object, null if not found
+	 */
+	private static MethodInfo findMethod(ILogEvent _event, String _methodName, long _timestamp)
+	{			
+		MethodInfo method = null;		
+		
+		for(int i = 0; i < methodList.size(); i++)
+		{
+			MethodInfo mInfo = methodList.get(i);
+			
+			//check it is the correct method and correct instance of the method
+//			if(eventUtils.validTimestamp(_timestamp))
+				if(_methodName.compareToIgnoreCase(mInfo.methodName()) == 0)
+					if(mInfo.FirstEventTimestamp() - 5 <= _timestamp && mInfo.LastEventTimestamp() + 5 >= _timestamp) //i +/- 5 because the timestamp seems to be off by just 1 so use this fix for now
+					{
+						method = mInfo;
+						break;
+					}
+		}
+		
+		if(method == null)//if method it is a method call but a system call (code fragment does not exist)		
+			if(eventUtils.isMethodCall(_event) &&
+					!codeFragments.codeFragmentExist(_methodName))
+			{
+				ILogEvent parent = _event.getParent();
+				if(parent != null)
+					return findMethod(parent, eventUtils.getMethodName(parent), parent.getTimestamp());
+				else
+					return null;
+			}
+		
+		return method;
+	}
+	
+	private static void updateCurrentWindow(int _lineNum)
+	{
+		//clear all lines
+		currentCodeWindow.clearAllLineHighlights();
+		//highlight cur line
+		currentCodeWindow.setLineColorToCurrent2(_lineNum);
+		currentCodeWindow.setExecutedLine(_lineNum);
+		
+		currentCodeWindow.removeHighlightedSection();
+	}
+	
+	private static void setNextMethodActive(MethodInfo _method)
+	{
+		//get current method
+		CodeWindow newCodeWindow = (CodeWindow) codeWindowArea.getChildren().get(_method.getCodeWindowIdx());
+		
+		timeline newTimeline = (timeline) timelineSection.getChildren().get(_method.getTimelineIdx());
+		
+		//set as current
+		currentCodeWindow = newCodeWindow;
+		currentTimeline = newTimeline;
+		
+		if(currentCodeWindow != mainCWH)
+		{
+			//set background colour
+			currentCodeWindow.setBackgroundColorToCurrent();
+			currentTimeline.setColor("A3FF7F");
+		}
+		
+		//minimize tick
+		
+		//maxmize window
+		currentCodeWindow.normalWindowSize();		
+		
+		//set variable pane
+		gridPane = currentCodeWindow.getGridPane();
+		variablePane.getChildren().set(0,gridPane);
+		
+		//reset all highlights in variable pane
+		gridPane.removeGridStyles();
+	}
+	
+	private static void setCurrentMethodInactive()
+	{
+		if(currentCodeWindow != mainCWH)
+		{
+			//set background colour
+			currentCodeWindow.setBackgroundColorToInactive();
+			//timeline
+			currentTimeline.setColor("CCCCCC");
+			
+			//minimize window
+			currentCodeWindow.reduceWindowSize();
+		}	
+		//minimize all timeline children
+		
+		//minimize tick
+		currentTimeline.clearTick();
+		
+		//store variable pane
+		currentCodeWindow.setGridPane(gridPane);
+		
+		//stash as previous method
+		prevCodeWindow = currentCodeWindow;
+		prevTimeline = currentTimeline;
+		
+		
+	}
+	
+	private static void setPrevMethodPrev(MethodInfo _method, ILogEvent _event)
+	{
+		//check if it is a method return
+		//if previous method is a child of current method, it is a method return
+		boolean isMethodReturn = false;
+		ArrayList<MethodInfo> childMethodList = _method.getChildList();
+		for (int i = 0; i < childMethodList.size(); i++) {
+			if(prevCodeWindow.getMethodName().compareToIgnoreCase(childMethodList.get(i).methodName()) == 0)
+			{
+				isMethodReturn = true;
+				break;
+			}
+		}
+		
+		if(!isMethodReturn)
+		{
+			//find previous codeWindow
+//				MethodInfo curMethod = findMethod(event, methodName, _timestamp);
+			ILogEvent parentEvent = _event.getParent();
+			MethodInfo previousMethod = findMethod(parentEvent, _method.getParentName(), _method.ParentMethodfirstTimestamp());
+			
+		
+			//set previous codeWindow as prev (yellow)
+			if(previousMethod != null)
+			{
+				//get previous method
+				prevCodeWindow= (CodeWindow) codeWindowArea.getChildren().get(previousMethod.getCodeWindowIdx());					
+				prevTimeline = (timeline) timelineSection.getChildren().get(previousMethod.getTimelineIdx());
+			}
+		}
+		
+		if(prevCodeWindow != mainCWH)
+		{
+			//set background colour
+			prevCodeWindow.setBackgroundColorToPrevious();
+			prevTimeline.setColor("FFFB78");
+		}	
+			//maxmize window
+		prevCodeWindow.normalWindowSize();	
+		
+		prevTimeline.clearTick();
+		
+	}
+	
+	private static void setOldPreviousInactive()
+	{
+		if(prevCodeWindow == null)
+			return;
+		
+		if(prevCodeWindow != mainCWH)
+		{
+			//set old previous to inactive
+			prevCodeWindow.setBackgroundColorToInactive();
+			prevTimeline.setColor("CCCCCC");
+			
+			prevCodeWindow.reduceWindowSize();	
+		}
+		prevTimeline.clearTick();
+	}
+	
+	private static void systemMethodCall(ILogEvent _event)
+	{
+		if(_event instanceof MethodCallEvent)
+		{
+			MethodCallEvent methodCall = (MethodCallEvent) _event;
+			ObjectId theObjectId = (ObjectId) methodCall.getArguments()[0];
+			ILogBrowser browser = eventUtils.getLogBrowser();
+			Object theRegistered = browser.getRegistered(theObjectId);
+			String value = null;
+			if (theRegistered != null) 
+				value = theRegistered.toString();
+			
+			Label console = (Label) getRootAnchorPane().lookup("#Console");
+			console.setText(console.getText().concat(value));
+			console.setPrefHeight(50);
+		}
+	}
+	
+	private static void writeEvent(ILogEvent _event, long _timestamp, int _linNum)
+	{
+			String varName= eventUtils.getWriteEventVarName(_event);			
+			String varValue=eventUtils.getWriteEventValue(_event);
+		
+			gridPane = currentCodeWindow.getGridPane().highlightVariableValue(varName, _timestamp);
+			currentCodeWindow.removeHighlightedSection();
+			currentCodeWindow.highlightSection2(_linNum, varName);		
+	}
+	
+	private static void createNewMethod(String _methodName, ILogEvent _event, long _timestamp)
+	{
+		//create the new codeWindow
+		CodeWindow newCodeWindow = codeFragments.createCodeWindow(_methodName);
+		//add new window to codeWindow area
+		codeWindowArea.getChildren().add(newCodeWindow);
+		//add arrow from current window to new window
+		Arrow arrowNew = new Arrow(currentCodeWindow, newCodeWindow);
+		codeWindowArea.getChildren().add(arrowNew);
+		
+		//create new timeline
+		ArrayList<EventInfo> childEventsInfo = eventUtils.getChildEventsInfo(_event.getParent());
+		timeline newTimeline = new timeline(childEventsInfo, _methodName);
+		//add timeline to area
+		timelineSection.getChildren().add(newTimeline);
+		//need to handle reducing child timelines
+		
+		
+		
+		//create new variable pane
+		newCodeWindow.getGridPane(childEventsInfo);
+		
+		//create it's method info
+		//since this is the 1st event in the new method, we need to get the parent event which is the method call
+		MethodCallEvent methodCall = (MethodCallEvent) _event.getParent();
+		IEventBrowser browser = methodCall.getChildrenBrowser();
+		ILogEvent parent = _event.getParent();
+			
+		//the current codeWindow will be come the parent of the new method
+		MethodInfo methodInfo = new MethodInfo(browser.getFirstTimestamp(), browser.getLastTimestamp(), 
+				currentCodeWindow.firstTimestamp(), currentCodeWindow.lastTimestamp(), 
+				_methodName, currentCodeWindow.getMethodName(), 
+				timelineSection.getChildren().size() - 1, codeWindowArea.getChildren().size() - 2); //-2 since we added the arrow after codewindow
+		
+		MethodInfo parentInfo = findMethod(parent, currentCodeWindow.getMethodName(), parent.getTimestamp());
+		parentInfo.addChild(methodInfo);
+		
+		methodList.add(methodInfo);
+		//store method info
+		
+		newCodeWindow.setFirstTimestamp(browser.getFirstTimestamp());
+		newCodeWindow.setLastTimestamp(browser.getLastTimestamp());
+		
+		//position codewindow
+		int cwX = calculateWindowX(currentCodeWindow);
+		int cwY = calculateWindowY(currentCodeWindow, currentCodeWindow.getCurrentExecutionLine());
+		
+		newCodeWindow.relocate(cwX, cwY);
+		//set the x and y property of the parent DraggableNode class
+		newCodeWindow.getDraggableX().set(cwX);
+		newCodeWindow.getDraggableY().set(cwY);
+		
+		//position timeline
+		//if timeline area empty - we are adding main
+		if(timelineSection.getChildren().size() == 0)
+			newTimeline.relocate(5, 5);
+		else
+		{
+			//find parent timeline location
+			int tX = (int) currentTimeline.getLayoutX();
+			int tY = (int) currentTimeline.getLayoutY();
+			//calculate timeline offset
+			tX = tX + currentTimeline.getValue() * (5 + 3 + 5);
+			
+			if(timelineSection.getChildren().size() == 1) //if previous timeline is main, we reduce y offset (main has no tail)
+				tY = tY + 20;
+			else
+				tY = tY + 34;
+			//reposition
+			newTimeline.relocate(tX, tY);
+		}
+		
+		//call naviTo - takes care of highlighting
+		naviTo(_timestamp);
 	}
 
 }
