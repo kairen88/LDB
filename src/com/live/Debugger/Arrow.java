@@ -25,7 +25,7 @@ public class Arrow extends Group{
 		endMethodName = endWindow.getMethodName();
 		
 //		IntegerBinding lineNumber = startWindow.selectedLineNumber.add(1);
-		int lineNumber = startWindow.selectedLineNumber.getValue() + 1;
+		int lineNumber = startWindow.getExecutedLine() + 1;
 		
 //		lineNumber.add(startWindow.getEditor().selectedLineNumber.add(1));
 		

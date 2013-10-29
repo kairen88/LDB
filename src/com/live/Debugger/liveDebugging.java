@@ -569,7 +569,7 @@ public class liveDebugging extends Application {
 	private static int calculateWindowX(CodeWindow cd) {
 		CodeEditor ed= cd.getEditor();
 		if(!ed.isReduced()){
-			return	(int)cd.getLayoutX()+630;
+			return	(int)cd.getLayoutX() + 630;
 		}else
 			return (int)(cd.getLayoutX()+ cd.getWindowWidth() +80);
 	}
@@ -579,7 +579,7 @@ public class liveDebugging extends Application {
 		// TODO Auto-generated method stub
 		CodeEditor ed = cd.getEditor();
 //		if(!ed.isReduced()){
-		return (int)cd.getLayoutY()+(linenum+1)*cd.lineoffset.getValue() + 30;
+		return (int)cd.getLayoutY() + (linenum+1)*cd.lineoffset.getValue() + 30;
 //		}
 //		else
 //			return (int)(cd.getLayoutY()+ ed.getHeight() + 80);//(int)(((int)ed.getLayoutY()+ed.getHeight()));//(linenum+1)*9)*0.3);

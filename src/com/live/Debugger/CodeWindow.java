@@ -481,7 +481,7 @@ public void setCodeWindowContainer(DraggableNode e){
 	
 	public void clearAllLineHighlights()
 	{
-		int numOfLines = endLine - startLine + 1;
+		int numOfLines = endLine - startLine - 1;
 //		for(int i = 0; i < numOfLines; i++)
 //			setLineColorToPrevious(i);
 		runScriptOnWebForm("for(var i = 0; i < "+numOfLines+"; i++) {editor.setLineClass(i, null, 'completedLine');}");
@@ -537,7 +537,7 @@ public void setCodeWindowContainer(DraggableNode e){
 	//sets current execution line
 	public void setCurrentExecutionLine(int newLineNum)
 	{
-		this.currentExecutionLine = newLineNum ;
+		this.currentExecutionLine = newLineNum  - startLine - 1;
 	}
 	
 	//increment the current execution line by 1
@@ -793,7 +793,7 @@ public void setCodeWindowContainer(DraggableNode e){
 	}
 	public void setExecutedLine(int _line)
 	{
-		currentExecutionLine = _line;
+		currentExecutionLine = _line - startLine - 1 ;
 	}
 	public int getSelectedLineNumber() {
 		return selectedLineNumber.get();
