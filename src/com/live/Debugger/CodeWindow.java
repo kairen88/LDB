@@ -671,6 +671,7 @@ public void setCodeWindowContainer(DraggableNode e){
 		pinBtn.setMinSize(20, 15);
 		pinBtn.setMaxSize(20, 15);
 		
+		final CodeWindow cw = this;
 		//imageView.setOnAction(new EventHandler<ActionEvent>() {
 		    imageView.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
@@ -685,15 +686,18 @@ public void setCodeWindowContainer(DraggableNode e){
                 		//status="cannotReduce";
                 		reduceWindowSize();
                 			
-                    	liveDebugging.reposition();
+//                    	liveDebugging.reposition();
+                		liveDebugging.repositionOnMinimize(cw);
                 	}
                 	else{
-                	//status="canReduce";
-                	img=new ImageView(minus);
-                	imageView=img;
-                	//pinBtn.setGraphic(img);
-                	normalWindowSize();
-                	liveDebugging.reposition();
+	                	//status="canReduce";
+	                	img=new ImageView(minus);
+	                	imageView=img;
+	                	//pinBtn.setGraphic(img);
+	                	normalWindowSize();
+//	                	liveDebugging.reposition();
+	                	liveDebugging.repositionOnMaximise(cw);
+	                	
                 	}
                 }
             });

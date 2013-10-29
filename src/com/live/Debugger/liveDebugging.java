@@ -585,6 +585,52 @@ public class liveDebugging extends Application {
 //			return (int)(cd.getLayoutY()+ ed.getHeight() + 80);//(int)(((int)ed.getLayoutY()+ed.getHeight()));//(linenum+1)*9)*0.3);
 
 	}
+	
+	static public void repositionOnMinimize(CodeWindow _codeWindow)
+	{
+		//get the x and y we want to shift the windows by
+		double diffX =  600 * (70.0 / 100); //currently we reduce width by 30% when we minimize
+		double  diffY = _codeWindow.getWindowHeight() * (70.0 / 100.0);
+		
+		MethodInfo method = findMethod(null, _codeWindow.getMethodName(), _codeWindow.firstTimestamp());
+		
+		repositionReurse(-diffX, -diffY, method);// -diff to remove distance we minimized
+	}
+	
+	static public void repositionOnMaximise(CodeWindow _codeWindow)
+	{
+		//get the x and y we want to shift the windows by
+		double diffX =  600 * (70.0 / 100); //currently we reduce width by 30% when we minimize
+		double  diffY = _codeWindow.getWindowHeight() * (30.0 / 70.0); //we reduce the orginal height by 30%, diff = 70%. from current height we want to get diff
+		
+		MethodInfo method = findMethod(null, _codeWindow.getMethodName(), _codeWindow.firstTimestamp());
+		
+		repositionReurse(diffX, diffY, method);// -diff to remove distance we minimized
+	}
+	
+	static private void repositionReurse(double _x, double _y, MethodInfo _method)
+	{
+		//get child methods
+		ArrayList<MethodInfo> childMethods = _method.getChildList();
+		
+		for(MethodInfo child : childMethods)
+		{		
+			//reposition all child method windows
+			CodeWindow codeWin = (CodeWindow) codeWindowArea.getChildren().get(child.getCodeWindowIdx());
+			
+			double x = codeWin.getLayoutX() + _x;
+			double y = codeWin.getLayoutY() + _y;
+			
+			codeWin.relocate(x, y);
+			codeWin.getDraggableX().set(x);
+			codeWin.getDraggableY().set(y);
+			
+			//recurse
+			repositionReurse(_x, _y, child);
+		}
+	}
+	
+	
 	//elocate all the existing added arrows and code fragment windows over the screen
 	static public void reposition(){
 		
@@ -1279,7 +1325,7 @@ public class liveDebugging extends Application {
 					}
 		}
 		
-		if(method == null)//if method it is a method call but a system call (code fragment does not exist)		
+		if(method == null && _event != null)//if method it is a method call but a system call (code fragment does not exist)		
 			if(eventUtils.isMethodCall(_event) &&
 					!codeFragments.codeFragmentExist(_methodName))
 			{
