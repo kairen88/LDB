@@ -982,63 +982,66 @@ public class liveDebugging extends Application {
 		stepOverNextBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				ILogEvent curEvent = eventUtils.getCurrentEvent();
-				
-				if(curEvent.getTimestamp() >= eventUtils.getLastTimestamp() - 1)//just tweaking this condition to make it work, not sure why timestamp is wrong
-				{
-					new Dialogue("Reached last event", "OK").show();
-					return;
-				}
+//				ILogEvent curEvent = eventUtils.getCurrentEvent();
+//				
+//				if(curEvent.getTimestamp() >= eventUtils.getLastTimestamp() - 1)//just tweaking this condition to make it work, not sure why timestamp is wrong
+//				{
+//					new Dialogue("Reached last event", "OK").show();
+//					return;
+//				}
 
 				// step forward and get next event
 				ILogEvent nextEvent = eventUtils.forwardStepOver();
+				naviTo(nextEvent.getTimestamp());
 				
-				if (nextEvent != null) 					
-					processNextLine(curEvent, nextEvent);
-				else
-					new Dialogue("Reached last event", "OK").show();
+//				if (nextEvent != null) 					
+//					processNextLine(curEvent, nextEvent);
+//				else
+//					new Dialogue("Reached last event", "OK").show();
 			}
 		});
 
 		previousBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				ILogEvent curEvent = eventUtils.getCurrentEvent();
-				
-				if(curEvent.getTimestamp() <= eventUtils.getFirstTimestamp())
-				{
-					new Dialogue("Reached last event", "OK").show();
-					return;
-				}
+//				ILogEvent curEvent = eventUtils.getCurrentEvent();
+//				
+//				if(curEvent.getTimestamp() <= eventUtils.getFirstTimestamp())
+//				{
+//					new Dialogue("Reached last event", "OK").show();
+//					return;
+//				}
 
 				// step backward and the the previous event
 				ILogEvent prevEvent = eventUtils.backwardStepInto();
+				naviTo(prevEvent.getTimestamp());
 				
-				if (prevEvent != null)
-					processPrevious(curEvent, prevEvent);
-				else
-					new Dialogue("Reached last event", "OK").show();
+//				if (prevEvent != null)
+//					processPrevious(curEvent, prevEvent);
+//				else
+//					new Dialogue("Reached last event", "OK").show();
 			}
 		});
 		
 		stepOverPreviousBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				ILogEvent curEvent = eventUtils.getCurrentEvent();
-				
-				if(curEvent.getTimestamp() <= eventUtils.getFirstTimestamp())
-				{
-					new Dialogue("Reached last event", "OK").show();
-					return;
-				}
+//				ILogEvent curEvent = eventUtils.getCurrentEvent();
+//				
+//				if(curEvent.getTimestamp() <= eventUtils.getFirstTimestamp())
+//				{
+//					new Dialogue("Reached last event", "OK").show();
+//					return;
+//				}
 
 				// step backward and the the previous event
 				ILogEvent prevEvent = eventUtils.backwardStepOver();
+				naviTo(prevEvent.getTimestamp());
 				
-				if (prevEvent != null)
-					processPrevious(curEvent, prevEvent);
-				else
-					new Dialogue("Reached last event", "OK").show();
+//				if (prevEvent != null)
+//					processPrevious(curEvent, prevEvent);
+//				else
+//					new Dialogue("Reached last event", "OK").show();
 			}
 		});
 
