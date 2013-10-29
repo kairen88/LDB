@@ -805,6 +805,13 @@ public void setCodeWindowContainer(DraggableNode e){
 	public void setSelectedLineNumber(int selectedLineNumber) {
 		this.selectedLineNumber.setValue(selectedLineNumber);
 	}
+	public void selectLine(int lineNum)
+	{
+		runScriptOnWebForm("var linenum = " + (lineNum - startLine - 1) +";"+
+				"var start = {line:linenum,ch:0};" +
+				"var end = {line:linenum, ch:800};" +
+				"editor.setSelection(start, end);");
+	}
 
 	public void setGridPane(VariablePane gridPane) {
 		gridPaneList.set((int)iterationBox.getValue()-1,gridPane);

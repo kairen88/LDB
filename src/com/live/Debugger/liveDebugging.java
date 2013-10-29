@@ -323,6 +323,7 @@ public class liveDebugging extends Application {
 			s1.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 			s1.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 			s1.setContent(codeWindowArea);
+			s1.setPannable(true);
 			codeWindowAreaNew.getChildren().add(s1);
 			displayedCodeWindowsList.put(methodName, 0);
 			
@@ -345,6 +346,15 @@ public class liveDebugging extends Application {
 		long timestamp = event.getTimestamp();
 
 		currentTimeline.setTick(timestamp);
+	}
+	
+	static public void selectLineInCodeWindow(String _methodName, long _timestamp, int _lineNum)
+	{
+		MethodInfo methodInfo = findMethod(null, _methodName, _timestamp);
+		
+		CodeWindow codeWin = (CodeWindow) codeWindowArea.getChildren().get(methodInfo.getCodeWindowIdx());
+		
+		codeWin.selectLine(_lineNum);
 	}
 	
 	//This method is used to decrement the slider value by 1

@@ -150,7 +150,7 @@ public class timeline extends VBox{
 //		for(Long timestamp : timestamps)
 		{
 //			final tick tk = new tick(timestamp, tickList.size(), isReduced);
-			final tick tk = new tick(eventList.get(i).getTimestamp(), eventList.get(i).getLineNumber(), tickList.size(), isReduced);
+			final tick tk = new tick(methodName, eventList.get(i).getTimestamp(), eventList.get(i).getLineNumber(), tickList.size(), isReduced);
 			tickList.add(tk);
 			tk.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			   public void handle(MouseEvent arg0) {

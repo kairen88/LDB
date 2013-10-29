@@ -18,6 +18,7 @@ public class tick extends HBox{
 	private boolean isSelected;
 	private int positionIdx;
 	private int lineNumber; //raw line number NOT corrected to relative line number in codeWindow
+	private String methodName;
 	
 	private Rectangle tick;
 	private Rectangle spaceR;
@@ -44,11 +45,12 @@ public class tick extends HBox{
 	
 	
 	
-	public tick(long _timestamp, int _lineNum, int _positionIdx, SimpleIntegerProperty _isReduced)
+	public tick(String _methodName, long _timestamp, int _lineNum, int _positionIdx, SimpleIntegerProperty _isReduced)
 	{
 		timestamp = _timestamp;
 		positionIdx = _positionIdx;
 		lineNumber = _lineNum;
+		methodName = _methodName;
 
 		//create the rectagles for the tick, the left and right spaces
 		tick = new Rectangle(10,10,tickWidthInitial,tickHeightInitial);
@@ -82,6 +84,8 @@ public class tick extends HBox{
 					   setTickSizeToExpanded();
 					   System.out.println("mouse in, Timestamp: " + timestamp);
 					   System.out.println("position index: " + positionIdx);
+					   
+					   liveDebugging.selectLineInCodeWindow(methodName, timestamp, lineNumber);
 				   }
 			   }
 		});
@@ -95,6 +99,8 @@ public class tick extends HBox{
 					   //set height and width to initial values
 					   setTickSizeToInitial();
 					   System.out.println("mouse out");
+					   
+					   liveDebugging.selectLineInCodeWindow(methodName, timestamp, -1);
 				   }
 			   }
 		});
