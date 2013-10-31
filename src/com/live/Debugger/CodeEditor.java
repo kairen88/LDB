@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 
@@ -16,7 +17,7 @@ import javafx.scene.web.WebView;
  *
  * See http://codemirror.net for more information on using the codemirror editor.
  */
-public class CodeEditor extends StackPane {
+public class CodeEditor extends Pane {
   /** a webview used to encapsulate the CodeMirror JavaScript. */
   private boolean isReduced=false; 
   final WebView webview = new WebView();

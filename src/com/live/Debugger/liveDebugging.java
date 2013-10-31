@@ -259,18 +259,18 @@ public class liveDebugging extends Application {
 		mainCWH.setBackgroundColorToMain();
 		mainTH.setColor(color);
 		
-		 scrollTimer = new AnimationTimer() {
-	            @Override
-	            public void handle(long now) {
-	            	if(s1.getHvalue() == HscrollPosition)
-	            		this.stop();
-	            	if(s1.getHvalue() < HscrollPosition)
-	            		s1.setHvalue(s1.getHvalue() + 0.001);
-	            	else if(s1.getHvalue() > HscrollPosition)
-	            		s1.setHvalue(s1.getHvalue() - 0.001);
-	                
-	            }
-	        };
+//		 scrollTimer = new AnimationTimer() {
+//	            @Override
+//	            public void handle(long now) {
+//	            	if(s1.getHvalue() == HscrollPosition )//just so it's easier to reach this condition
+//	            		this.stop();
+//	            	if(s1.getHvalue() < HscrollPosition)
+//	            		s1.setHvalue(s1.getHvalue() + 0.01);
+//	            	else if(s1.getHvalue() > HscrollPosition)
+//	            		s1.setHvalue(s1.getHvalue() - 0.01);
+//	                
+//	            }
+//	        };
 		
 		initializeElementControl();
 
@@ -667,12 +667,12 @@ public class liveDebugging extends Application {
         double x = currentCodeWindow.getBoundsInParent().getMaxX() * 1.5;
         double y = currentCodeWindow.getBoundsInParent().getMaxY() * 1.5;
         
-        HscrollPosition = new BigDecimal(x / width).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();//to 2 sig figures
-        VscrollPosition = new BigDecimal(y / height).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        HscrollPosition = new BigDecimal(x / width).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue();//to 2 sig figures
+        VscrollPosition = new BigDecimal(y / height).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue();
         
         
         
-        scrollTimer.start();
+//        scrollTimer.start();
 
         // scrolling values range from 0 to 1
 //        s1.setVvalue(y/height);

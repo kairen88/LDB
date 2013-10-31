@@ -36,6 +36,16 @@
 		.CodeMirror-LineSection-highlight{
           background-color:rgba(0,255,0,0.5);
         }
+        
+        .Font1 {font-size: 3px !important;}
+        .Font2 {font-size: 5px !important;}
+        .Font3 {font-size: 7px !important;}
+        .Font4 {font-size: 9px !important;}
+        .Font5 {font-size: 10px !important;}
+        .Font6 {font-size: 12px !important;}
+        .Font7 {font-size: 14px !important;}
+        .Font8 {font-size: 18px !important;}
+        .Font9 {font-size: 20px !important;}
 	</style>
     <script>${jquery}</script>	
     <script>      

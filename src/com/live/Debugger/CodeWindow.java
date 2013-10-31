@@ -27,6 +27,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ComboBoxBuilder;
@@ -47,6 +48,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -55,6 +57,7 @@ public class CodeWindow extends DraggableNode{
 
 	private static String pinUnPressPath = CodeWindow.class.getResource("plus.png").toExternalForm();
     private static Image plus= new Image(pinUnPressPath);
+    private ResizeIcon icon;
 
 	private static String pinPressPath = CodeWindow.class.getResource("minus.png").toExternalForm();
     private static Image minus= new Image(pinPressPath);
@@ -269,9 +272,14 @@ public void setCodeWindowContainer(DraggableNode e){
 		this.windowHeight=(int)((this.windowHeight)*0.3);
 		this.windowWidth=(int)(this.windowWidth*0.3);
 		
-		this.cwBackground.setWidth(this.windowWidth+ 20);
-		this.cwBackground.setHeight(this.windowHeight+ 40);
+//		this.cwBackground.setWidth(this.windowWidth+ 20);
+//		this.cwBackground.setHeight(this.windowHeight+ 40);
+		icon.setWidth(this.windowWidth+ 20);
+		icon.setHeight(this.windowHeight+ 40);
 		
+		//relocate the position of the resize icon
+		icon.layoutXProperty().set(this.windowWidth+ 20);
+		icon.layoutYProperty().set(this.windowHeight+ 40);		
     
 		this.editor.webview.setPrefSize(this.windowWidth, this.windowHeight);
 		this.editor.webview.setMinSize(this.windowWidth, this.windowHeight);
@@ -320,20 +328,24 @@ public void setCodeWindowContainer(DraggableNode e){
 		this.windowHeight=(int)((this.windowHeight)/0.3);
 		this.windowWidth=600;
 		
-		this.cwBackground.setWidth(this.windowWidth+ 20);
-		this.cwBackground.setHeight(this.windowHeight+ 40);
+		icon.setWidth(600);
+		icon.setHeight((this.windowHeight)/0.3);
+
+		//can't set background width as it is bound so we set the resize value it is bound to
+		icon.setWidth(this.windowWidth+ 20);
+		icon.setHeight(this.windowHeight+ 40);
+		
+		//relocate the position of the resize icon
+		icon.layoutXProperty().set(this.windowWidth+ 20);
+		icon.layoutYProperty().set(this.windowHeight+ 40);
 		
     
 		this.editor.webview.setPrefSize(this.windowWidth, this.windowHeight);
 		this.editor.webview.setMinSize(this.windowWidth, this.windowHeight);
 		
 		this.lineoffset.setValue(9);
-		
-		//this.hbox.relocate(codeWindowContainer.getLayoutX()+510, codeWindowContainer.getLayoutY());  
-		//this.hbox.relocate(codeWindowContainer.getLayoutX()+5, codeWindowContainer.getLayoutY()+5);
-	
-		//((HBox)(this.hbox.getChildren().get(1))).relocate(codeWindowContainer.getDWidth()-25, codeWindowContainer.getLayoutY()+5);
-		runScriptOnWebForm("editor.normalWindowSize();");
+
+			runScriptOnWebForm("editor.normalWindowSize();");
 		this.editor.setReduced(false);
 
 		editor.webview.setPrefWidth(this.windowWidth);
@@ -344,21 +356,7 @@ public void setCodeWindowContainer(DraggableNode e){
 		
 		GridPane gp=((GridPane)(this.hbox.getChildren().get(0)));
 		gp.setPrefSize(this.windowWidth, 30);
-		//gp.setPadding(new Insets(18, 18, 18, 18));
 	        gp.setGridLinesVisible(false);
-	        /*RowConstraints rowinfo = new RowConstraints();
-	        rowinfo.setPercentHeight(30);
-	        
-	        ColumnConstraints colInfo1 = (ColumnConstraints)gp.getColumnConstraints().get(0);
-	        colInfo1.setPercentWidth(90);
-	 
-	        ColumnConstraints colInfo2 = (ColumnConstraints)gp.getColumnConstraints().get(0);
-	        colInfo2.setPercentWidth(10);
-	 
-	        gp.getRowConstraints().add(rowinfo);//2*50 percent
-	         //25 percent
-	        gp.getColumnConstraints().add(colInfo2); //30 percent
-	         */
 	        
 	        HBox labelHbox=(HBox)gp.getChildren().get(0);
 	        HBox infoHBox=(HBox)gp.getChildren().get(1);
@@ -598,6 +596,8 @@ public void setCodeWindowContainer(DraggableNode e){
 		codeWindowBackground.setFill(codeMirrorBackgroundColor);
 		codeWindowBackground.setArcHeight(15);
 		codeWindowBackground.setArcWidth(15);
+		codeWindowBackground.minHeight(windowHeight);
+		codeWindowBackground.minWidth(windowWidth);
 		return codeWindowBackground;
 	}
 	
@@ -737,6 +737,9 @@ public void setCodeWindowContainer(DraggableNode e){
         gp.getChildren().addAll(labelHbox, infoHBox);
         
         hbox.getChildren().addAll(gp);
+        
+        
+        
         this.getChildren().add(codeWindowBackground);
         this.getChildren().add(hbox);
 		hbox.relocate(this.getLayoutX()+5, this.getLayoutY()+5);
@@ -748,11 +751,79 @@ public void setCodeWindowContainer(DraggableNode e){
 		
 		//Group groupCont=new Group();
 		this.getChildren().add(editor);
+		
+		//adding icon to allow code window to be resized	
+		icon = createResizeIcon();
+		hbox.getChildren().add(icon);
+		icon.relocate(windowWidth, windowHeight);
 		 
 		this.setDSize(this.windowWidth, this.windowHeight);
 
 		//infoHBox.relocate(codeWindowContainer.getLayoutX()+490, codeWindowContainer.getLayoutY());
 
+	}
+	
+	private ResizeIcon createResizeIcon()
+	{
+		final ResizeIcon icon = new ResizeIcon(windowWidth, windowHeight);
+		this.getLostFocuProperty().bind(icon.getIsClickedPropert());
+		
+		cwBackground.widthProperty().bind(icon.getX());
+		cwBackground.heightProperty().bind(icon.getY());
+		
+		cwBackground.widthProperty().addListener(
+				new ChangeListener<Object>() {
+	                @Override
+	                public void changed(ObservableValue observable,
+	                                    Object oldValue, Object newValue) {
+	                	
+	                	icon.layoutXProperty().setValue((double) newValue);
+	                	
+	                	editor.webview.setPrefWidth((double) newValue - 20);
+	                	
+	                	double width = (double)newValue;
+	                	if(width > 400 && width < 900)
+	                	runScriptOnWebForm("$('.CodeMirror').removeClass('Font9')" +
+							                				".removeClass('Font8')" +
+							                				".removeClass('Font7')" +
+							                				".removeClass('Font6')" +
+							                				".removeClass('Font5')" +
+							                				".removeClass('Font4')" +
+							                				".removeClass('Font3')" +
+							                				".removeClass('Font2')" +
+							                				".removeClass('Font1')");	                	
+	                	
+	                	if(width > 400 && width < 450)
+		                		runScriptOnWebForm("$('.CodeMirror').addClass('Font1')");
+	                	else if(width > 450 && width < 500)
+		                		runScriptOnWebForm("$('.CodeMirror').addClass('Font2')");
+	                	else if(width > 500 && width < 550)
+		                		runScriptOnWebForm("$('.CodeMirror').addClass('Font3')");
+	                	else if(width > 550 && width < 600)
+		                		runScriptOnWebForm("$('.CodeMirror').addClass('Font4')");
+	                	else if(width > 650 && width < 700)
+		                		runScriptOnWebForm("$('.CodeMirror').addClass('Font5')");
+	                	else if(width > 700 && width < 750)
+		                		runScriptOnWebForm("$('.CodeMirror').addClass('Font6')");
+	                	else if(width > 750 && width < 800)
+		                		runScriptOnWebForm("$('.CodeMirror').addClass('Font7')");
+	                	else if(width > 800 && width < 850)
+		                		runScriptOnWebForm("$('.CodeMirror').addClass('Font8')");
+	                	else if(width > 850 && width < 900)
+		                		runScriptOnWebForm("$('.CodeMirror').addClass('Font9')");	                	
+	                }
+	            });
+		cwBackground.heightProperty().addListener(
+				new ChangeListener<Object>() {
+	                @Override
+	                public void changed(ObservableValue observable,
+	                                    Object oldValue, Object newValue) {
+	                	
+	                	editor.webview.setPrefHeight((double) newValue - 40);
+	                	icon.layoutYProperty().setValue((double) newValue);
+	                }
+	            });
+		return icon;
 	}
 	
 	private String getCodeFromFile(Path _editingCodePath)

@@ -1,6 +1,7 @@
 package com.live.Debugger;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -18,6 +19,8 @@ public class DraggableNode extends Group{
    //X AND Y position of mouse
    double mousex=0;
    double mousey=0;
+   
+   SimpleBooleanProperty lostFocus;
    
    int dwidth;
    int dheight;
@@ -42,6 +45,8 @@ public class DraggableNode extends Group{
    public DraggableNode(){
        super();
 
+       lostFocus = new SimpleBooleanProperty();
+       
        //EventListener for MousePressed
        onMousePressedProperty().set(new EventHandler<MouseEvent>(){
 
@@ -60,26 +65,27 @@ public class DraggableNode extends Group{
        onMouseDraggedProperty().set(new EventHandler<MouseEvent>(){
 
            public void handle(MouseEvent event) {
-               //Get the exact moved X and Y
-               x.setValue(x.get() + event.getSceneX()-mousex) ;
-               y.setValue(y.get() + event.getSceneY()-mousey) ;
-               
-//               System.out.println("Value of X = "+x.get());
-//               System.out.println("Value of Y = "+y.get());
-               
-              /* if(x>=0&&x<=640&&y<700&&y>=0){
-            	*/
-               
-               //set the positon of Node after calculation
-               setLayoutX(x.get());
-               setLayoutY(y.get());
-
-               //again set current Mouse x AND y position
-               mousex = event.getSceneX();
-               mousey= event.getSceneY();
-               //}
+        	   if(!lostFocus.getValue())
+        	   {
+	               //Get the exact moved X and Y
+	               x.setValue(x.get() + event.getSceneX()-mousex) ;
+	               y.setValue(y.get() + event.getSceneY()-mousey) ;
+	
+	               //set the positon of Node after calculation
+	               setLayoutX(x.get());
+	               setLayoutY(y.get());
+	
+	               //again set current Mouse x AND y position
+	               mousex = event.getSceneX();
+	               mousey= event.getSceneY();
+        	   }
            }
        });
+   }
+   
+   public SimpleBooleanProperty getLostFocuProperty()
+   {
+	   return lostFocus;
    }
 }
 
