@@ -49,10 +49,11 @@ public class timeline extends VBox{
 	Label valueLabel;
 	
 	
-	timeline(ArrayList<EventInfo> _timestamps, String _methodName)
+	timeline(ArrayList<EventInfo> _eventList, String _methodName, long _timeStamp)
 	{
-		eventList = _timestamps;
+		eventList = _eventList;
 		methodName = _methodName;
+		createdTimestamp = _timeStamp;
 		currentValue = new SimpleIntegerProperty(0);
 //		createdTimestamp = _timeCreated;
 		isReduced = new SimpleIntegerProperty(1);
@@ -111,6 +112,15 @@ public class timeline extends VBox{
 		
 		
 		this.getChildren().add(timebar);
+		
+		//enable timeline to be shown (expanded) when clicked
+		this.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			   public void handle(MouseEvent arg0) {
+					   
+			   liveDebugging.showTimeline(methodName, createdTimestamp);
+//			   liveDebugging.naviTo(createdTimestamp);
+			   }
+		});
 				
 		//add listener to update valueLabel
 		currentValue.addListener(new ChangeListener<Object>(){
@@ -127,10 +137,13 @@ public class timeline extends VBox{
 			public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
 				if((int)(newVal) == 0)
 				{
-					thisTimeLine.setMinWidth(10);
-					thisTimeLine.setMaxWidth(10);
-					valueLabel.visibleProperty().setValue(false);
-					methodLabel.setText(methodName.substring(0, 4));
+					if(methodName.length() > 4)
+					{
+						thisTimeLine.setMinWidth(10);
+						thisTimeLine.setMaxWidth(10);
+						valueLabel.visibleProperty().setValue(false);
+						methodLabel.setText(methodName.substring(0, 4));
+					}
 				}
 				else
 				{
@@ -209,6 +222,11 @@ public class timeline extends VBox{
 	public String getMethodName()
 	{
 		return methodName;
+	}
+	
+	public long getCreatedTimestamp()
+	{
+		return createdTimestamp;
 	}
 	
 	public void setValue(double val)

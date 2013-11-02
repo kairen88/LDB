@@ -525,7 +525,7 @@ public class liveDebugging extends Application {
 			currentTimeline= tLine;
 			
 			//reduce / hide child timelines and make sure our "new" timeline is expanded and visible
-			reduceChildTimelines(false);			
+//			reduceChildTimelines(false);			
 			currentTimeline.expandTimeline();
 			currentTimeline.showTimeline();
 			
@@ -955,7 +955,7 @@ public class liveDebugging extends Application {
 				prevTimeline=currentTimeline;
 				currentTimeline= tLine;
 				
-				reduceChildTimelines(timelineExists);
+//				reduceChildTimelines(timelineExists);
 				tLine.expandTimeline();
 				tLine.showTimeline();
 				
@@ -1032,21 +1032,50 @@ public class liveDebugging extends Application {
 		};
 	}
 
-	private void reduceChildTimelines(boolean timelineExists) {
-		//reduce all child timelines of prevTimeline
-		Vector<Integer> childTimelineIdxList = prevTimeline.getChildTimelineIdxList();
-		if(!childTimelineIdxList.isEmpty() && timelineExists == false)
-		{
-			//iterate through all child timelines
-			for(int i = 0; i < childTimelineIdxList.size(); i++)
+	private static void reduceChildTimelines(String _methodName, long _timestamp, String _childMethodName) {//chid method name is the method name of the new method created, we do not want to reduce this timeline
+		
+		//get method info
+		MethodInfo method = findMethod(null, _methodName, _timestamp);
+		
+		//get list of child timestamps
+		ArrayList<MethodInfo> childInfo = method.getChildList();
+		
+		//iterate through child timestamps and set to reduce
+		for (int i = 0; i < childInfo.size(); i++) {
+			
+			if(childInfo.get(i).methodName().compareToIgnoreCase(_childMethodName) != 0)
 			{
-				int index = childTimelineIdxList.get(i);
-				timeline tl = (timeline) timelineSection.getChildren().get(index);
-				tl.reduceTimeline();
+				timeline childTimeline = (timeline) timelineSection.getChildren().get(childInfo.get(i).getTimelineIdx());
+				childTimeline.reduceTimeline();
 				
-				//hide any grandchildren timelines
-				hideChildTimelines(tl.getChildTimelineIdxList());
+				//get grandchildren timelines
+				ArrayList<MethodInfo> grandchildInfo = childInfo.get(i).getChildList();
+				
+				//hide grandchildren timeline
+				hideChildTimelines(grandchildInfo);
 			}
+		}
+	}
+	
+	static public void showTimeline(String _methodName, long _timestamp)
+	{
+		//get method info
+		MethodInfo method = findMethod(null, _methodName, _timestamp);
+		
+		timeline tl = (timeline) timelineSection.getChildren().get(method.getTimelineIdx());
+		tl.expandTimeline();
+		tl.showTimeline();
+		
+		//get list of child timestamps
+		ArrayList<MethodInfo> childInfo = method.getChildList();
+		
+		//iterate through child timestamps and set to reduce
+		for (int i = 0; i < childInfo.size(); i++) {
+			
+			timeline childTimeline = (timeline) timelineSection.getChildren().get(childInfo.get(i).getTimelineIdx());
+			
+			childTimeline.showTimeline();
+//			childTimeline.reduceTimeline();
 		}
 	}
 	
@@ -1277,7 +1306,7 @@ public class liveDebugging extends Application {
 			if(parentMethodName == null)
 					parentMethodName = eventUtils.getMethodName(curEvent.getParent());
 		
-		timeline timeline = new timeline(childEventsInfo, newMethodName);
+		timeline timeline = new timeline(childEventsInfo, newMethodName, nextEvent.getTimestamp());
 
 		long parentTimestamp = 2671896418426L;
 		if(curEvent != null)
@@ -1310,7 +1339,7 @@ public class liveDebugging extends Application {
 		return timeline;
 	}
 	
-	private void hideChildTimelines(Vector<Integer> _childIdxList)
+	private static void hideChildTimelines(ArrayList<MethodInfo> _childIdxList)
 	{
 		if(_childIdxList.isEmpty())
 			return;
@@ -1318,11 +1347,11 @@ public class liveDebugging extends Application {
 		//iterate through all the child timelines
 		for(int i = 0; i < _childIdxList.size(); i++)
 		{
-			int index = _childIdxList.get(i);
+			int index = _childIdxList.get(i).getTimelineIdx();
 			timeline t = (timeline) timelineSection.getChildren().get(index);
 			t.hideTimeline();
 			
-			Vector<Integer> grandChildIdxList = t.getChildTimelineIdxList();
+			ArrayList<MethodInfo> grandChildIdxList = _childIdxList.get(i).getChildList();
 			hideChildTimelines(grandChildIdxList);
 		}	
 		return;
@@ -1345,7 +1374,11 @@ public class liveDebugging extends Application {
 	static public void naviTo(long _timestamp)
 	{
 		ILogEvent event = eventUtils.getEventFromTimestamp(_timestamp);
+		
+		// we only step into a new method if the next event is current method -> child method -> this event
+		//so method name is the parent method call event of this event 
 		String parentMethodName = eventUtils.getMethodName(event.getParent());
+		
 		//if method name is null, we get the name of the parent method
 		if(parentMethodName == null)
 			parentMethodName = eventUtils.getMethodName(event.getParent());
@@ -1469,8 +1502,8 @@ public class liveDebugging extends Application {
 			currentTimeline.setColor("A3FF7F");
 		}
 		
-		//minimize tick
-		
+		//maximize timeline tick
+		showTimeline(currentTimeline.getMethodName(), currentTimeline.getCreatedTimestamp());
 		//maxmize window
 		currentCodeWindow.normalWindowSize();		
 		
@@ -1482,6 +1515,8 @@ public class liveDebugging extends Application {
 		gridPane.removeGridStyles();
 		//ensure the current window is visible
 		ensureCurrentWinVisible();
+		
+		reduceChildTimelines(_method.getParentName(), _method.ParentMethodfirstTimestamp(), _method.methodName());
 	}
 	
 	private static void setCurrentMethodInactive()
@@ -1552,6 +1587,7 @@ public class liveDebugging extends Application {
 		prevCodeWindow.normalWindowSize();	
 		
 		prevTimeline.clearTick();
+		showTimeline(prevTimeline.getMethodName(), prevTimeline.getCreatedTimestamp());
 		
 	}
 	
@@ -1616,12 +1652,13 @@ public class liveDebugging extends Application {
 		
 		//create new timeline
 		ArrayList<EventInfo> childEventsInfo = eventUtils.getChildEventsInfo(_event.getParent());
-		timeline newTimeline = new timeline(childEventsInfo, _methodName);
+		timeline newTimeline = new timeline(childEventsInfo, _methodName, _timestamp);
 		//add timeline to area
 		timelineSection.getChildren().add(newTimeline);
+		
 		//need to handle reducing child timelines
-		
-		
+		reduceChildTimelines(currentTimeline.getMethodName(), currentTimeline.getCreatedTimestamp(), _methodName);
+//		showTimeline(_methodName, _timestamp);
 		
 		//create new variable pane
 		newCodeWindow.getGridPane(childEventsInfo);
