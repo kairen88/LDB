@@ -35,9 +35,9 @@ public class ResizeIcon extends Polygon{
 		
 //		this = new Polygon();
 		this.getPoints().addAll(new Double[]{
-		        -7.0, 7.0,
-		        7.0, -7.0,
-		        7.0, 7.0 });
+		        -5.0, 5.0,
+		        5.0, -5.0,
+		        5.0, 5.0 });
 		javafx.scene.paint.Paint tailColor = javafx.scene.paint.Paint.valueOf("000000");
 		this.setFill(tailColor);
 		

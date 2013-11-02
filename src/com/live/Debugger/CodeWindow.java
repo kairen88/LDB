@@ -39,6 +39,8 @@ import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -100,6 +102,8 @@ public class CodeWindow extends DraggableNode{
 	private VariablePane gridPane;
 	private ArrayList<VariablePane> gridPaneList=new ArrayList<VariablePane>();
 	private liveDebugging ld;//to use reposition logic, etc.
+	
+	ArrayList<Annotation> annotatorList; //list of the annotations added to this codeWindow - maybe we can move this to a new pane in future
 	
 	
 	private int indexOnScreen;
@@ -228,6 +232,7 @@ public void setCodeWindowContainer(DraggableNode e){
 		//initialize window dimensions
 		//set code window size, min 300 by 300
 		iterationList = new LinkedHashMap<Long, Integer>();
+		annotatorList = new ArrayList<Annotation>();
 		
 		if(_windowWidth < 600)
 			this.windowWidth = 600;
@@ -313,6 +318,11 @@ public void setCodeWindowContainer(DraggableNode e){
 		this.editor.setReduced(true);
 		codeWindowContainer.setDSize(this.windowWidth, this.windowHeight);
 		}
+		
+		//set all anotation to invisible
+		for (int i = 0; i < annotatorList.size(); i++) {
+			annotatorList.get(i).setVisible(false);
+		}
 	
 	}
 	
@@ -371,7 +381,10 @@ public void setCodeWindowContainer(DraggableNode e){
 			this.hbox.getChildren().set(0,gp);
 		}
 		
-		//98FB98
+		//set all anotation to invisible
+		for (int i = 0; i < annotatorList.size(); i++) {
+			annotatorList.get(i).setVisible(true);
+		}
 	}
 	//sets the class for the line number indicated to completedLine which styles it green
 	public void highlightGutters(ArrayList<Integer> lineNumList, int offset)
@@ -636,6 +649,24 @@ public void setCodeWindowContainer(DraggableNode e){
 		//initialize codeMirror editor
 		//padding for editor is 2*padding, 2*padding + paddingTop
 		editor = new CodeEditor(editingCode, windowWidth - (padding * 2), windowHeight - (padding * 2 + paddingTop) );
+		
+		//when right click on the editor area, we create a new annotation
+		final DraggableNode container = this;
+		editor.addEventHandler(MouseEvent.MOUSE_CLICKED,
+			    new EventHandler<MouseEvent>() {
+			        @Override public void handle(MouseEvent e) {
+			            if (e.getButton() == MouseButton.SECONDARY)  
+			            {
+			            	Annotation annotation = new Annotation(200, 100, icon, container, container.getChildren().size());
+			            	
+			            	container.getChildren().add(annotation);
+			            	annotatorList.add(annotation);
+			            	
+			            	annotation.relocate(e.getX(), e.getY());
+			            }
+			            
+			        }
+			});
 		
 		//creating code window background
 		Rectangle codeWindowBackground = createCodeWindowBackground();
@@ -944,7 +975,10 @@ public void setCodeWindowContainer(DraggableNode e){
 		this.gridPaneList = gridPaneList;
 	}
 
-
+	public ResizeIcon getResizeIcon()
+	{
+		return icon;
+	}
 
 
 }
