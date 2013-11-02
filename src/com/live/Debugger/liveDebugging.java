@@ -1050,6 +1050,22 @@ public class liveDebugging extends Application {
 		}
 	}
 	
+	static public void setTimelineTickHighlight(String _methodName, long _timestamp)
+	{
+		MethodInfo method = findMethod(null, _methodName, _timestamp);
+		
+		timeline tl = (timeline) timelineSection.getChildren().get(method.getTimelineIdx());
+		tl.setTickHighlight(_timestamp);
+	}
+	
+	static public void removeTimelineTickHighlight(String _methodName, long _timestamp)
+	{
+		MethodInfo method = findMethod(null, _methodName, _timestamp);
+		
+		timeline tl = (timeline) timelineSection.getChildren().get(method.getTimelineIdx());
+		tl.removeTickHighlight(_timestamp);
+	}	
+	
 	
 	private void initializeElementControl() {
 		Button nextBtn = (Button) getRootAnchorPane().lookup("#NextBtn");
@@ -1492,7 +1508,7 @@ public class liveDebugging extends Application {
 		prevCodeWindow = currentCodeWindow;
 		prevTimeline = currentTimeline;
 		
-		
+		//add logic for reposition diff from current miminize
 	}
 	
 	private static void setPrevMethodPrev(MethodInfo _method, ILogEvent _event)
@@ -1550,7 +1566,9 @@ public class liveDebugging extends Application {
 			prevCodeWindow.setBackgroundColorToInactive();
 			prevTimeline.setColor("CCCCCC");
 			
-			prevCodeWindow.reduceWindowSize();	
+			prevCodeWindow.reduceWindowSize();
+			
+			//need to add feature to reposition logic here, diff from minimize
 		}
 		prevTimeline.clearTick();
 	}

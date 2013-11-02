@@ -268,6 +268,23 @@ public class timeline extends VBox{
 		return lineNum;
 	}
 	
+	/**
+	 * set tick as highlighted (same as mouse-over event)
+	 * @param _timestamp
+	 */
+	
+	public void setTickHighlight(long _timestamp)
+	{
+		int idx = getIndexFromTimestamp(_timestamp);
+		tickList.get(idx).setTickSizeToExpanded();
+	}
+	
+	public void removeTickHighlight(long _timestamp)
+	{
+		int idx = getIndexFromTimestamp(_timestamp);
+		tickList.get(idx).setTickSizeToInitial();
+	}
+	
 	public int getValue()
 	{
 		return currentValue.getValue();

@@ -107,14 +107,22 @@ public class VariablePane extends VBox{
 				                    cell.addEventHandler(MouseEvent.MOUSE_ENTERED, new EventHandler<MouseEvent>() {
 										   public void handle(MouseEvent arg0) {
 
-											   liveDebugging.selectLineInCodeWindow(methodName, cell.getItem().timestamp(), cell.getItem().lineNum());
+											   if(cell.getItem() != null)
+											   {
+												   liveDebugging.selectLineInCodeWindow(methodName, cell.getItem().timestamp(), cell.getItem().lineNum());
+												   liveDebugging.setTimelineTickHighlight(methodName, cell.getItem().timestamp());
+											   }
 										   }
 				                    });
 				                    
 				                    cell.addEventHandler(MouseEvent.MOUSE_EXITED, new EventHandler<MouseEvent>() {
 										   public void handle(MouseEvent arg0) {
 
-											   liveDebugging.selectLineInCodeWindow(methodName, cell.getItem().timestamp(), -1);
+											   if(cell.getItem() != null)
+											   {
+												   liveDebugging.selectLineInCodeWindow(methodName, cell.getItem().timestamp(), -1);
+												   liveDebugging.removeTimelineTickHighlight(methodName, cell.getItem().timestamp());
+											   }
 										   }
 				                    });
 				                    
