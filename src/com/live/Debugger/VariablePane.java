@@ -10,15 +10,20 @@ import com.sun.org.apache.bcel.internal.classfile.LocalVariable;
 
 import tod.core.database.structure.IStructureDatabase.LocalVariableInfo;
 
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.util.Callback;
 import javafx.util.Pair;
 
 public class VariablePane extends VBox{
@@ -52,7 +57,7 @@ public class VariablePane extends VBox{
 
 
 	private void populateGrid(ArrayList<EventInfo> _childEventsInfo) {
-		for(EventInfo eventInfo : _childEventsInfo)
+		for(final EventInfo eventInfo : _childEventsInfo)
 		{
 			//is a write event with variable value
 			//object[1] contains the variable / method name of the child events
@@ -64,8 +69,8 @@ public class VariablePane extends VBox{
 					//create it and add it to the variable Pane
 					
 					//create value pair, timestamp : var value
-					valuePair<Long, String> varValue = new valuePair<Long, String>((long)eventInfo.getTimestamp(), (String) eventInfo.getWriteValue());
-					ComboBox<valuePair<Long, String>> valueBox = new ComboBox<valuePair<Long, String>>();
+					valueTriple varValue = new valueTriple((long)eventInfo.getTimestamp(), (String) eventInfo.getWriteValue(), eventInfo.getLineNumber());
+					ComboBox<valueTriple> valueBox = new ComboBox<valueTriple>();
 					valueBox.getItems().add(varValue);
 					
 					Label varNameLabel = new Label(eventInfo.getVarName().toString());
@@ -80,6 +85,59 @@ public class VariablePane extends VBox{
 					grid.add(varNameLabel, 0, row);
 					grid.add(valueBox, 1, row);
 					
+					//setting 
+					valueBox.setCellFactory(
+				            new Callback<ListView<valueTriple>, ListCell<valueTriple>>() {
+				                @Override public ListCell<valueTriple> call(ListView<valueTriple> param) {
+				                    final ListCell<valueTriple> cell = new ListCell<valueTriple>(){
+				                    	 @Override
+				                         protected void updateItem(valueTriple item, boolean empty) {
+				                             super.updateItem(item, empty);
+
+				                             if (!empty) {
+				                               // Use a SimpleDateFormat or similar in the format method
+				                               setText(item.value());
+				                             } else {
+				                               setText(null);
+				                             }
+				                         }
+
+				                    };
+				                    
+				                    cell.addEventHandler(MouseEvent.MOUSE_ENTERED, new EventHandler<MouseEvent>() {
+										   public void handle(MouseEvent arg0) {
+
+											   liveDebugging.selectLineInCodeWindow(methodName, cell.getItem().timestamp(), cell.getItem().lineNum());
+										   }
+				                    });
+				                    
+				                    cell.addEventHandler(MouseEvent.MOUSE_EXITED, new EventHandler<MouseEvent>() {
+										   public void handle(MouseEvent arg0) {
+
+											   liveDebugging.selectLineInCodeWindow(methodName, cell.getItem().timestamp(), -1);
+										   }
+				                    });
+				                    
+				                    cell.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+										   public void handle(MouseEvent arg0) {
+
+											   liveDebugging.naviTo(cell.getItem().timestamp());
+										   }
+				                    });
+				                    
+				                return cell;
+				            }
+				                
+				                ListCell<valueTriple> cell = new ListCell<valueTriple>() {
+
+				                    public void updateItem(valueTriple item, boolean empty) {
+				                        super.updateItem(item, empty);
+				                        setText((item == null || empty) ? null : item.toString());
+				                        setGraphic(null);
+				                    }
+				                };
+				        });
+					
 					//store the index of the variable label element, combobox element index will be idx + 1
 					variableMap.put(eventInfo.getVarName(), grid.getChildren().size() - 2);
 					
@@ -87,10 +145,11 @@ public class VariablePane extends VBox{
 				{
 					//get the index of the label element
 					int index = variableMap.get(eventInfo.getVarName());
-					ComboBox<valuePair<Long, String>> valueBox = (ComboBox<valuePair<Long, String>>) grid.getChildren().get(index + 1);
+					ComboBox<valueTriple> valueBox = (ComboBox<valueTriple>) grid.getChildren().get(index + 1);
 					
-					valuePair<Long, String> varValue = new valuePair<Long, String>((long)eventInfo.getTimestamp(), (String) eventInfo.getWriteValue());
-					valueBox.getItems().add(varValue);
+					valueTriple varValue = new valueTriple((long)eventInfo.getTimestamp(), (String) eventInfo.getWriteValue(), eventInfo.getLineNumber());
+					valueBox.getItems().add(varValue);		
+					
 				}
 			}
 		}
@@ -147,13 +206,13 @@ public class VariablePane extends VBox{
 		{
 			int index = variableMap.get(_varName);
 			Label nameLabel = (Label) grid.getChildren().get(index);
-			ComboBox<valuePair<Long, String>> valueBox = (ComboBox<valuePair<Long, String>>) grid.getChildren().get(index + 1);
+			ComboBox<valueTriple> valueBox = (ComboBox<valueTriple>) grid.getChildren().get(index + 1);
 			
 			Iterator iter = valueBox.getItems().iterator();
 			for (int i = 0; iter.hasNext(); i++)
 			{
-				valuePair<Long, String> pair = (valuePair) iter.next();
-				if(pair.getKey() == _timestamp)
+				valueTriple pair = (valueTriple) iter.next();
+				if(pair.timestamp() == _timestamp)
 				{
 					valueBox.setValue(valueBox.getItems().get(i));
 					valueBox.setStyle("-fx-background-color: #ff9999");
@@ -176,19 +235,33 @@ public class VariablePane extends VBox{
 		}
 	}
 	
-	private class valuePair<k, v> extends Pair<k, v>{
+	private class valueTriple implements Comparable<valueTriple>{
+		private long timestamp;
+		private String value;
+		private int lineNum;
 
-		public valuePair(k key, v value) {
-			super(key, value);
-			// TODO Auto-generated constructor stub
+		public valueTriple(long _timestamp, String _value, int _lineNum) {
+			super();
+			timestamp = _timestamp;
+			value = _value;
+			lineNum = _lineNum;
 		}
+		
+		long timestamp() { return timestamp; }
+		String value() { return value; }
+		int lineNum() { return lineNum; }
 
 		@Override
 		public String toString(){
-			return this.getValue().toString();
+			return value.toString();
+		}
+
+		@Override
+		public int compareTo(valueTriple o) {
+		      return (int) (this.timestamp() - o.timestamp());
 		}
 		
 	}
-
+	
 	
 }

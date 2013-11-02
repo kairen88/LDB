@@ -402,6 +402,16 @@ public class EventUtils {
 		return null;
 	}
 	
+	public ILogEvent StepOut()
+	{
+		if(hasNextEvent(stepper.getCurrentEvent()))
+		{
+			stepper.stepOut();
+			return stepper.getCurrentEvent();
+		}
+		return null;
+	}
+	
 	public ILogEvent backwardStepInto()
 	{
 		if(hasPrevEvent(stepper.getCurrentEvent()))
@@ -547,6 +557,8 @@ public class EventUtils {
 				obj =  localVarWriteEvent.getValue();
 				value = localVarWriteEvent.getValue().toString();
 				name = localVarWriteEvent.getVariable().getVariableName();
+				if(localVarWriteEvent.getVariable().getVariableTypeName().compareToIgnoreCase("C") == 0)
+					value = Character.toString((char)Integer.parseInt(value)); 
 			}
 			
 

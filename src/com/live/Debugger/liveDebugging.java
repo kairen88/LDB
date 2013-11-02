@@ -209,8 +209,7 @@ public class liveDebugging extends Application {
 		ILogEvent mainEvent = getMainMethodEvent();
 		createMainWindow("main");
 		
-		//highlight gutters
-		highlightGutters(mainEvent);
+		
 
 		//setting the 1st and last event of "main"		
 		MethodCallEvent mEvent = (MethodCallEvent)(mainEvent);
@@ -259,7 +258,10 @@ public class liveDebugging extends Application {
 		mainCWH.setBackgroundColorToMain();
 		mainTH.setColor(color);
 		
-//		 scrollTimer = new AnimationTimer() {
+		//highlight gutters
+		highlightGutters(childEventsInfo);
+
+		//		 scrollTimer = new AnimationTimer() {
 //	            @Override
 //	            public void handle(long now) {
 //	            	if(s1.getHvalue() == HscrollPosition )//just so it's easier to reach this condition
@@ -334,8 +336,13 @@ public class liveDebugging extends Application {
 	}
 	
 	//This method is used to highlight gutters in the editor
-	private static void highlightGutters(ILogEvent event){
-		ArrayList<Integer> lineNumbers =eventUtils.getExecutedLineNumers(event);
+	private static void highlightGutters(ArrayList<EventInfo> childEventInfo){
+//		ArrayList<Integer> lineNumbers =eventUtils.getExecutedLineNumers(event);
+		ArrayList<Integer> lineNumbers = new ArrayList<Integer>();
+		for (int i = 0; i < childEventInfo.size(); i++) {
+			lineNumbers.add(childEventInfo.get(i).getLineNumber());
+		}
+		
 		currentCodeWindow.highlightGutters(lineNumbers, codeFragments.getLineNumberOffset(currentCodeWindow.getMethodName()) );
 		
 	}
@@ -972,7 +979,7 @@ public class liveDebugging extends Application {
 					gridPane=currentCodeWindow.getGridPane();
 				variablePane.getChildren().set(0,gridPane);
 				
-				highlightGutters(nextEvent);
+				highlightGutters(childEventsInfo);
 				reposition();	
 				
 				//-------------------------------------------------------------------just doing this to get method info for now
@@ -1049,97 +1056,121 @@ public class liveDebugging extends Application {
 		Button previousBtn = (Button) getRootAnchorPane().lookup("#PrevBtn");
 		Button stepOverNextBtn = (Button) getRootAnchorPane().lookup("#StepOverNextBtn");
 		Button stepOverPreviousBtn = (Button) getRootAnchorPane().lookup("#StepOverPrevBtn");
+		Button stepOut = (Button) getRootAnchorPane().lookup("#StepOut");
 //		Button tagBtn = (Button) getRootAnchorPane().lookup("#varTagSwitch");
 
 		nextBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-//				ILogEvent curEvent = eventUtils.getCurrentEvent();
-//				
-//				if(curEvent.getTimestamp() >= eventUtils.getLastTimestamp() - 1)//just tweaking this condition to make it work, not sure why timestamp is wrong
-//				{
-//					new Dialogue("Reached last event", "OK").show();
-//					return;
-//				}
-//
-//				// step forward and get next event
-//				ILogEvent nextEvent = eventUtils.forwardStepInto();
-//				
-//				if (nextEvent != null) 					
-//					processNextLine(curEvent, nextEvent);
-//				else
-//					new Dialogue("Reached last event", "OK").show();
-				
-				
-				
+				ILogEvent curEvent = eventUtils.getCurrentEvent();
 				ILogEvent nextEvent = eventUtils.forwardStepInto();
-				naviTo(nextEvent.getTimestamp());
+				
+				if(curEvent.getTimestamp() >= eventUtils.getLastTimestamp() - 1)//just tweaking this condition to make it work, not sure why timestamp is wrong
+				{
+					new Dialogue("Reached last event", "OK").show();
+					eventUtils.backwardStepOver();
+					return;
+				}
+
+				// step forward and get next event
+				
+				if (nextEvent != null) 					
+					naviTo(nextEvent.getTimestamp());
+				else
+					new Dialogue("Reached last event", "OK").show();
+			
 			}
 		});
 		
 		stepOverNextBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-//				ILogEvent curEvent = eventUtils.getCurrentEvent();
-//				
-//				if(curEvent.getTimestamp() >= eventUtils.getLastTimestamp() - 1)//just tweaking this condition to make it work, not sure why timestamp is wrong
+
+				ILogEvent curEvent = eventUtils.getCurrentEvent();
+				
+				
+				if(curEvent.getTimestamp() >= eventUtils.getLastTimestamp() - 1)//just tweaking this condition to make it work, not sure why timestamp is wrong
+				{
+					new Dialogue("Reached last event", "OK").show();
+					eventUtils.backwardStepOver();
+					return;
+				}
+
+				// step forward and get next event
+				ILogEvent nextEvent = eventUtils.forwardStepOver();
+				if (nextEvent != null) 					
+					naviTo(nextEvent.getTimestamp());
+				else
+					new Dialogue("Reached last event", "OK").show();
+
+			}
+		});
+		
+		stepOut.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+
+				ILogEvent curEvent = eventUtils.getCurrentEvent();
+				
+				
+//				if(curEvent.getTimestamp() <= eventUtils.getLastTimestamp() - 1)//just tweaking this condition to make it work, not sure why timestamp is wrong
 //				{
 //					new Dialogue("Reached last event", "OK").show();
+//					eventUtils.forwardStepInto();
 //					return;
 //				}
 
 				// step forward and get next event
-				ILogEvent nextEvent = eventUtils.forwardStepOver();
-				naviTo(nextEvent.getTimestamp());
-				
-//				if (nextEvent != null) 					
-//					processNextLine(curEvent, nextEvent);
-//				else
-//					new Dialogue("Reached last event", "OK").show();
+				ILogEvent nextEvent = eventUtils.StepOut();
+				if (nextEvent != null) 					
+					naviTo(nextEvent.getTimestamp());
+				else
+					new Dialogue("Reached last event", "OK").show();
+
 			}
 		});
 
 		previousBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-//				ILogEvent curEvent = eventUtils.getCurrentEvent();
-//				
-//				if(curEvent.getTimestamp() <= eventUtils.getFirstTimestamp())
-//				{
-//					new Dialogue("Reached last event", "OK").show();
-//					return;
-//				}
+				ILogEvent curEvent = eventUtils.getCurrentEvent();
+				
+				if(curEvent.getTimestamp() <= eventUtils.getFirstTimestamp())
+				{
+					new Dialogue("Reached last event", "OK").show();
+					eventUtils.forwardStepOver();
+					return;
+				}
 
 				// step backward and the the previous event
 				ILogEvent prevEvent = eventUtils.backwardStepInto();
-				naviTo(prevEvent.getTimestamp());
 				
-//				if (prevEvent != null)
-//					processPrevious(curEvent, prevEvent);
-//				else
-//					new Dialogue("Reached last event", "OK").show();
+				if (prevEvent != null)
+					naviTo(prevEvent.getTimestamp());
+				else
+					new Dialogue("Reached last event", "OK").show();
 			}
 		});
 		
 		stepOverPreviousBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-//				ILogEvent curEvent = eventUtils.getCurrentEvent();
-//				
-//				if(curEvent.getTimestamp() <= eventUtils.getFirstTimestamp())
-//				{
-//					new Dialogue("Reached last event", "OK").show();
-//					return;
-//				}
+				ILogEvent curEvent = eventUtils.getCurrentEvent();
+				
+				if(curEvent.getTimestamp() <= eventUtils.getFirstTimestamp())
+				{
+					new Dialogue("Reached last event", "OK").show();
+					eventUtils.forwardStepOver();
+					return;
+				}
 
 				// step backward and the the previous event
 				ILogEvent prevEvent = eventUtils.backwardStepOver();
-				naviTo(prevEvent.getTimestamp());
 				
-//				if (prevEvent != null)
-//					processPrevious(curEvent, prevEvent);
-//				else
-//					new Dialogue("Reached last event", "OK").show();
+				if (prevEvent != null)
+					naviTo(prevEvent.getTimestamp());
+				else
+					new Dialogue("Reached last event", "OK").show();
 			}
 		});
 
@@ -1344,9 +1375,9 @@ public class liveDebugging extends Application {
 		}
 		else //method (or method instance) does not exist, create new method
 		{
-			createNewMethod(parentMethodName, event, _timestamp);
+			ArrayList<EventInfo> childEventInfo = createNewMethod(parentMethodName, event, _timestamp);
 			//highlight gutters
-			highlightGutters(event.getParent());
+			highlightGutters(childEventInfo);
 		}
 		
 		//update Event Stepper
@@ -1527,16 +1558,19 @@ public class liveDebugging extends Application {
 		if(_event instanceof MethodCallEvent)
 		{
 			MethodCallEvent methodCall = (MethodCallEvent) _event;
-			ObjectId theObjectId = (ObjectId) methodCall.getArguments()[0];
-			ILogBrowser browser = eventUtils.getLogBrowser();
-			Object theRegistered = browser.getRegistered(theObjectId);
-			String value = null;
-			if (theRegistered != null) 
-				value = theRegistered.toString();
-			
-			Label console = (Label) getRootAnchorPane().lookup("#Console");
-			console.setText(console.getText().concat(value));
-			console.setPrefHeight(50);
+			if(methodCall.getArguments().length > 0)
+			{
+				ObjectId theObjectId = (ObjectId) methodCall.getArguments()[0];
+				ILogBrowser browser = eventUtils.getLogBrowser();
+				Object theRegistered = browser.getRegistered(theObjectId);
+				String value = null;
+				if (theRegistered != null) 
+					value = theRegistered.toString();
+				
+				Label console = (Label) getRootAnchorPane().lookup("#Console");
+				console.setText(console.getText().concat(value));
+				console.setPrefHeight(50);
+			}
 		}
 	}
 	
@@ -1550,7 +1584,7 @@ public class liveDebugging extends Application {
 			currentCodeWindow.highlightSection2(_linNum, varName);		
 	}
 	
-	private static void createNewMethod(String _methodName, ILogEvent _event, long _timestamp)
+	private static ArrayList<EventInfo> createNewMethod(String _methodName, ILogEvent _event, long _timestamp)
 	{
 		//create the new codeWindow
 		CodeWindow newCodeWindow = codeFragments.createCodeWindow(_methodName);
@@ -1624,6 +1658,8 @@ public class liveDebugging extends Application {
 		
 		//call naviTo - takes care of highlighting
 		naviTo(_timestamp);
+		
+		return childEventsInfo;
 	}
 
 }
