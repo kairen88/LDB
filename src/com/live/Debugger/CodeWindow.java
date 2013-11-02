@@ -383,7 +383,7 @@ public void setCodeWindowContainer(DraggableNode e){
 	
 	public void setGutterToComplete(int _lineNum)
 	{
-		runScriptOnWebForm("editor.setMarker(" + String.valueOf(_lineNum) + ",'<div height=10 width=10 style=\"background-color:#FF9900;\"> %N%');");
+		runScriptOnWebForm("editor.setMarker(" + String.valueOf(_lineNum - startLine - 1) + ",'<div height=10 width=10 style=\"background-color:#CCCCCC;\"> %N%');");
 	}
 		
 //Methods for section by section highlighting, currently NOT WORKING--------------------------------------------------------

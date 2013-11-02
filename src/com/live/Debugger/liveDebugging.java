@@ -339,7 +339,7 @@ public class liveDebugging extends Application {
 	private static void highlightGutters(ArrayList<EventInfo> childEventInfo){
 //		ArrayList<Integer> lineNumbers =eventUtils.getExecutedLineNumers(event);
 		ArrayList<Integer> lineNumbers = new ArrayList<Integer>();
-		for (int i = 0; i < childEventInfo.size(); i++) {
+		for (int i = 0; i < childEventInfo.size() -1; i++) { //here we -1 because we ant to exclude the last event (highlights the last brace - method exit event)
 			lineNumbers.add(childEventInfo.get(i).getLineNumber());
 		}
 		
@@ -1431,6 +1431,8 @@ public class liveDebugging extends Application {
 		currentCodeWindow.setExecutedLine(_lineNum);
 		
 		currentCodeWindow.removeHighlightedSection();
+		
+		currentCodeWindow.setGutterToComplete(_lineNum);
 	}
 	
 	private static void setNextMethodActive(MethodInfo _method)
