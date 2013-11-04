@@ -234,7 +234,7 @@ public class liveDebugging extends Application {
 
         //initializing timeline section
 		ScrollPane sc = new ScrollPane();
-		sc.setPrefSize(1830, 200);
+		sc.setPrefSize(1590, 200);
 		sc.setContent(timelineSection);
 		sc.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 		sc.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);		
@@ -281,7 +281,7 @@ public class liveDebugging extends Application {
 		s.getStylesheets().add(url.toExternalForm());
 		primaryStage.setTitle("Swift Debugger");
 		primaryStage.setScene(s);
-		primaryStage.setWidth(1830);
+		primaryStage.setWidth(1840);
 		primaryStage.setHeight(1000);
 		primaryStage.show();
 	}
@@ -1424,6 +1424,7 @@ public class liveDebugging extends Application {
 		}
 		else //method (or method instance) does not exist, create new method
 		{
+			currentCodeWindow.removeInlineVar();
 			ArrayList<EventInfo> childEventInfo = createNewMethod(parentMethodName, event, _timestamp);
 			//highlight gutters
 			highlightGutters(childEventInfo);
@@ -1480,6 +1481,7 @@ public class liveDebugging extends Application {
 		currentCodeWindow.setExecutedLine(_lineNum);
 		
 		currentCodeWindow.removeHighlightedSection();
+		currentCodeWindow.removeInlineVar();
 		
 		currentCodeWindow.setGutterToComplete(_lineNum);
 	}
@@ -1630,14 +1632,16 @@ public class liveDebugging extends Application {
 		}
 	}
 	
-	private static void writeEvent(ILogEvent _event, long _timestamp, int _linNum)
+	private static void writeEvent(ILogEvent _event, long _timestamp, int _lineNum)
 	{
 			String varName= eventUtils.getWriteEventVarName(_event);			
 			String varValue=eventUtils.getWriteEventValue(_event);
 		
 			gridPane = currentCodeWindow.getGridPane().highlightVariableValue(varName, _timestamp);
 			currentCodeWindow.removeHighlightedSection();
-			currentCodeWindow.highlightSection2(_linNum, varName);		
+			currentCodeWindow.removeInlineVar();
+			currentCodeWindow.highlightSection2(_lineNum, varName);	
+			currentCodeWindow.setInlineVar(_lineNum, varValue, varName);
 	}
 	
 	private static ArrayList<EventInfo> createNewMethod(String _methodName, ILogEvent _event, long _timestamp)

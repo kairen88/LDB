@@ -310,7 +310,7 @@ public void setCodeWindowContainer(DraggableNode e){
 			
 			this.hbox.getChildren().set(0,gp);
 	        
-		runScriptOnWebForm("editor.reduceWindowSize();");
+		runScriptOnWebForm("$('.CodeMirror').removeClass('CodeMirror').addClass('CodeMirror-reduce');");
 		
 		editor.webview.setPrefWidth(this.windowWidth);
 		editor.webview.setPrefHeight(this.windowHeight);
@@ -355,7 +355,7 @@ public void setCodeWindowContainer(DraggableNode e){
 		
 		this.lineoffset.setValue(9);
 
-			runScriptOnWebForm("editor.normalWindowSize();");
+			runScriptOnWebForm("$('.CodeMirror-reduce').removeClass('CodeMirror-reduce').addClass('CodeMirror');");
 		this.editor.setReduced(false);
 
 		editor.webview.setPrefWidth(this.windowWidth);
@@ -390,13 +390,38 @@ public void setCodeWindowContainer(DraggableNode e){
 	public void highlightGutters(ArrayList<Integer> lineNumList, int offset)
 	{
 		for(int lineNum : lineNumList)
-			runScriptOnWebForm("editor.setMarker(" + String.valueOf(lineNum - offset - 1) + ",'<div height=10 width=10 style=\"background-color:#A3FF7F;\"> %N%');");
+			runScriptOnWebForm("editor.setGutterMarker(" + String.valueOf(lineNum - offset - 1) + ",'<div height=10 width=10 style=\"background-color:#A3FF7F;\"> %N%');");
 		//98FB98
 	}
 	
 	public void setGutterToComplete(int _lineNum)
 	{
-		runScriptOnWebForm("editor.setMarker(" + String.valueOf(_lineNum - startLine - 1) + ",'<div height=10 width=10 style=\"background-color:#CCCCCC;\"> %N%');");
+		runScriptOnWebForm("editor.setGutterMarker(" + String.valueOf(_lineNum - startLine - 1) + ",'<div height=10 width=10 style=\"background-color:#CCCCCC;\"> %N%');");
+	}
+	
+	public void setInlineVar(int _lineNum, String _value, String _varName)
+	{
+		//create an empty line below current line
+		runScriptOnWebForm("var htmlSpace = document.createElement('div');" +
+				"htmlSpace.className = 'widget';" +
+				"htmlSpace.appendChild (document.createTextNode('-'));" +
+				"editor.addLineWidget("+(_lineNum - startLine - 1)+", htmlSpace, {coverGutter: false, noHScroll: true});");
+		
+		runScriptOnWebForm("var lineNum = " + (_lineNum - startLine - 1) + ";" +
+				"var lineStr = editor.lineInfo(lineNum).text;" +
+				"var varName = \"" + _varName + "\";" +
+				"var start = lineStr.indexOf(varName);" +
+				"var htmlNode =document.createElement('div');" +
+				"htmlNode.style.backgroundColor = '#FF99FF';" +
+				"htmlNode.className = 'widget';" +
+				"var text =  document.createTextNode('"+ _value +"');" +
+				"htmlNode.appendChild(text);" +
+				"editor.addWidget({line: "+(_lineNum - startLine - 1)+", ch: start},htmlNode, false);");
+	}
+	
+	public void removeInlineVar()
+	{
+		runScriptOnWebForm("jQuery('.widget').remove();");
 	}
 		
 //Methods for section by section highlighting, currently NOT WORKING--------------------------------------------------------
@@ -495,14 +520,14 @@ public void setCodeWindowContainer(DraggableNode e){
 		int numOfLines = endLine - startLine - 1;
 //		for(int i = 0; i < numOfLines; i++)
 //			setLineColorToPrevious(i);
-		runScriptOnWebForm("for(var i = 0; i < "+numOfLines+"; i++) {editor.setLineClass(i, null, 'completedLine');}");
+		runScriptOnWebForm("for(var i = 0; i < "+numOfLines+"; i++) {editor.removeLineClass(i, 'div', 'currentLine');}");
 
 	}
 	
 	//sets the class for the line number indicated to completedLine which styles it white
 	public void setLineColorToPrevious(int lineNum)
 	{
-		runScriptOnWebForm("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'completedLine');");
+		runScriptOnWebForm("editor.addLineClass(" + String.valueOf(lineNum) + ", 'div', 'completedLine');");
 		//98FB98
 	}
 	
@@ -510,18 +535,18 @@ public void setCodeWindowContainer(DraggableNode e){
 	//sets the class for the line number indicated to currentLine which styles it yellow
 	public void setLineColorToCurrent(int lineNum)
 	{
-		runScriptOnWebForm("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'currentLine');");
+		runScriptOnWebForm("editor.addLineClass(" + String.valueOf(lineNum) + ", 'div', 'currentLine');");
 	}
 	
 	public void setLineColorToCurrent2(int lineNum)
 	{
-		runScriptOnWebForm("editor.setLineClass(" + String.valueOf(lineNum - startLine - 1) + ", null, 'currentLine');");
+		runScriptOnWebForm("editor.addLineClass(" + String.valueOf(lineNum - startLine - 1) + ", 'div', 'currentLine');");
 	}
 	
 	//sets the class for the line number indicated to newLine which styles it red - for method calls
 	public void setLineColorToMethodCall(int lineNum)
 	{
-		runScriptOnWebForm("editor.setLineClass(" + String.valueOf(lineNum) + ", null, 'newLine');");
+		runScriptOnWebForm("editor.addLineClass(" + String.valueOf(lineNum) + ", 'div', 'newLine');");
 	}
 	
 	//execute script on editor webview
