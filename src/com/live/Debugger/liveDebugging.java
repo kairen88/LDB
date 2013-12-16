@@ -178,8 +178,7 @@ public class liveDebugging extends Application {
 	@Override
 	public void start(Stage primaryStage) throws IOException {
 
-		root = FXMLLoader.load(getClass().getClassLoader().getResource(
-				"LDB_fxml.fxml"));
+		root = FXMLLoader.load(getClass().getClassLoader().getResource("LDB_fxml.fxml"));
 
 		//load the test code
 //		Path classPath = FileSystems.getDefault().getPath("resource", "Program1.txt");
@@ -1037,22 +1036,25 @@ public class liveDebugging extends Application {
 		//get method info
 		MethodInfo method = findMethod(null, _methodName, _timestamp);
 		
-		//get list of child timestamps
-		ArrayList<MethodInfo> childInfo = method.getChildList();
-		
-		//iterate through child timestamps and set to reduce
-		for (int i = 0; i < childInfo.size(); i++) {
+		if(method != null)
+		{
+			//get list of child timestamps
+			ArrayList<MethodInfo> childInfo = method.getChildList();
 			
-			if(childInfo.get(i).methodName().compareToIgnoreCase(_childMethodName) != 0)
-			{
-				timeline childTimeline = (timeline) timelineSection.getChildren().get(childInfo.get(i).getTimelineIdx());
-				childTimeline.reduceTimeline();
+			//iterate through child timestamps and set to reduce
+			for (int i = 0; i < childInfo.size(); i++) {
 				
-				//get grandchildren timelines
-				ArrayList<MethodInfo> grandchildInfo = childInfo.get(i).getChildList();
-				
-				//hide grandchildren timeline
-				hideChildTimelines(grandchildInfo);
+				if(childInfo.get(i).methodName().compareToIgnoreCase(_childMethodName) != 0)
+				{
+					timeline childTimeline = (timeline) timelineSection.getChildren().get(childInfo.get(i).getTimelineIdx());
+					childTimeline.reduceTimeline();
+					
+					//get grandchildren timelines
+					ArrayList<MethodInfo> grandchildInfo = childInfo.get(i).getChildList();
+					
+					//hide grandchildren timeline
+					hideChildTimelines(grandchildInfo);
+				}
 			}
 		}
 	}
@@ -1618,16 +1620,19 @@ public class liveDebugging extends Application {
 			MethodCallEvent methodCall = (MethodCallEvent) _event;
 			if(methodCall.getArguments().length > 0)
 			{
-				ObjectId theObjectId = (ObjectId) methodCall.getArguments()[0];
-				ILogBrowser browser = eventUtils.getLogBrowser();
-				Object theRegistered = browser.getRegistered(theObjectId);
-				String value = null;
-				if (theRegistered != null) 
-					value = theRegistered.toString();
-				
-				Label console = (Label) getRootAnchorPane().lookup("#Console");
-				console.setText(console.getText().concat(value));
-				console.setPrefHeight(50);
+				if(methodCall.getArguments()[0] instanceof ObjectId)
+				{
+					ObjectId theObjectId = (ObjectId) methodCall.getArguments()[0];
+					ILogBrowser browser = eventUtils.getLogBrowser();
+					Object theRegistered = browser.getRegistered(theObjectId);
+					String value = null;
+					if (theRegistered != null) 
+						value = theRegistered.toString();
+					
+					Label console = (Label) getRootAnchorPane().lookup("#Console");
+					console.setText(console.getText().concat(value));
+	//				console.setPrefHeight(50);
+				}
 			}
 		}
 	}

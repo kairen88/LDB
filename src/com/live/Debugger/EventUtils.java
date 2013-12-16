@@ -562,7 +562,7 @@ public class EventUtils {
 			}
 			
 
-			if(value.startsWith("UID"))
+			if(value != null && value.startsWith("UID"))
 			{
 //				if(name.compareTo("result") == 0)
 				if (obj instanceof ObjectId)

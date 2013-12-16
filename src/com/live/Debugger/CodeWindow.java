@@ -390,13 +390,15 @@ public void setCodeWindowContainer(DraggableNode e){
 	public void highlightGutters(ArrayList<Integer> lineNumList, int offset)
 	{
 		for(int lineNum : lineNumList)
-			runScriptOnWebForm("editor.setGutterMarker(" + String.valueOf(lineNum - offset - 1) + ",'<div height=10 width=10 style=\"background-color:#A3FF7F;\"> %N%');");
+//			runScriptOnWebForm("editor.setGutterMarker(" + String.valueOf(lineNum - offset - 1) + ",'<div height=10 width=10 style=\"background-color:#A3FF7F;\"> %N%');");
+			runScriptOnWebForm("var marker = document.createElement('div');marker.style.color = '#A3FF7F';marker.style.height = '10px';marker.style.width = '10px';marker.style.backgroundColor = '#A3FF7F';editor.setGutterMarker(" + String.valueOf(lineNum - offset - 1) + " ,'CodeMirror-collapserange',marker);");
 		//98FB98
 	}
 	
 	public void setGutterToComplete(int _lineNum)
 	{
-		runScriptOnWebForm("editor.setGutterMarker(" + String.valueOf(_lineNum - startLine - 1) + ",'<div height=10 width=10 style=\"background-color:#CCCCCC;\"> %N%');");
+//		runScriptOnWebForm("editor.setGutterMarker(" + String.valueOf(_lineNum - startLine - 1) + ",'<div height=10 width=10 style=\"background-color:#CCCCCC;\"> %N%');");
+		runScriptOnWebForm("var marker = document.createElement('div');marker.style.color = '#A3FF7F';marker.style.height = '10px';marker.style.width = '10px';marker.style.backgroundColor = '#CCCCCC';editor.setGutterMarker(" + String.valueOf(_lineNum - startLine - 1) + " ,'CodeMirror-collapserange',marker);");
 	}
 	
 	public void setInlineVar(int _lineNum, String _value, String _varName)
@@ -404,15 +406,16 @@ public void setCodeWindowContainer(DraggableNode e){
 		//create an empty line below current line
 		runScriptOnWebForm("var htmlSpace = document.createElement('div');" +
 				"htmlSpace.className = 'widget';" +
-				"htmlSpace.appendChild (document.createTextNode('-'));" +
-				"editor.addLineWidget("+(_lineNum - startLine - 1)+", htmlSpace, {coverGutter: false, noHScroll: true});");
+				"htmlSpace.appendChild (document.createTextNode('|'));" +
+				"linecSpace = editor.addLineWidget("+(_lineNum - startLine - 1)+", htmlSpace, {coverGutter: false, noHScroll: true});");
 		
+		if(_value.compareToIgnoreCase("\n") !=0)
 		runScriptOnWebForm("var lineNum = " + (_lineNum - startLine - 1) + ";" +
 				"var lineStr = editor.lineInfo(lineNum).text;" +
-				"var varName = \"" + _varName + "\";" +
+				"var varName = \"" + _varName.substring(0, 1) + "\";" +
 				"var start = lineStr.indexOf(varName);" +
 				"var htmlNode =document.createElement('div');" +
-				"htmlNode.style.backgroundColor = '#FF99FF';" +
+				"htmlNode.style.backgroundColor = '#ff9999';" +
 				"htmlNode.className = 'widget';" +
 				"var text =  document.createTextNode('"+ _value +"');" +
 				"htmlNode.appendChild(text);" +
@@ -421,7 +424,8 @@ public void setCodeWindowContainer(DraggableNode e){
 	
 	public void removeInlineVar()
 	{
-		runScriptOnWebForm("jQuery('.widget').remove();");
+		runScriptOnWebForm("/*linecSpace.line.clear()*/" + //this line is not working atm, need to fix
+				"jQuery('.widget').remove();");
 	}
 		
 //Methods for section by section highlighting, currently NOT WORKING--------------------------------------------------------

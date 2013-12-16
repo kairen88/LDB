@@ -21,11 +21,11 @@
       </children>
     </Pane>
     <Pane fx:id="codeWindowSection" layoutX="15.0" layoutY="253.0" prefHeight="800.0" prefWidth="1600.0" style="-fx-background-color:#CCCCCC;" />
-    <Button fx:id="StepOverPrevBtn" layoutX="18.0" layoutY="219.0" mnemonicParsing="false" text="step over backwards" />
-    <Button fx:id="PrevBtn" layoutX="190.0" layoutY="219.0" mnemonicParsing="false" text="Prev" />
+    <Button fx:id="StepOverPrevBtn" layoutX="18.0" layoutY="219.0" mnemonicParsing="false" text="StepOverBack" />
+    <Button fx:id="PrevBtn" layoutX="140.0" layoutY="219.0" mnemonicParsing="false" text="StepIntoPrev" />
     <Button fx:id="StepOut" layoutX="250.0" layoutY="219.0" mnemonicParsing="false" text="Step Out" />    
-    <Button fx:id="NextBtn" layoutX="330.0" layoutY="219.0" mnemonicParsing="false" text="Next" />
-    <Button fx:id="StepOverNextBtn" layoutX="400.0" layoutY="219.0" mnemonicParsing="false" text="step over forward" />
+    <Button fx:id="NextBtn" layoutX="333.0" layoutY="219.0" mnemonicParsing="false" text="StepIntoNext" />
+    <Button fx:id="StepOverNextBtn" layoutX="450.0" layoutY="219.0" mnemonicParsing="false" text="StepOverForward" />
     <Pane fx:id="VariablePane" layoutX="1615.0" layoutY="253.0" prefHeight="800.0" prefWidth="230.0" style="-fx-background-color:#F7F7F7;" />
     <Label fx:id="Console" layoutX="1610.0" layoutY="15.0" prefHeight="200.0" prefWidth="220.0" style="-fx-background-color:#FFFFCC;" />
   </children>
