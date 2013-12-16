@@ -1,0 +1,182 @@
+To run in Ubuntu
+
+Download e(fx)clipse
+http://www.eclipse.org/efxclipse/install.html
+(or use the copy in google drive)
+https://drive.google.com/file/d/0B2Nnws8J_7IOUkc5NXV3WHFYeHc/edit?usp=sharing
+
+download JDK jdk1.7.0_21
+(or use the copy in google drive jdk-7u21-linux-i586.tar.gz)
+https://drive.google.com/file/d/0B2Nnws8J_7IOT0tyaXVzUktkX0k/edit?usp=sharing
+
+change the vm used by eclipse 
+(you may skip this step if the jdk is installed on your system and you are able to run eclipse after unzipping)
+
+open eclipse/eclipse.ini 
+
+add this line:
+
+-vm     (add the line below after this argument)
+[path to where you unzipped the jdk]/jdk1.7.0_21/bin
+
+eg.
+-vm
+/home/user/Desktop/FYP/jdk-jre/jdk1.7.0_21/bin
+
+
+REMEMBER TO INSTALL AJDT plugin
+http://download.eclipse.org/tools/ajdt/42/dev/update
+
+follow setup instructions
+
+--------------------------------------------------------------------------------------------------------------------
+Tested on Eclipse 4.2.1 with Lubuntu.
+
+Create a the directory structure & clone repositoriesmkdir tod
+cd tod/
+mkdir ws-tod-0.9
+mkdir git
+cd git/
+
+Use the new version below (with native agent for linux already in agent folder)
+git clone https://github.com/kairen88/tod.git;
+git clone https://github.com/kairen88/zz.eclipse.utils.git;
+git clone https://github.com/kairen88/zz.jinterp.git;
+git clone https://github.com/kairen88/zz.utils.git;
+
+or use the original version below:
+git clone -b 0.9 https://github.com/gpothier/stiq.git tod;
+git clone https://github.com/gpothier/zz.eclipse.utils.git;
+git clone https://github.com/gpothier/zz.jinterp.git;
+git clone https://github.com/gpothier/zz.utils.git;
+
+Ensure everything is checked out ok, you should have these 4 directories in the git subfolder:
+tod
+zz.eclipse.utils
+zz.jinterp
+zz.utils
+
+Import projectsLaunch Eclipse using the recently created ws-tod-0.9 as your workspace. Ensure you have both a jdk 6 and a jdk 7 defined, and the AJDT plugin installed (a git plugin would also be helpful).
+Import the projects into the workspace, starting with the zz.utils ones.
+
+Choose File > Import, then Projects from Git:
+
+The first time you have to add the 4 local repositories from the directories created in the first step:
+
+Then choose the zz.* ones for importing (as there is one project per repository, you must run the import command for each one). 
+
+Once you have the zz.* projects, import these tod projects from the tod repository:
+TOD-agent
+TOD-core
+TOD-dbgrid
+TOD-evdb1
+TOD-evdbng
+tod.plugin.v2
+tod.plugin.ajdt
+ReadyYour Eclipse workspace should now look like this:
+
+
+
+All the projects are loaded, there are no compilation errors.
+
+if you get a compilation error: TOD-Core has missing files
+check the build path, if required remove:
+
+.../jfxrt.jar
+
+After adding new proj (LDB) project has lots of errors (does not recog ILogBrowser etc.)
+
+Check Build Path setup - need to include projects eg. TOD-core in build path -> Projects:
+
+TOD-core:
+
+TOD-agent
+zz.jinterp
+zz.utils
+
+zz.jinterp:
+
+zz.utils
+
+tod.plugin.adjt:
+
+TOD-core
+
+TOD-evdbng:
+
+TOD-agent
+TOD-core
+TOD-dbgrid
+zz.utils
+
+TOD-evdb1:
+
+TOD-core
+zz.utils
+
+TOD-dbgrid:
+
+TOD-agent
+TOD-core
+zz.utils
+Run Eclipse with the pluginRight click the tod.plugin project, select Run As... Eclipse Application. A new Eclipse instance should show up. Close it, then open the Run config for the newly created launch, and ensure that your Eclipse app runs with Java 7 (in the Java Runtime Environment group):
+
+Then add this parameter to the VM: -Ddev.path=${workspace_loc}
+
+Now you should be able to run Eclipse with the TOD plugin without problems.
+
+--------------------------------------------------------------------------------------------------------------------
+
+copy libtod-agent15.so into git/tod/agent/
+
+from plugin download tod.plugin_0.9.7.4/plugins/tod.plugin_0.9.7.4/lib
+(or copy from git repo)
+
+To run standalone gui
+
+TOD-core/src/debugger/tod.gui
+
+run as > application
+
+then setup configuration as stated in site, use evdbng 
+
+*if TOD is now working create a new folder LDB and pull LDB:
+git clone https://github.com/kairen88/LDB.git
+
+Import this project into the same workspace as the working TOD
+
+ERRORS: ----------------------------------------------------------------------
+if you get errors about missing a project 'Test' or library jfxrt.jar, just got to build path and remove them
+
+create a new java project NumRec (this is the sample code LDB is currently using)
+The sample code can be copied from the file NumRecSampleCode.txt in the LDB project
+
+if you get an error 'unable to find Program2.txt' just create a file named Program2.txt in resources under LDB project and paste the code from NumRec there
+-------------------------------------------------------------------------------------------------------------------
+
+use the tod plugin already installed in e(fx)clipse to run the NumRec sample code first to populate the database
+
+then run LDB as application
+
+Compiling native agent for the platform
+
+install ANT
+
+compile the agent.dll using the build.xml
+
+locate the build.xml dir in command line
+
+eg.     ant clean
+
+Links:
+
+http://wiki.apache.org/ant/AntOnWindows
+
+http://code.google.com/p/winant/
+
+http://wiki.eclipse.org/FAQ_What_is_the_use_of_the_build.xml_file%3F
+
+http://www.coderanch.com/t/107220/tools/Run-build-xml
+
+http://www-stat.stanford.edu/~naras/java/course/lec5/lec5.html
+
